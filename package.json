@@ -1,0 +1,20 @@
+{
+  "name": "matlab-install-action",
+  "version": "0.0.1",
+  "description": "",
+  "main": "tsout/index.js",
+  "scripts": {
+    "build": "tsc",
+    "package": "ncc build --source-map",
+    "all": "npm run build && npm run package"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@actions/core": "^1.2.4"
+  },
+  "devDependencies": {
+    "@zeit/ncc": "^0.22.3"
+  }
+}

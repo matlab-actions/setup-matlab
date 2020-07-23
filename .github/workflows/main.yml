@@ -1,0 +1,18 @@
+on: [push]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - run: npm install
+      - run: npm run all
+
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Install MATLAB
+        uses: ./
+      - name: Run Sample MATLAB Command
+        run: matlab -batch 'disp("hello world")'
