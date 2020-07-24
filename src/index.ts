@@ -8,3 +8,5 @@ async function run(): Promise<void> {
         core.setFailed(e.message)
     }
 }
+
+run()
