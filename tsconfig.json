@@ -6,11 +6,9 @@
         "outDir": "tsout",
         "strict": true,
         "noImplicitAny": true,
+        "resolveJsonModule": true,
         "esModuleInterop": true
     },
 
-    "exclude": [
-        "node_modules",
-        "**/*.test.ts"
-    ]
+    "exclude": ["node_modules", "**/*.test.ts"]
 }

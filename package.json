@@ -1,20 +1,32 @@
 {
-  "name": "matlab-install-action",
-  "version": "0.0.1",
-  "description": "",
-  "main": "tsout/index.js",
-  "scripts": {
-    "build": "tsc",
-    "package": "ncc build --source-map",
-    "all": "npm run build && npm run package"
-  },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "dependencies": {
-    "@actions/core": "^1.2.4"
-  },
-  "devDependencies": {
-    "@zeit/ncc": "^0.22.3"
-  }
+    "name": "matlab-install-action",
+    "version": "0.0.1",
+    "description": "",
+    "main": "dist/index.js",
+    "scripts": {
+        "format": "prettier --write .",
+        "format-check": "prettier --check .",
+        "build": "tsc",
+        "package": "ncc build --source-map",
+        "test": "jest",
+        "all": "npm run build && npm run package"
+    },
+    "keywords": [],
+    "author": "",
+    "license": "ISC",
+    "dependencies": {
+        "@actions/core": "^1.2.4",
+        "@actions/exec": "^1.0.4",
+        "@actions/tool-cache": "^1.6.0"
+    },
+    "devDependencies": {
+        "@types/jest": "^26.0.7",
+        "@types/node": "^14.0.26",
+        "@zeit/ncc": "^0.22.3",
+        "jest": "^24.9.0",
+        "jest-circus": "^26.1.0",
+        "prettier": "2.0.5",
+        "ts-jest": "^26.1.4",
+        "typescript": "^3.9.7"
+    }
 }
