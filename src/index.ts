@@ -1,12 +1,12 @@
-import * as core from '@actions/core'
+import * as core from "@actions/core";
 
-async function run(): Promise<void> {
+export async function run(): Promise<void> {
     try {
-        console.log('Hello, world!')
-        throw new Error('Not yet implemented!')
+        console.log("Hello, world!");
+        throw new Error("Not yet implemented!");
     } catch (e) {
-        core.setFailed(e.message)
+        core.setFailed(e.message);
     }
 }
 
-run()
+run();
