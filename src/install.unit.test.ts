@@ -13,39 +13,17 @@ afterEach(() => {
 });
 
 describe("install procedure", () => {
-    let mockCoreGroup = core.group as jest.Mock;
-    let mockExecExec = exec.exec as jest.Mock;
+    const mockCoreGroup = core.group as jest.Mock;
+    const mockExecExec = exec.exec as jest.Mock;
+    const mockToolCacheDownloadTool = toolCache.downloadTool as jest.Mock;
 
-    let downloadInstallerSpy: jest.SpyInstance;
-    let generateInstallCommandSpy: jest.SpyInstance;
+    it("works", async () => {
+        const mockDownloadTool = (toolCache.downloadTool as jest.Mock).mockResolvedValue(
+            "fake script"
+        );
 
-    beforeEach(() => {
-        downloadInstallerSpy = jest.spyOn(install, "downloadInstaller");
-        generateInstallCommandSpy = jest.spyOn(install, "generateInstallCommand");
-    });
-
-    afterEach(() => {
-        downloadInstallerSpy.mockRestore();
-        generateInstallCommandSpy.mockRestore();
-    });
-
-    it("downloads yeah", async () => {
-        downloadInstallerSpy = downloadInstallerSpy.mockImplementation(() => {
-            console.log("oh");
-            return Promise.resolve("hey");
-        });
-        generateInstallCommandSpy.mockReturnValue("fake command");
-        const errorCode = 0;
-
-        mockCoreGroup.mockImplementation((_, fn) => {
-            fn();
-        });
-
-        mockExecExec.mockResolvedValue(errorCode);
-
-        return install.install().then(() => {
-            fail("should have failed");
-        });
+        await expect(install.install()).resolves.toBeUndefined();
+        expect(core.group).toHaveBeenCalled();
     });
 });
 
@@ -57,29 +35,16 @@ describe("installer download", () => {
 
         downloadToolMock.mockRejectedValue(expectedError);
 
-        return install
-            .install()
-            .then(() => {
-                fail("should have thrown an error");
-            })
-            .catch((e) => {
-                expect((e as Error).message).toContain(expectedError.message);
-                expect(downloadToolMock).toHaveBeenCalledTimes(1);
-            });
+        await expect(install.install()).rejects.toThrowError(RegExp(expectedError.message + "$"));
+        expect(downloadToolMock).toHaveBeenCalledTimes(1);
     });
 
     it("uses the link provided in properties.json", async () => {
-        downloadToolMock.mockRejectedValue(null);
+        downloadToolMock.mockResolvedValue("nice");
 
-        return install
-            .install()
-            .then(() => {
-                fail("invalid: mocked downloadTool should have failed");
-            })
-            .catch((e) => {
-                expect(downloadToolMock).toHaveBeenCalledTimes(1);
-                expect(downloadToolMock).toHaveBeenCalledWith(properties.ephemeralInstallerUrl);
-            });
+        await expect(install.install()).resolves.toBeUndefined;
+        expect(downloadToolMock).toHaveBeenCalledTimes(1);
+        expect(downloadToolMock).toHaveBeenCalledWith(properties.ephemeralInstallerUrl);
     });
 });
 
