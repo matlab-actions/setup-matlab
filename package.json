@@ -1,5 +1,5 @@
 {
-    "name": "matlab-install-action",
+    "name": "setup-matlab-action",
     "version": "0.0.1",
     "description": "",
     "main": "dist/index.js",
