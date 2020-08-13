@@ -58,7 +58,7 @@ describe("install procedure", () => {
 describe("installer download", () => {
     let downloadToolMock = toolCache.downloadTool as jest.Mock;
 
-    it("rejects when the download fails", async () => {
+    it("rejects when toolCache.downloadTool() fails", async () => {
         const expectedError = Error("failed to download");
 
         downloadToolMock.mockRejectedValue(expectedError);

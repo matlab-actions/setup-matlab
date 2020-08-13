@@ -1,12 +1,10 @@
 import * as core from "@actions/core";
+import * as install from "./install";
 
 export async function run(): Promise<void> {
-    try {
-        console.log("Hello, world!");
-        throw new Error("Not yet implemented!");
-    } catch (e) {
-        core.setFailed(e.message);
-    }
+    return install.install();
 }
 
-run();
+run().catch((e) => {
+    core.setFailed(e);
+});
