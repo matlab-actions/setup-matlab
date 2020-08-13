@@ -13,17 +13,45 @@ afterEach(() => {
 });
 
 describe("install procedure", () => {
-    const mockCoreGroup = core.group as jest.Mock;
-    const mockExecExec = exec.exec as jest.Mock;
-    const mockToolCacheDownloadTool = toolCache.downloadTool as jest.Mock;
+    beforeAll(() => {
+        // Mock core.group to simply resolve the function it gets from the
+        // caller
+        (core.group as jest.Mock).mockImplementation(async (_, func) => {
+            return func();
+        });
+    });
 
-    it("works", async () => {
-        const mockDownloadTool = (toolCache.downloadTool as jest.Mock).mockResolvedValue(
-            "fake script"
-        );
+    it("ideally works", async () => {
+        (toolCache.downloadTool as jest.Mock).mockResolvedValue("test script");
+        (exec.exec as jest.Mock).mockResolvedValue(0);
 
         await expect(install.install()).resolves.toBeUndefined();
+        expect(toolCache.downloadTool).toHaveBeenCalledTimes(1);
         expect(core.group).toHaveBeenCalled();
+    });
+
+    it("rejects when the download fails", async () => {
+        (toolCache.downloadTool as jest.Mock).mockRejectedValue(Error("failed for test"));
+
+        await expect(install.install()).rejects.toThrowError();
+        expect(core.group).not.toHaveBeenCalled();
+        expect(exec.exec).not.toHaveBeenCalled();
+    });
+
+    it("rejects when executing the command fails", async () => {
+        (toolCache.downloadTool as jest.Mock).mockResolvedValue("test script");
+        (exec.exec as jest.Mock).mockResolvedValue(1);
+
+        return install
+            .install()
+            .then(() => {
+                throw new Error("this should not have happened");
+            })
+            .catch((error) => {
+                expect(error).toBeDefined();
+                expect(toolCache.downloadTool).toHaveBeenCalledTimes(1);
+                expect(core.group).toHaveBeenCalled();
+            });
     });
 });
 
@@ -42,7 +70,7 @@ describe("installer download", () => {
     it("uses the link provided in properties.json", async () => {
         downloadToolMock.mockResolvedValue("nice");
 
-        await expect(install.install()).resolves.toBeUndefined;
+        await expect(install.install()).resolves.toBeUndefined();
         expect(downloadToolMock).toHaveBeenCalledTimes(1);
         expect(downloadToolMock).toHaveBeenCalledWith(properties.ephemeralInstallerUrl);
     });
