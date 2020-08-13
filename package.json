@@ -2,7 +2,7 @@
     "name": "setup-matlab-action",
     "version": "0.0.1",
     "description": "",
-    "main": "dist/index.js",
+    "main": "tsout/index.js",
     "scripts": {
         "format": "prettier --write .",
         "format-check": "prettier --check .",
