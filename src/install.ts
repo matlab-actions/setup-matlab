@@ -6,26 +6,28 @@ import * as toolCache from "@actions/tool-cache";
 import properties from "./properties.json";
 
 export async function install(): Promise<void> {
-    // Download the install script
-    let installScriptPath = await downloadInstaller();
+    // Install runtime system dependencies for MATLAB
+    await core.group("Preparing system for MATLAB", () =>
+        downloadAndRunScript(properties.matlabDepsUrl)
+    );
 
-    // Get the appropriate command to run for the platform
-    let cmd = generateInstallCommand(process.platform, installScriptPath);
+    // Invoke ephemeral installer to setup a MATLAB on the runner
+    await core.group("Setting up MATLAB", () =>
+        downloadAndRunScript(properties.ephemeralInstallerUrl)
+    );
 
-    // Run the command
-    return core.group("Setting up MATLAB", async () => {
-        let exitCode = await exec.exec(cmd);
-
-        if (exitCode !== 0) {
-            return Promise.reject(Error(`MATLAB setup failed with exit code ${exitCode}`));
-        }
-    });
+    return;
 }
 
-export async function downloadInstaller(): Promise<string> {
-    return toolCache.downloadTool(properties.ephemeralInstallerUrl).catch((e) => {
-        return Promise.reject(Error(`Failed to download install script: ${e.message}`));
-    });
+export async function downloadAndRunScript(url: string): Promise<void> {
+    const scriptPath = await toolCache.downloadTool(url);
+    const cmd = generateInstallCommand(process.platform, scriptPath);
+
+    const exitCode = await exec.exec(cmd);
+
+    if (exitCode !== 0) {
+        return Promise.reject(Error(`Script exited with non-zero code ${exitCode}`));
+    }
 }
 
 export function generateInstallCommand(platform: string, scriptPath: string): string {
