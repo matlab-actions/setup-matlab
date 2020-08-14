@@ -1,3 +1,5 @@
+// Copyright 2020 The MathWorks, Inc.
+
 import * as install from "./install";
 import * as core from "@actions/core";
 import * as exec from "@actions/exec";
@@ -14,8 +16,8 @@ afterEach(() => {
 
 describe("install procedure", () => {
     beforeAll(() => {
-        // Mock core.group to simply resolve the function it gets from the
-        // caller
+        // Mock core.group to simply return the output of the func it gets from
+        // the caller
         (core.group as jest.Mock).mockImplementation(async (_, func) => {
             return func();
         });
@@ -38,7 +40,7 @@ describe("install procedure", () => {
         expect(exec.exec).not.toHaveBeenCalled();
     });
 
-    it("rejects when executing the command fails", async () => {
+    it("rejects when executing the command returns with a non-zero code", async () => {
         (toolCache.downloadTool as jest.Mock).mockResolvedValue("test script");
         (exec.exec as jest.Mock).mockResolvedValue(1);
 

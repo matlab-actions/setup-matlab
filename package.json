@@ -11,9 +11,7 @@
         "test": "jest",
         "all": "npm run build && npm run package"
     },
-    "keywords": [],
-    "author": "",
-    "license": "ISC",
+    "author": "The MathWorks, Inc.",
     "dependencies": {
         "@actions/core": "^1.2.4",
         "@actions/exec": "^1.0.4",

@@ -1,3 +1,5 @@
+# Copyright 2020 The MathWorks, Inc.
+
 name: Install MATLAB
 description: Install MATLAB
 runs:

@@ -1,3 +1,5 @@
+// Copyright 2020 The MathWorks, Inc.
+
 import * as core from "@actions/core";
 import * as exec from "@actions/exec";
 import * as toolCache from "@actions/tool-cache";
