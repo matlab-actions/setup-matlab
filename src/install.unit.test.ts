@@ -57,24 +57,32 @@ describe("install procedure", () => {
     });
 });
 
-describe("installer download", () => {
-    let downloadToolMock = toolCache.downloadTool as jest.Mock;
+describe("script downloader/runner", () => {
+    const downloadToolMock = toolCache.downloadTool as jest.Mock;
+    const execMock = exec.exec as jest.Mock;
+
+    const sampleUrl = "https://www.mathworks.com/";
+    const samplePlatform = "linux";
+
+    //TODO: test the sucessful case
 
     it("rejects when toolCache.downloadTool() fails", async () => {
-        const expectedError = Error("failed to download");
+        downloadToolMock.mockRejectedValue(new Error("failed"));
 
-        downloadToolMock.mockRejectedValue(expectedError);
-
-        await expect(install.install()).rejects.toThrowError(RegExp(expectedError.message + "$"));
+        await expect(install.downloadAndRunScript(sampleUrl, samplePlatform)).rejects.toBeDefined();
         expect(downloadToolMock).toHaveBeenCalledTimes(1);
+        expect(execMock).not.toHaveBeenCalled();
     });
 
-    it("uses the link provided in properties.json", async () => {
+    it("rejects when the downloaded script exits with non-zero code", async () => {
         downloadToolMock.mockResolvedValue("nice");
+        execMock.mockRejectedValue(new Error("oof"));
 
-        await expect(install.install()).resolves.toBeUndefined();
+        await expect(
+            install.downloadAndRunScript(samplePlatform, samplePlatform)
+        ).rejects.toBeDefined();
         expect(downloadToolMock).toHaveBeenCalledTimes(1);
-        expect(downloadToolMock).toHaveBeenCalledWith(properties.ephemeralInstallerUrl);
+        expect(execMock).toHaveBeenCalledTimes(1);
     });
 });
 

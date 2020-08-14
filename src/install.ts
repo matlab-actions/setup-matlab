@@ -6,22 +6,24 @@ import * as toolCache from "@actions/tool-cache";
 import properties from "./properties.json";
 
 export async function install(): Promise<void> {
+    const platform = process.platform;
+
     // Install runtime system dependencies for MATLAB
     await core.group("Preparing system for MATLAB", () =>
-        downloadAndRunScript(properties.matlabDepsUrl)
+        downloadAndRunScript(properties.matlabDepsUrl, platform)
     );
 
     // Invoke ephemeral installer to setup a MATLAB on the runner
     await core.group("Setting up MATLAB", () =>
-        downloadAndRunScript(properties.ephemeralInstallerUrl)
+        downloadAndRunScript(properties.ephemeralInstallerUrl, platform)
     );
 
     return;
 }
 
-export async function downloadAndRunScript(url: string): Promise<void> {
+export async function downloadAndRunScript(url: string, platform: string): Promise<void> {
     const scriptPath = await toolCache.downloadTool(url);
-    const cmd = generateInstallCommand(process.platform, scriptPath);
+    const cmd = generateInstallCommand(platform, scriptPath);
 
     const exitCode = await exec.exec(cmd);
 
