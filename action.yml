@@ -1,7 +1,7 @@
 # Copyright 2020 The MathWorks, Inc.
 
-name: Install MATLAB
-description: Install MATLAB
+name: Setup MATLAB
+description: Sets up an instance of MATLAB on the runner
 runs:
   using: node12
   main: dist/index.js
