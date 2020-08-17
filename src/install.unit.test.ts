@@ -21,15 +21,20 @@ describe("install procedure", () => {
         (core.group as jest.Mock).mockImplementation(async (_, func) => {
             return func();
         });
+
+        // Make sure that no actual exec is happening by mocking out exec.exec
     });
 
     it("ideally works", async () => {
-        (toolCache.downloadTool as jest.Mock).mockResolvedValue("test script");
+        const downloadTool = toolCache.downloadTool as jest.Mock;
+        downloadTool.mockResolvedValue("script");
+
         (exec.exec as jest.Mock).mockResolvedValue(0);
 
         await expect(install.install()).resolves.toBeUndefined();
-        expect(toolCache.downloadTool).toHaveBeenCalledTimes(1);
-        expect(core.group).toHaveBeenCalled();
+        expect(downloadTool).toHaveBeenCalledTimes(2);
+        expect(downloadTool).toHaveBeenNthCalledWith(1, properties.matlabDepsUrl);
+        expect(downloadTool).toHaveBeenNthCalledWith(2, properties.ephemeralInstallerUrl);
     });
 
     it("rejects when the download fails", async () => {
@@ -54,54 +59,5 @@ describe("install procedure", () => {
                 expect(toolCache.downloadTool).toHaveBeenCalledTimes(1);
                 expect(core.group).toHaveBeenCalled();
             });
-    });
-});
-
-describe("script downloader/runner", () => {
-    const downloadToolMock = toolCache.downloadTool as jest.Mock;
-    const execMock = exec.exec as jest.Mock;
-
-    const sampleUrl = "https://www.mathworks.com/";
-    const samplePlatform = "linux";
-
-    //TODO: test the sucessful case
-
-    it("rejects when toolCache.downloadTool() fails", async () => {
-        downloadToolMock.mockRejectedValue(new Error("failed"));
-
-        await expect(install.downloadAndRunScript(sampleUrl, samplePlatform)).rejects.toBeDefined();
-        expect(downloadToolMock).toHaveBeenCalledTimes(1);
-        expect(execMock).not.toHaveBeenCalled();
-    });
-
-    it("rejects when the downloaded script exits with non-zero code", async () => {
-        downloadToolMock.mockResolvedValue("nice");
-        execMock.mockRejectedValue(new Error("oof"));
-
-        await expect(
-            install.downloadAndRunScript(samplePlatform, samplePlatform)
-        ).rejects.toBeDefined();
-        expect(downloadToolMock).toHaveBeenCalledTimes(1);
-        expect(execMock).toHaveBeenCalledTimes(1);
-    });
-});
-
-describe("install command generator", () => {
-    const scriptPath = "hello.sh";
-
-    beforeAll(() => {
-        jest.restoreAllMocks();
-    });
-
-    it("does not change the command on Windows", () => {
-        const cmd = install.generateInstallCommand("win32", scriptPath);
-        expect(cmd).toEqual(`bash ${scriptPath}`);
-    });
-
-    ["darwin", "linux"].forEach((platform) => {
-        it(`calls the command with sudo on ${platform}`, () => {
-            const cmd = install.generateInstallCommand(platform, scriptPath);
-            expect(cmd).toEqual(`sudo -E bash ${scriptPath}`);
-        });
     });
 });
