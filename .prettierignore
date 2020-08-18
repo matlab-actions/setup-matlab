@@ -6,3 +6,9 @@ node_modules
 
 ## Don't include intermediate TypeScript compilation
 tsout
+
+## Ignore code coverage
+coverage
+
+## Editor related
+.vscode
