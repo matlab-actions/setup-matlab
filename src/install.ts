@@ -4,7 +4,7 @@ import * as core from "@actions/core";
 import * as script from "./script";
 import properties from "./properties.json";
 
-export async function install(): Promise<void> {
+export async function install() {
     const platform = process.platform;
 
     // Install runtime system dependencies for MATLAB
