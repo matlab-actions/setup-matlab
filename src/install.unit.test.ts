@@ -1,14 +1,12 @@
 // Copyright 2020 The MathWorks, Inc.
 
 import * as install from "./install";
+import * as script from "./script";
 import * as core from "@actions/core";
-import * as exec from "@actions/exec";
-import * as toolCache from "@actions/tool-cache";
 import properties from "./properties.json";
 
 jest.mock("@actions/core");
-jest.mock("@actions/exec");
-jest.mock("@actions/tool-cache");
+jest.mock("./script");
 
 afterEach(() => {
     jest.resetAllMocks();
@@ -21,22 +19,17 @@ describe("install procedure", () => {
         (core.group as jest.Mock).mockImplementation(async (_, func) => {
             return func();
         });
-
-        // Make sure that no actual exec is happening by mocking out exec.exec
     });
 
     it("ideally works", async () => {
-        const downloadTool = toolCache.downloadTool as jest.Mock;
-        downloadTool.mockResolvedValue("script");
-
-        (exec.exec as jest.Mock).mockResolvedValue(0);
+        const downloadAndRunScriptMock = script.downloadAndRunScript as jest.Mock;
+        downloadAndRunScriptMock.mockResolvedValue(undefined);
 
         await expect(install.install()).resolves.toBeUndefined();
-        expect(downloadTool).toHaveBeenCalledTimes(2);
-        expect(downloadTool).toHaveBeenNthCalledWith(1, properties.matlabDepsUrl);
-        expect(downloadTool).toHaveBeenNthCalledWith(2, properties.ephemeralInstallerUrl);
+        expect(downloadAndRunScriptMock).toHaveBeenCalledTimes(2);
     });
 
+    //TODO: work on the rest of these tests
     it("rejects when the download fails", async () => {
         (toolCache.downloadTool as jest.Mock).mockRejectedValue(Error("failed for test"));
 
