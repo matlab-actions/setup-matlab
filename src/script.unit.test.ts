@@ -17,8 +17,16 @@ describe("script downloader/runner", () => {
 
     const sampleUrl = "https://www.mathworks.com/";
     const samplePlatform = "linux";
+    const doDownloadAndRunScript = () => script.downloadAndRunScript(samplePlatform, sampleUrl);
 
-    //TODO: test the sucessful case
+    it("ideally works", async () => {
+        downloadToolMock.mockResolvedValue("nice");
+        execMock.mockResolvedValue(0);
+
+        await expect(doDownloadAndRunScript()).resolves.not.toThrow();
+        expect(downloadToolMock).toHaveBeenCalledTimes(1);
+        expect(execMock).toHaveBeenCalledTimes(1);
+    });
 
     it("rejects when toolCache.downloadTool() fails", async () => {
         downloadToolMock.mockRejectedValue(new Error("failed"));
@@ -28,9 +36,18 @@ describe("script downloader/runner", () => {
         expect(execMock).not.toHaveBeenCalled();
     });
 
-    it("rejects when the downloaded script exits with non-zero code", async () => {
+    it("rejects when the downloaded script fails", async () => {
         downloadToolMock.mockResolvedValue("nice");
         execMock.mockRejectedValue(new Error("oof"));
+
+        await expect(script.downloadAndRunScript(samplePlatform, sampleUrl)).rejects.toBeDefined();
+        expect(downloadToolMock).toHaveBeenCalledTimes(1);
+        expect(execMock).toHaveBeenCalledTimes(1);
+    });
+
+    it("rejects when the downloaded script exits with non-zero code", async () => {
+        downloadToolMock.mockResolvedValue("nice");
+        execMock.mockResolvedValue(1);
 
         await expect(script.downloadAndRunScript(samplePlatform, sampleUrl)).rejects.toBeDefined();
         expect(downloadToolMock).toHaveBeenCalledTimes(1);
