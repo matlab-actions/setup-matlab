@@ -22,7 +22,7 @@ describe("script downloader/runner", () => {
     it("rejects when toolCache.downloadTool() fails", async () => {
         downloadToolMock.mockRejectedValue(new Error("failed"));
 
-        await expect(script.downloadAndRunScript(sampleUrl, samplePlatform)).rejects.toBeDefined();
+        await expect(script.downloadAndRunScript(samplePlatform, sampleUrl)).rejects.toBeDefined();
         expect(downloadToolMock).toHaveBeenCalledTimes(1);
         expect(execMock).not.toHaveBeenCalled();
     });
@@ -31,9 +31,7 @@ describe("script downloader/runner", () => {
         downloadToolMock.mockResolvedValue("nice");
         execMock.mockRejectedValue(new Error("oof"));
 
-        await expect(
-            script.downloadAndRunScript(samplePlatform, samplePlatform)
-        ).rejects.toBeDefined();
+        await expect(script.downloadAndRunScript(samplePlatform, sampleUrl)).rejects.toBeDefined();
         expect(downloadToolMock).toHaveBeenCalledTimes(1);
         expect(execMock).toHaveBeenCalledTimes(1);
     });

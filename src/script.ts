@@ -3,7 +3,7 @@
 import * as exec from "@actions/exec";
 import * as toolCache from "@actions/tool-cache";
 
-export async function downloadAndRunScript(url: string, platform: string, args?: string[]) {
+export async function downloadAndRunScript(platform: string, url: string, args?: string[]) {
     const scriptPath = await toolCache.downloadTool(url);
     const cmd = generateExecCommand(platform, scriptPath);
 

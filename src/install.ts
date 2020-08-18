@@ -9,12 +9,12 @@ export async function install() {
 
     // Install runtime system dependencies for MATLAB
     await core.group("Preparing system for MATLAB", () =>
-        script.downloadAndRunScript(properties.matlabDepsUrl, platform)
+        script.downloadAndRunScript(platform, properties.matlabDepsUrl)
     );
 
     // Invoke ephemeral installer to setup a MATLAB on the runner
     await core.group("Setting up MATLAB", () =>
-        script.downloadAndRunScript(properties.ephemeralInstallerUrl, platform)
+        script.downloadAndRunScript(platform, properties.ephemeralInstallerUrl)
     );
 
     return;
