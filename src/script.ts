@@ -3,11 +3,11 @@
 import * as exec from "@actions/exec";
 import * as toolCache from "@actions/tool-cache";
 
-export async function downloadAndRunScript(url: string, platform: string): Promise<void> {
+export async function downloadAndRunScript(url: string, platform: string, args?: string[]) {
     const scriptPath = await toolCache.downloadTool(url);
     const cmd = generateExecCommand(platform, scriptPath);
 
-    const exitCode = await exec.exec(cmd);
+    const exitCode = await exec.exec(cmd, args);
 
     if (exitCode !== 0) {
         return Promise.reject(Error(`Script exited with non-zero code ${exitCode}`));
