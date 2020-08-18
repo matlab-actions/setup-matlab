@@ -13,7 +13,11 @@ afterEach(() => {
 });
 
 describe("install procedure", () => {
-    beforeAll(() => {
+    let downloadAndRunScriptMock: jest.Mock<any, any>;
+
+    beforeEach(() => {
+        downloadAndRunScriptMock = script.downloadAndRunScript as jest.Mock;
+
         // Mock core.group to simply return the output of the func it gets from
         // the caller
         (core.group as jest.Mock).mockImplementation(async (_, func) => {
@@ -22,35 +26,27 @@ describe("install procedure", () => {
     });
 
     it("ideally works", async () => {
-        const downloadAndRunScriptMock = script.downloadAndRunScript as jest.Mock;
         downloadAndRunScriptMock.mockResolvedValue(undefined);
 
         await expect(install.install()).resolves.toBeUndefined();
         expect(downloadAndRunScriptMock).toHaveBeenCalledTimes(2);
     });
 
-    //TODO: work on the rest of these tests
     it("rejects when the download fails", async () => {
-        (toolCache.downloadTool as jest.Mock).mockRejectedValue(Error("failed for test"));
+        downloadAndRunScriptMock.mockRejectedValueOnce(Error("oof"));
 
-        await expect(install.install()).rejects.toThrowError();
-        expect(core.group).not.toHaveBeenCalled();
-        expect(exec.exec).not.toHaveBeenCalled();
+        await expect(install.install()).rejects.toBeDefined();
+        expect(downloadAndRunScriptMock).toHaveBeenCalledTimes(1);
+        expect(core.group).toHaveBeenCalledTimes(1);
     });
 
     it("rejects when executing the command returns with a non-zero code", async () => {
-        (toolCache.downloadTool as jest.Mock).mockResolvedValue("test script");
-        (exec.exec as jest.Mock).mockResolvedValue(1);
+        downloadAndRunScriptMock
+            .mockResolvedValueOnce(undefined)
+            .mockRejectedValueOnce(Error("oof"));
 
-        return install
-            .install()
-            .then(() => {
-                throw new Error("this should not have happened");
-            })
-            .catch((error) => {
-                expect(error).toBeDefined();
-                expect(toolCache.downloadTool).toHaveBeenCalledTimes(1);
-                expect(core.group).toHaveBeenCalled();
-            });
+        await expect(install.install()).rejects.toBeDefined();
+        expect(downloadAndRunScriptMock).toHaveBeenCalledTimes(2);
+        expect(core.group).toHaveBeenCalledTimes(2);
     });
 });
