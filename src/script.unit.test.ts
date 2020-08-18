@@ -1,6 +1,7 @@
+// Copyright 2020 The MathWorks, Inc.
+
 import * as exec from "@actions/exec";
 import * as toolCache from "@actions/tool-cache";
-
 import * as script from "./script";
 
 jest.mock("@actions/exec");

@@ -1,8 +1,8 @@
 // Copyright 2020 The MathWorks, Inc.
 
+import * as core from "@actions/core";
 import * as install from "./install";
 import * as script from "./script";
-import * as core from "@actions/core";
 
 jest.mock("@actions/core");
 jest.mock("./script");

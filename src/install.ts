@@ -1,8 +1,8 @@
 // Copyright 2020 The MathWorks, Inc.
 
 import * as core from "@actions/core";
-import * as script from "./script";
 import properties from "./properties.json";
+import * as script from "./script";
 
 export async function install(platform: string, release: string) {
     // Install runtime system dependencies for MATLAB
