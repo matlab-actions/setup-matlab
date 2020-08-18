@@ -2,6 +2,14 @@
 
 name: Setup MATLAB
 description: Sets up an instance of MATLAB on the runner
+inputs:
+  release:
+    description: >-
+      MATLAB release to install.
+      You can specify R2020a or a later release.
+      By default, the task installs the latest release of MATLAB.
+    required: true
+    default: latest
 runs:
   using: node12
   main: dist/index.js
