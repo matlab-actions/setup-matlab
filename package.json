@@ -7,7 +7,7 @@
         "format": "prettier --write .",
         "format-check": "prettier --check .",
         "build": "tsc",
-        "package": "ncc build --source-map",
+        "package": "ncc build --minify",
         "test": "jest",
         "all": "npm run build && npm run package"
     },
