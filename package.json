@@ -1,8 +1,9 @@
 {
     "name": "setup-matlab-action",
+    "author": "The MathWorks, Inc.",
     "version": "0.0.1",
     "description": "",
-    "main": "tsout/index.js",
+    "main": "lib/index.js",
     "scripts": {
         "format": "prettier --write .",
         "format-check": "prettier --check .",
@@ -11,7 +12,9 @@
         "test": "jest",
         "all": "npm run build && npm run package"
     },
-    "author": "The MathWorks, Inc.",
+    "files": [
+        "lib/"
+    ],
     "dependencies": {
         "@actions/core": "^1.2.4",
         "@actions/exec": "^1.0.4",

@@ -1,8 +1,12 @@
 ## For development environment
 .vscode
 
-## Don't include intermediate TypeScript compilation
-tsout
+# Don't include intermediate TypeScript compilation;
+# it should be forcibly added on release
+lib
+
+# Leave out dist; it should be forcibly added on release
+dist
 
 ## https://raw.githubusercontent.com/github/gitignore/master/Node.gitignore
 # Logs
