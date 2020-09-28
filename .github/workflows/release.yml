@@ -1,0 +1,60 @@
+name: Build and Release
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    outputs:
+        tag: ${{ steps.release_info.outputs.tag }}
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+      - uses: actions/setup-node@v1
+        with:
+          node-version: '12'
+      - name: Perform npm tasks
+        run: npm ci && npm run build && npm run package
+
+      - name: Set release vars
+        id: release_helpers
+        run: |
+          echo "::set-output name=commit::$(git rev-parse --short HEAD)"
+          echo "::set-output name=package_version::$(node -e "console.log(require('./package.json').version);")"
+
+      - name: Commit to release branch
+        id: release_info
+        run: |
+          git config user.name 'Build Action'
+          git config user.email '<>'
+
+          TAG="v${{ steps.release_helpers.outputs.package_version }}"
+          BRANCH="release/$TAG"
+          git switch -c $BRANCH
+          git add --force dist lib
+
+          MESSAGE="Build for ${{ steps.release_helpers.outputs.commit }}"
+          git commit --allow-empty -m "$MESSAGE"
+          git tag -a -m "Release $TAG" $TAG
+          git push origin $TAG
+
+          echo "::set-output name=tag::$TAG"
+
+  release:
+    name: Release
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - name: Create Release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ needs.build.outputs.tag }}
+          release_name: Release ${{ needs.build.outputs.tag }}
+          draft: false
+          prerelease: false
