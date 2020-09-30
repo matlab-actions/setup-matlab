@@ -1,7 +1,10 @@
 # Copyright 2020 The MathWorks, Inc.
 
 name: Setup MATLAB
-description: Sets up an instance of MATLAB on the runner
+description: >-
+  Install MATLAB on a Linux-based GitHub-hosted agent. Currently, this task
+  is available only for public projects and does not include transformation
+  products, such as MATLAB Coder and MATLAB Compiler.
 inputs:
   release:
     description: >-
