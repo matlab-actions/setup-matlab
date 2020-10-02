@@ -1,0 +1,36 @@
+
+{
+    "name": "setup-matlab-action",
+    "author": "The MathWorks, Inc.",
+    "version": "0.0.1",
+    "description": "",
+    "main": "lib/index.js",
+    "scripts": {
+        "clean": "rm -rf dist lib",
+        "format": "prettier --write .",
+        "format-check": "prettier --check .",
+        "build": "tsc",
+        "package": "ncc build --minify",
+        "test": "jest",
+        "all": "npm test && npm run build && npm run package",
+        "ci": "npm run clean && npm ci && npm run all"
+    },
+    "files": [
+        "lib/"
+    ],
+    "dependencies": {
+        "@actions/core": "^1.2.6",
+        "@actions/exec": "^1.0.4",
+        "@actions/tool-cache": "^1.6.0"
+    },
+    "devDependencies": {
+        "@types/jest": "^26.0.14",
+        "@types/node": "^14.11.2",
+        "@zeit/ncc": "^0.22.3",
+        "jest": "^26.4.2",
+        "jest-circus": "^26.4.2",
+        "prettier": "2.0.5",
+        "ts-jest": "^26.4.1",
+        "typescript": "^3.9.7"
+    }
+}

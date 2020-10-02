@@ -1,0 +1,20 @@
+name: Build and Test
+on: [push]
+
+jobs:
+  bat:
+    name: Build and Test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v1
+        with:
+          node-version: '12'
+      - name: Perform npm tasks
+        run: npm run ci
+      - name: Perform 'setup-matlab-action'
+        uses: ./
+        env:
+          MATHWORKS_TOKEN: ${{ secrets.MATHWORKS_TOKEN }}
+      - name: Run Sample MATLAB Command
+        run: matlab -batch "disp('hello world')"

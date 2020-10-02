@@ -1,0 +1,16 @@
+{
+    "compilerOptions": {
+        "target": "ES6",
+        "module": "CommonJS",
+        "declaration": true,
+        "sourceMap": true,
+        "rootDir": "src",
+        "outDir": "lib",
+        "strict": true,
+        "noImplicitAny": true,
+        "resolveJsonModule": true,
+        "esModuleInterop": true
+    },
+
+    "exclude": ["node_modules", "lib", "**/*.test.ts"]
+}
