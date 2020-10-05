@@ -1,6 +1,6 @@
 # Copyright 2020 The MathWorks, Inc.
 
-name: Setup MATLAB
+name: Set up MATLAB
 description: >-
   Install MATLAB on a Linux-based GitHub-hosted agent. Currently, this action is
   available only for public projects and does not include transformation
