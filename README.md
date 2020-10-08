@@ -1,22 +1,22 @@
-# Use MATLAB on a GitHub-Hosted Runner
+# Set up MATLAB® on a GitHub-Hosted Runner
 
-This action enables you to run MATLAB®/Simulink® scripts, functions, and
-statements as part of your build workflow on a GitHub-hosted runner.
+Use the Set Up MATLAB action when you want to run MATLAB code and Simulink®
+models in public projects that utilize GitHub-hosted runners. The action
+installs the specified MATLAB release on a Linux virtual machine. If you do not
+specify a release, the action installs the latest release of MATLAB. You can
+then use the runner to execute MATLAB scripts, functions, or statements. You
+also can use the runner to execute MATLAB and Simulink tests and generate test
+artifacts.
 
-Note: For self hosted runners, please install MATLAB/Simulink (see the
-[documentation](https://www.mathworks.com/help/install/install-products.html)
-for more information). Calling this action on a self-hosted runner is not
-currently supported.
-
----
-
-Use this action when you want to run MATLAB code in public projects that utilize
-GitHub-hosted runners. The action installs the latest MATLAB release on a Linux
-virtual machine and enables the runner to run MATLAB scripts, functions,
-statements, and tests.
+This action is not supported on self-hosted runners. If you want to run your
+workflow on a self-hosted runner, make sure that MATLAB and the required
+products are installed on the runner. For more information, see
+https://www.mathworks.com/help/install/install-products.html.
 
 Currently, this action is available only for public projects and does not
 include transformation products, such as MATLAB Coder™ and MATLAB Compiler™.
+
+## Usage
 
 You can use this action `with`:
 | Argument  | Description |
@@ -38,12 +38,12 @@ jobs:
       - name: Run MATLAB from the system shell
         run: matlab -batch "disp('hello world')"
 ```
-> **Note:** You can use this action in conjunction with the following actions to
-> make launching MATLAB eaiser:
-> - [Run MATLAB Command](https://github.com/mathworks/run-matlab-command-action/) 
-> - [Run MATLAB Tests](https://github.com/mathworks/run-matlab-tests-action/)
+
+You can use this action with the [Run MATLAB Command](https://github.com/mathworks/run-matlab-command-action/) and [Run MATLAB Tests](https://github.com/mathworks/run-matlab-tests-action/) actions to easily run MATLAB and Simulink as part of your build pipeline.
 
 ## See also
+- [Run MATLAB Command](https://github.com/mathworks/run-matlab-command-action/)
+- [Run MATLAB Tests](https://github.com/mathworks/run-matlab-tests-action/)
 - [Continuous Integration - MATLAB & Simulink](https://www.mathworks.com/solutions/continuous-integration.html)
 
 ## Contact Us
