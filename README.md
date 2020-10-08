@@ -44,7 +44,7 @@ jobs:
 > - [Run MATLAB Tests](https://github.com/mathworks/run-matlab-tests-action/)
 
 ## See also
-- [Continuous Integration (CI) - MATLAB & Simulink](https://www.mathworks.com/help/matlab/continuous-integration.html)
+- [Continuous Integration - MATLAB & Simulink](https://www.mathworks.com/solutions/continuous-integration.html)
 
 ## Contact Us
 If you have any questions or suggestions, please contact MathWorks® at continuous-integration@mathworks.com.
