@@ -16,7 +16,7 @@ https://www.mathworks.com/help/install/install-products.html.
 Currently, this action is available only for public projects and does not
 include transformation products, such as MATLAB Coder™ and MATLAB Compiler™.
 
-**Note**: By running the code in the submission, you will be executing third party
+**Note**: By running the code in this action, you will be executing third party
 code that is licensed under separate terms.
 
 ## Usage
