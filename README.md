@@ -37,16 +37,16 @@ jobs:
     name: Say hello from MATLAB
     runs-on: ubuntu-latest
     steps:
-      - uses: mathworks/setup-matlab-action@v0
+      - uses: matlab-actions/setup-matlab@v0
       - name: Run MATLAB from the system shell
         run: matlab -batch "disp('hello world')"
 ```
 
-You can use this action with the [Run MATLAB Command](https://github.com/mathworks/run-matlab-command-action/) and [Run MATLAB Tests](https://github.com/mathworks/run-matlab-tests-action/) actions to easily run MATLAB and Simulink as part of your build pipeline.
+You can use this action with the [Run MATLAB Command](https://github.com/matlab-actions/run-command/) and [Run MATLAB Tests](https://github.com/matlab-actions/run-tests/) actions to easily run MATLAB and Simulink as part of your build pipeline.
 
 ## See also
-- [Run MATLAB Command](https://github.com/mathworks/run-matlab-command-action/)
-- [Run MATLAB Tests](https://github.com/mathworks/run-matlab-tests-action/)
+- [Run MATLAB Command](https://github.com/matlab-actions/run-command/)
+- [Run MATLAB Tests](https://github.com/matlab-actions/run-tests/)
 - [Continuous Integration - MATLAB & Simulink](https://www.mathworks.com/solutions/continuous-integration.html)
 
 ## Contact Us

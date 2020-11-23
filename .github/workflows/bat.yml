@@ -12,7 +12,7 @@ jobs:
           node-version: '12'
       - name: Perform npm tasks
         run: npm run ci
-      - name: Perform 'setup-matlab-action'
+      - name: Perform 'setup-matlab'
         uses: ./
         env:
           MATHWORKS_TOKEN: ${{ secrets.MATHWORKS_TOKEN }}
