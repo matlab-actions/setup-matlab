@@ -31,7 +31,7 @@ jobs:
         include:
           - os: ubuntu-latest
             release: latest
-            command: matlab -batch "assert(~isempty(regexp(version('-release'), '\d{4}.')))"
+            command: assert(~isempty(regexp(version('-release'), '\d{4}.')))
           - os: ubuntu-18.04
             release: R2020a
             command: assert(strcmp(version('-release'),'2020a'))
