@@ -15,23 +15,32 @@ jobs:
           node-version: "12"
       - name: Perform npm tasks
         run: npm run ci
+      - uses: actions/upload-artifact@v2
+        with:
+          name: built-action
+          path: |
+            **/*
+            !node_modules/
 
-  integ-latest:
-    name: Test latest MATLAB
-    runs-on: ubuntu-latest
+  integ:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: true
+      matrix:
+        include:
+          - os: ubuntu-latest
+            release: latest
+            command: matlab -batch "assert(~isempty(regexp(version('-release'), '\d{4}.')))"
+          - os: ubuntu-18.04
+            release: R2020a
+            command: assert(strcmp(version('-release'),'2020a'))
     steps:
-      - name: Perform 'setup-matlab'
-        uses: ./
-      - name: Run Sample MATLAB Command
-        run: matlab -batch "assert(~isempty(regexp(version('-release'), '\d{4}.')))"
-
-  integ-release:
-    name: Test MATLAB R2020a
-    runs-on: ubuntu-18.04
-    steps:
+      - uses: actions/download-artifact@v2
+        with:
+          name: built-action
       - name: Perform 'setup-matlab'
         uses: ./
         with:
-          release: R2020a
+          release: ${{ matrix.release }}
       - name: Run Sample MATLAB Command
-        run: matlab -batch "assert(strcmp(version('-release'),'2020a'))"
+        run: matlab -batch "${{ matrix.command }}"
