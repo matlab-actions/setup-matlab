@@ -23,6 +23,7 @@ jobs:
             !node_modules/
 
   integ:
+    needs: bat
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: true
