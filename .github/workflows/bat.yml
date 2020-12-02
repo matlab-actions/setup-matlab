@@ -1,6 +1,9 @@
 name: Build and Test
 on: [push]
 
+env:
+  MATHWORKS_TOKEN: ${{ secrets.MATHWORKS_TOKEN }}
+
 jobs:
   bat:
     name: Build and Test
@@ -12,9 +15,23 @@ jobs:
           node-version: "12"
       - name: Perform npm tasks
         run: npm run ci
+
+  integ-latest:
+    name: Test latest MATLAB
+    runs-on: ubuntu-latest
+    steps:
       - name: Perform 'setup-matlab'
         uses: ./
-        env:
-          MATHWORKS_TOKEN: ${{ secrets.MATHWORKS_TOKEN }}
       - name: Run Sample MATLAB Command
-        run: matlab -batch "disp('hello world')"
+        run: matlab -batch "assert(~isempty(regexp(version('-release'), '\d{4}.')))"
+
+  integ-release:
+    name: Test MATLAB R2020a
+    runs-on: ubuntu-18.04
+    steps:
+      - name: Perform 'setup-matlab'
+        uses: ./
+        with:
+          release: R2020a
+      - name: Run Sample MATLAB Command
+        run: matlab -batch "assert(strcmp(version('-release'),'2020a'))"
