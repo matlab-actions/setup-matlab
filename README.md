@@ -1,32 +1,31 @@
-# Set up MATLAB® on a GitHub-Hosted Runner
+# Action for Installing MATLAB on GitHub-Hosted Runner
 
-Use the Set Up MATLAB action when you want to run MATLAB code and Simulink®
-models in public projects that utilize GitHub-hosted runners. The action
-installs the specified MATLAB release on a Linux virtual machine. If you do not
-specify a release, the action installs the latest release of MATLAB. You can
-then use the runner to execute MATLAB scripts, functions, or statements. You
-also can use the runner to execute MATLAB and Simulink tests and generate test
-artifacts.
+Use the [Set Up MATLAB](#set-up-matlab) GitHub&reg; action when you want to run MATLAB&reg; code and Simulink&reg; models on a [GitHub-hosted](https://docs.github.com/en/free-pro-team@latest/actions/reference/specifications-for-github-hosted-runners) runner. The action installs the specified MATLAB release on a Linux virtual machine. If you do not specify a release, the action installs the latest release of MATLAB. 
 
-This action is not supported on self-hosted runners. If you want to run your
-workflow on a self-hosted runner, make sure that MATLAB and the required
-products are installed on the runner. For more information, see
-https://www.mathworks.com/help/install/install-products.html.
+The **Set Up MATLAB** action is not supported on [self-hosted](https://docs.github.com/en/free-pro-team@latest/actions/hosting-your-own-runners/about-self-hosted-runners) runners. Currently, it is available only for public projects and does not include transformation products, such as MATLAB Coder&trade; and MATLAB Compiler&trade;.
 
-Currently, this action is available only for public projects and does not
-include transformation products, such as MATLAB Coder™ and MATLAB Compiler™.
+## Usage Examples
+Once you install MATLAB on a GitHub-hosted runner, you can use the runner to execute MATLAB scripts, functions, or statements. You also can use the runner to execute MATLAB and Simulink tests and generate test artifacts. To execute code on the runner, include the [Run MATLAB Command](https://github.com/matlab-actions/run-command/) or [Run MATLAB Tests](https://github.com/matlab-actions/run-tests/) actions in your workflow.
 
-**Note**: By running the code in this action, you will be executing third-party
-code that is licensed under separate terms.
+### Run MATLAB Script on GitHub-Hosted Runner
+Set up a GitHub-hosted runner to run the commands in a file named `myscript.m` in the root of your repository. To run the script, include the [Run MATLAB Command](https://github.com/matlab-actions/run-command/) action in your workflow.
 
-## Usage
+```yaml
+name: Use MATLAB in Workflow 
+on: [push]
+jobs:
+  my-job:
+    name: Run MATLAB Commands
+    runs-on: ubuntu-latest
+    steps:
+      - name: Run commands in myscript.m
+        uses: matlab-actions/run-command@v0
+        with:
+            command: 'myscript'
+```
 
-You can use this action `with`:
-| Argument  | Description |
-|-----------|-------------|
-| `release` | (Optional) MATLAB release to install. You can specify R2020a or a later release. By default, the action installs the latest release of MATLAB. <br/> **Example**: `R2020a` <br/> **Default**: `latest`
-
-## Example
+### Run MATLAB Tests on GitHub-Hosted Runner
+Set up a GitHub-hosted runner to automatically run the tests in your [MATLAB project](https://www.mathworks.com/help/matlab/projects.html) and generate a JUnit test results report and a Cobertura code coverage report. To run the tests and generate the artifacts, include the [Run MATLAB Tests](https://github.com/matlab-actions/run-tests/) action in your workflow.
 
 ```yaml
 name: Sample workflow
@@ -34,20 +33,37 @@ on: [push]
 
 jobs:
   my-job:
-    name: Say hello from MATLAB
+    name: Run MATLAB Tests and Save Results
     runs-on: ubuntu-latest
     steps:
+      # Checkout the project from GitHub
+      - uses: actions/checkout@v2
+
+      # Set up MATLAB using this action first if running on a GitHub-hosted runner!
       - uses: matlab-actions/setup-matlab@v0
-      - name: Run MATLAB from the system shell
-        run: matlab -batch "disp('hello world')"
+      
+      # Run the MATLAB tests inside the repo and produce test artifacts
+      - name: Run all the tests
+        uses: matlab-actions/run-tests@v0
+        with:
+            test-results-junit: test-results/results.xml
+            code-coverage-cobertura: code-coverage/coverage.xml
 ```
 
-You can use this action with the [Run MATLAB Command](https://github.com/matlab-actions/run-command/) and [Run MATLAB Tests](https://github.com/matlab-actions/run-tests/) actions to easily run MATLAB and Simulink as part of your build pipeline.
+## Set Up MATLAB
+When you define your workflow in the `.github/workflows` directory of your repositoy, you can specify the **Set Up MATLAB** action using the `setup-matlab` key. The action accepts an optional input.
+
+| Input     | Description |
+|-----------|-------------|
+| `release` | (Optional) MATLAB release to install. You can specify R2020a or a later release. If you do not specify release, the action installs the latest release of MATLAB.<br/>**Example**: `R2020a`
+
+## Notes
+By running the **Set Up MATLAB** action, you will be executing third-party code that is licensed under separate terms.
 
 ## See also
-- [Run MATLAB Command](https://github.com/matlab-actions/run-command/)
-- [Run MATLAB Tests](https://github.com/matlab-actions/run-tests/)
-- [Continuous Integration - MATLAB & Simulink](https://www.mathworks.com/solutions/continuous-integration.html)
+- [Action for Running MATLAB Commands](https://github.com/matlab-actions/run-command/)
+- [Action for Running MATLAB Tests](https://github.com/matlab-actions/run-tests/)
+- [Continuous Integration with MATLAB and Simulink](https://www.mathworks.com/solutions/continuous-integration.html)
 
 ## Contact Us
-If you have any questions or suggestions, please contact MathWorks® at continuous-integration@mathworks.com.
+If you have any questions or suggestions, please contact MathWorks&reg; at [continuous-integration@mathworks.com](mailto:continuous-integration@mathworks.com).
