@@ -1,6 +1,9 @@
 name: Build and Test
 on: [push]
 
+env:
+  MATHWORKS_TOKEN: ${{ secrets.MATHWORKS_TOKEN }}
+
 jobs:
   bat:
     name: Build and Test
@@ -12,9 +15,33 @@ jobs:
           node-version: "12"
       - name: Perform npm tasks
         run: npm run ci
+      - uses: actions/upload-artifact@v2
+        with:
+          name: built-action
+          path: |
+            **/*
+            !node_modules/
+
+  integ:
+    needs: bat
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: true
+      matrix:
+        include:
+          - os: ubuntu-latest
+            release: latest
+            command: assert(~isempty(regexp(version('-release'), '\d{4}.')))
+          - os: ubuntu-18.04
+            release: R2020a
+            command: assert(strcmp(version('-release'),'2020a'))
+    steps:
+      - uses: actions/download-artifact@v2
+        with:
+          name: built-action
       - name: Perform 'setup-matlab'
         uses: ./
-        env:
-          MATHWORKS_TOKEN: ${{ secrets.MATHWORKS_TOKEN }}
+        with:
+          release: ${{ matrix.release }}
       - name: Run Sample MATLAB Command
-        run: matlab -batch "disp('hello world')"
+        run: matlab -batch "${{ matrix.command }}"
