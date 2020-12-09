@@ -11,43 +11,43 @@ Once you install MATLAB on a GitHub-hosted runner, you can use the runner to exe
 Set up a GitHub-hosted runner to run the commands in a file named `myscript.m` in the root of your repository. To run the script, include the [Run MATLAB Command](https://github.com/matlab-actions/run-command/) action in your workflow.
 
 ```yaml
-name: Use MATLAB in Workflow 
+name: Run MATLAB Script on GitHub-Hosted Runner
 on: [push]
 jobs:
   my-job:
-    name: Run MATLAB Commands
+    name: Run MATLAB Script
     runs-on: ubuntu-latest
     steps:
-      - name: Run commands in myscript.m
+      - name: Check out repository
+        uses: actions/checkout@v2
+      - name: Install MATLAB
+        uses: matlab-actions/setup-matlab@v0
+      - name: Run script
         uses: matlab-actions/run-command@v0
         with:
-            command: 'myscript'
+          command: 'myscript'
 ```
 
 ### Run MATLAB Tests on GitHub-Hosted Runner
 Set up a GitHub-hosted runner to automatically run the tests in your [MATLAB project](https://www.mathworks.com/help/matlab/projects.html) and generate a JUnit test results report and a Cobertura code coverage report. To run the tests and generate the artifacts, include the [Run MATLAB Tests](https://github.com/matlab-actions/run-tests/) action in your workflow.
 
 ```yaml
-name: Sample workflow
+name: Run MATLAB Tests on GitHub-Hosted Runner
 on: [push]
-
 jobs:
   my-job:
-    name: Run MATLAB Tests and Save Results
+    name: Run MATLAB Tests and Generate Artifacts
     runs-on: ubuntu-latest
     steps:
-      # Checkout the project from GitHub
-      - uses: actions/checkout@v2
-
-      # Set up MATLAB using this action first if running on a GitHub-hosted runner!
-      - uses: matlab-actions/setup-matlab@v0
-      
-      # Run the MATLAB tests inside the repo and produce test artifacts
-      - name: Run all the tests
+      - name: Check out repository
+        uses: actions/checkout@v2
+      - name: Install MATLAB
+        uses: matlab-actions/setup-matlab@v0
+      - name: Run tests and generate artifacts
         uses: matlab-actions/run-tests@v0
         with:
-            test-results-junit: test-results/results.xml
-            code-coverage-cobertura: code-coverage/coverage.xml
+          test-results-junit: test-results/results.xml
+          code-coverage-cobertura: code-coverage/coverage.xml
 ```
 
 ## Set Up MATLAB
