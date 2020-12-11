@@ -51,7 +51,7 @@ jobs:
 ```
 
 ## Set Up MATLAB
-When you define your workflow in the `.github/workflows` directory of your repositoy, you can specify the **Set Up MATLAB** action using the `setup-matlab` key. The action accepts an optional input.
+When you define your workflow in the `.github/workflows` directory of your repository, you can specify the **Set Up MATLAB** action as `matlab-actions/setup-matlab@v0`. The action accepts an optional input.
 
 | Input     | Description |
 |-----------|-------------|
