@@ -25,7 +25,7 @@ jobs:
       - name: Run script
         uses: matlab-actions/run-command@v0
         with:
-          command: 'myscript'
+          command: myscript
 ```
 
 ### Run MATLAB Tests on GitHub-Hosted Runner
