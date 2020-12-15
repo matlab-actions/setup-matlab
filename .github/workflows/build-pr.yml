@@ -1,0 +1,42 @@
+name: Build Pull Request
+on:
+  pull_request:
+
+jobs:
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    outputs:
+        tag: ${{ steps.release_info.outputs.tag }}
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+      - uses: actions/setup-node@v1
+        with:
+          node-version: '12'
+      - name: Perform npm tasks
+        run: npm run ci
+
+      - name: Set release vars
+        id: release_helpers
+        run: |
+          PR=$(jq --raw-output .pull_request.number "$GITHUB_EVENT_PATH")
+          echo "::set-output name=commit::$(git rev-parse --short HEAD)"
+          echo "::set-output name=tag_name::PR#$PR"
+
+      - name: Commit to release branch
+        id: release_info
+        run: |
+          git config user.name 'Build Action'
+          git config user.email '<>'
+
+          TAG=${{ steps.release_helpers.outputs.tag_name }}
+          BRANCH=$TAG-temp
+          git switch -c $BRANCH
+          git add --force dist lib
+
+          MESSAGE="Build for ${{ steps.release_helpers.outputs.commit }}"
+          git commit --allow-empty -m "$MESSAGE"
+          git tag -f -a -m "Build for $TAG" $TAG
+          git push origin $TAG
