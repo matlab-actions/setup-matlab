@@ -1,9 +1,6 @@
 name: Build and Test
 on: [push]
 
-env:
-  MATHWORKS_TOKEN: ${{ secrets.MATHWORKS_TOKEN }}
-
 jobs:
   bat:
     name: Build and Test
