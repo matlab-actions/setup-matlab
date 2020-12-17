@@ -60,7 +60,7 @@ When you define your workflow in the `.github/workflows` directory of your repos
 ## Notes
 By running the **Set Up MATLAB** action, you will be executing third-party code that is licensed under separate terms.
 
-## See also
+## See Also
 - [Action for Running MATLAB Commands](https://github.com/matlab-actions/run-command/)
 - [Action for Running MATLAB Tests](https://github.com/matlab-actions/run-tests/)
 - [Continuous Integration with MATLAB and Simulink](https://www.mathworks.com/solutions/continuous-integration.html)
