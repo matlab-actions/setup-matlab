@@ -1,43 +1,54 @@
 name: Build and Release
+
 on:
-  push:
-    branches:
-      - main
+  workflow_dispatch:
+    inputs:
+      npm-version-arg:
+        description: Argument to npm-version
+        default: minor
+        required: true
 
 jobs:
   build:
     name: Build
     runs-on: ubuntu-latest
     outputs:
-        tag: ${{ steps.release_info.outputs.tag }}
+      tag: ${{ steps.release_info.outputs.tag }}
     steps:
       - uses: actions/checkout@v2
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Configure git
+        run: |
+          git config user.name 'Release Action'
+          git config user.email '<>'
+
       - uses: actions/setup-node@v1
         with:
-          node-version: '12'
+          node-version: "12"
+
+      - name: Update package version
+        id: update-package-version
+        run: |
+          VERSION=$(npm version "${{ github.event.inputs.npm-version-arg }}")
+          echo "::set-output name=version::$VERSION"
+
+      - name: Push new version
+        run: git push
+
       - name: Perform npm tasks
         run: npm run ci
-
-      - name: Set release vars
-        id: release_helpers
-        run: |
-          echo "::set-output name=commit::$(git rev-parse --short HEAD)"
-          echo "::set-output name=package_version::$(node -e "console.log(require('./package.json').version);")"
 
       - name: Commit to release branch
         id: release_info
         run: |
-          git config user.name 'Build Action'
-          git config user.email '<>'
-
-          TAG="v${{ steps.release_helpers.outputs.package_version }}"
+          TAG="v${{ steps.update-package-version.outputs.version }}"
           BRANCH="release/$TAG"
           git switch -c $BRANCH
           git add --force dist lib
 
-          MESSAGE="Build for ${{ steps.release_helpers.outputs.commit }}"
+          MESSAGE="Build for $(git rev-parse --short HEAD)"
           git commit --allow-empty -m "$MESSAGE"
           git tag -a -m "Release $TAG" $TAG
           git push origin $TAG
