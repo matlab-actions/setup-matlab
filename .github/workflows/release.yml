@@ -1,48 +1,70 @@
-name: Build and Release
+name: Perform a Release
+
 on:
-  push:
-    branches:
-      - main
+  workflow_dispatch:
+    inputs:
+      npm-version-arg:
+        description: Argument to npm-version
+        default: minor
+        required: true
 
 jobs:
   build:
     name: Build
     runs-on: ubuntu-latest
     outputs:
-        tag: ${{ steps.release_info.outputs.tag }}
+      tag: ${{ steps.update-package-version.outputs.version }}
     steps:
+      # Configure runner with the right stuff
       - uses: actions/checkout@v2
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
+      - name: Configure git
+        run: |
+          git config user.name 'Release Action'
+          git config user.email '<>'
       - uses: actions/setup-node@v1
         with:
-          node-version: '12'
+          node-version: "12"
+
+      # Call `npm version`. It increments the version and commits the changes.
+      # We'll save the output (new version string) for use in the following
+      # steps
+      - name: Update package version
+        id: update-package-version
+        run: |
+          VERSION=$(npm version "${{ github.event.inputs.npm-version-arg }}")
+          echo "::set-output name=version::$VERSION"
+
+      # Update the branch with the new commit
+      - name: Push new version
+        run: git push
+
+      # Now carry on, business as usual
       - name: Perform npm tasks
         run: npm run ci
 
-      - name: Set release vars
-        id: release_helpers
-        run: |
-          echo "::set-output name=commit::$(git rev-parse --short HEAD)"
-          echo "::set-output name=package_version::$(node -e "console.log(require('./package.json').version);")"
-
+      # Finally, create a detached commit containing the built artifacts and tag
+      # it with the release. Note: the fact that the branch is locally updated
+      # will not be relayed (pushed) to origin
       - name: Commit to release branch
         id: release_info
         run: |
-          git config user.name 'Build Action'
-          git config user.email '<>'
+          # Retrieve the previously created tag
+          TAG="${{ steps.update-package-version.outputs.version }}"
 
-          TAG="v${{ steps.release_helpers.outputs.package_version }}"
-          BRANCH="release/$TAG"
-          git switch -c $BRANCH
+          # Add the built artifacts. Using --force because dist/lib should be in
+          # .gitignore
           git add --force dist lib
 
-          MESSAGE="Build for ${{ steps.release_helpers.outputs.commit }}"
+          # Make the commit
+          MESSAGE="Build for $(git rev-parse --short HEAD)"
           git commit --allow-empty -m "$MESSAGE"
-          git tag -a -m "Release $TAG" $TAG
-          git push origin $TAG
 
-          echo "::set-output name=tag::$TAG"
+          # Create an annotated tag and push it to origin. Using -f to overwrite
+          # the tag that `npm version` made for us in a previous step
+          git tag -f -a -m "Release $TAG" $TAG
+          git push origin $TAG
 
   release:
     name: Release
@@ -56,5 +78,5 @@ jobs:
         with:
           tag_name: ${{ needs.build.outputs.tag }}
           release_name: Release ${{ needs.build.outputs.tag }}
-          draft: false
+          draft: true
           prerelease: false
