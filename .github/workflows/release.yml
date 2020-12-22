@@ -61,8 +61,9 @@ jobs:
           MESSAGE="Build for $(git rev-parse --short HEAD)"
           git commit --allow-empty -m "$MESSAGE"
 
-          # Create an annotated tag and push it to origin
-          git tag -a -m "Release $TAG" $TAG
+          # Create an annotated tag and push it to origin. Using -f to overwrite
+          # the tag that `npm version` made for us in a previous step
+          git tag -f -a -m "Release $TAG" $TAG
           git push origin $TAG
 
   release:
