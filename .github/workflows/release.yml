@@ -77,5 +77,5 @@ jobs:
         with:
           tag_name: ${{ needs.build.outputs.tag }}
           release_name: Release ${{ needs.build.outputs.tag }}
-          draft: false
+          draft: true
           prerelease: false
