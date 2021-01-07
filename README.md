@@ -1,6 +1,6 @@
 # Action for Installing MATLAB on GitHub-Hosted Runner
 
-Use the [Set Up MATLAB](#set-up-matlab) GitHub&reg; action when you want to run MATLAB&reg; code and Simulink&reg; models on a [GitHub-hosted](https://docs.github.com/en/free-pro-team@latest/actions/reference/specifications-for-github-hosted-runners) runner. The action installs the specified MATLAB release on a Linux virtual machine. If you do not specify a release, the action installs the latest release of MATLAB. 
+Use the [Set Up MATLAB](#set-up-matlab) GitHub&reg; action when you want to run MATLAB&reg; code and Simulink&reg; models on a [GitHub-hosted](https://docs.github.com/en/free-pro-team@latest/actions/reference/specifications-for-github-hosted-runners) runner. The action installs the specified MATLAB release on a Linux&reg; virtual machine. If you do not specify a release, the action installs the latest release of MATLAB. 
 
 The **Set Up MATLAB** action is not supported on [self-hosted](https://docs.github.com/en/free-pro-team@latest/actions/hosting-your-own-runners/about-self-hosted-runners) runners. Currently, it is available only for public projects and does not include transformation products, such as MATLAB Coder&trade; and MATLAB Compiler&trade;.
 
