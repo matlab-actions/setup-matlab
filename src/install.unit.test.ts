@@ -34,7 +34,7 @@ describe("install procedure", () => {
         downloadAndRunScriptMock.mockResolvedValue(undefined);
 
         await expect(doInstall()).resolves.toBeUndefined();
-        expect(downloadAndRunScriptMock).toHaveBeenCalledTimes(2);
+        expect(downloadAndRunScriptMock).toHaveBeenCalledTimes(3);
     });
 
     it("rejects when the download fails", async () => {
