@@ -3,6 +3,8 @@ on: [push]
 
 env:
   MATHWORKS_SKIP_ACTIVATION: true
+  MATHWORKS_ACCOUNT: ${{ secrets.MATHWORKS_ACCOUNT }}
+  MATHWORKS_TOKEN: ${{ secrets.MATHWORKS_TOKEN }}
 
 jobs:
   bat:
