@@ -1,6 +1,9 @@
 name: Build and Test
 on: [push]
 
+env:
+  MATHWORKS_SKIP_ACTIVATION: true
+
 jobs:
   bat:
     name: Build and Test
@@ -23,7 +26,7 @@ jobs:
     needs: bat
     runs-on: ${{ matrix.os }}
     strategy:
-      fail-fast: true
+      fail-fast: false
       matrix:
         include:
           - os: ubuntu-latest
@@ -41,4 +44,4 @@ jobs:
         with:
           release: ${{ matrix.release }}
       - name: Run Sample MATLAB Command
-        run: matlab -batch "${{ matrix.command }}"
+        run: matlab-batch -r "${{ matrix.command }}"
