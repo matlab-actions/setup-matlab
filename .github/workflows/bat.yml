@@ -1,6 +1,11 @@
 name: Build and Test
 on: [push]
 
+env:
+  MATHWORKS_SKIP_ACTIVATION: true
+  MATHWORKS_ACCOUNT: ${{ secrets.MATHWORKS_ACCOUNT }}
+  MATHWORKS_TOKEN: ${{ secrets.MATHWORKS_TOKEN }}
+
 jobs:
   bat:
     name: Build and Test
@@ -23,15 +28,16 @@ jobs:
     needs: bat
     runs-on: ${{ matrix.os }}
     strategy:
-      fail-fast: true
+      fail-fast: false
       matrix:
         include:
           - os: ubuntu-latest
             release: latest
             command: assert(~isempty(regexp(version('-release'), '\d{4}.')))
-          - os: ubuntu-18.04
-            release: R2020a
-            command: assert(strcmp(version('-release'),'2020a'))
+        # Excluding the R2020a job as the pilot currently only supports R2020b
+          # - os: ubuntu-18.04
+          #   release: R2020a
+          #   command: assert(strcmp(version('-release'),'2020a'))
     steps:
       - uses: actions/download-artifact@v2
         with:
@@ -41,4 +47,4 @@ jobs:
         with:
           release: ${{ matrix.release }}
       - name: Run Sample MATLAB Command
-        run: matlab -batch "${{ matrix.command }}"
+        run: matlab-batch -r "${{ matrix.command }}"
