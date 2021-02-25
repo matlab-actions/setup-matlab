@@ -34,9 +34,10 @@ jobs:
           - os: ubuntu-latest
             release: latest
             command: assert(~isempty(regexp(version('-release'), '\d{4}.')))
-          - os: ubuntu-18.04
-            release: R2020a
-            command: assert(strcmp(version('-release'),'2020a'))
+        # Excluding the R2020a job as the pilot currently only supports R2020b
+          # - os: ubuntu-18.04
+          #   release: R2020a
+          #   command: assert(strcmp(version('-release'),'2020a'))
     steps:
       - uses: actions/download-artifact@v2
         with:
