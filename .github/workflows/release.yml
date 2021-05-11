@@ -34,7 +34,8 @@ jobs:
         id: update-package-version
         run: |
           VERSION=$(npm version "${{ github.event.inputs.npm-version-arg }}")
-          echo "::set-output name=version::$VERSION"
+          PILOT_VERSION="$VERSION-pilot"
+          echo "::set-output name=version::$PILOT_VERSION"
 
       # Update the branch with the new commit
       - name: Push new version
