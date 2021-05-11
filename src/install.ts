@@ -22,12 +22,14 @@ export async function install(platform: string, release: string) {
     );
 
     // Invoke ephemeral installer to setup a MATLAB on the runner
-    await core.group("Setting up MATLAB", () =>
-        script.downloadAndRunScript(platform, properties.ephemeralInstallerUrl, [
+    await core.group("Setting up MATLAB", async () => {
+        await script.downloadAndRunScript(platform, properties.ephemeralInstallerUrl, [
             "--release",
             release,
-        ])
-    );
+        ]);
+
+        await script.downloadAndRunScript(platform, properties.matlabBatchInstallerUrl, []);
+    });
 
     return;
 }
