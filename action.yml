@@ -2,9 +2,7 @@
 
 name: Set up MATLAB
 description: >-
-  Install MATLAB on a Linux-based GitHub-hosted agent. Currently, this action is
-  available only for public projects and does not include transformation
-  products, such as MATLAB Coder and MATLAB Compiler.
+  Setup MATLAB on a Linux-based GitHub-hosted agent
 inputs:
   release:
     description: >-
