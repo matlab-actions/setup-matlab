@@ -6,9 +6,7 @@ description: >-
 inputs:
   release:
     description: >-
-      MATLAB release to install.
-      You can specify R2020a or a later release.
-      By default, the action installs the latest release of MATLAB.
+      MATLAB release to set up (R2020a or later)
     required: true
     default: latest
 runs:
