@@ -1,16 +1,12 @@
 # Copyright 2020 The MathWorks, Inc.
 
-name: Set up MATLAB
+name: Setup MATLAB
 description: >-
-  Install MATLAB on a Linux-based GitHub-hosted agent. Currently, this action is
-  available only for public projects and does not include transformation
-  products, such as MATLAB Coder and MATLAB Compiler.
+  Set up MATLAB on a Linux-based GitHub-hosted runner
 inputs:
   release:
     description: >-
-      MATLAB release to install.
-      You can specify R2020a or a later release.
-      By default, the action installs the latest release of MATLAB.
+      MATLAB release to set up (R2020a or later)
     required: true
     default: latest
 runs:
