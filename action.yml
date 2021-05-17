@@ -2,7 +2,7 @@
 
 name: Setup MATLAB
 description: >-
-  Set up MATLAB on a Linux-based GitHub-hosted agent
+  Set up MATLAB on a Linux-based GitHub-hosted runner
 inputs:
   release:
     description: >-
