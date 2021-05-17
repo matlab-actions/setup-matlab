@@ -1,8 +1,8 @@
 # Copyright 2020 The MathWorks, Inc.
 
-name: Set up MATLAB
+name: Setup MATLAB
 description: >-
-  Setup MATLAB on a Linux-based GitHub-hosted agent
+  Set up MATLAB on a Linux-based GitHub-hosted agent
 inputs:
   release:
     description: >-
