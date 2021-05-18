@@ -21,9 +21,9 @@ jobs:
       - name: Check out repository
         uses: actions/checkout@v2
       - name: Install MATLAB
-        uses: matlab-actions/setup-matlab@v0
+        uses: matlab-actions/setup-matlab@v1
       - name: Run script
-        uses: matlab-actions/run-command@v0
+        uses: matlab-actions/run-command@v1
         with:
           command: myscript
 ```
@@ -42,16 +42,16 @@ jobs:
       - name: Check out repository
         uses: actions/checkout@v2
       - name: Install MATLAB
-        uses: matlab-actions/setup-matlab@v0
+        uses: matlab-actions/setup-matlab@v1
       - name: Run tests and generate artifacts
-        uses: matlab-actions/run-tests@v0
+        uses: matlab-actions/run-tests@v1
         with:
           test-results-junit: test-results/results.xml
           code-coverage-cobertura: code-coverage/coverage.xml
 ```
 
 ## Set Up MATLAB
-When you define your workflow in the `.github/workflows` directory of your repository, specify the **Set Up MATLAB** action as `matlab-actions/setup-matlab@v0`. The action accepts an optional input.
+When you define your workflow in the `.github/workflows` directory of your repository, specify the **Set Up MATLAB** action as `matlab-actions/setup-matlab@v1`. The action accepts an optional input.
 
 | Input     | Description |
 |-----------|-------------|
