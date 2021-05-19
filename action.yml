@@ -7,7 +7,7 @@ inputs:
   release:
     description: >-
       MATLAB release to set up (R2020a or later)
-    required: true
+    required: false
     default: latest
 runs:
   using: node12
