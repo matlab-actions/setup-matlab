@@ -38,6 +38,7 @@ export async function install(platform: string, release: string) {
         if (exitCode !== 0) {
             return Promise.reject(Error(`MPM exited with non-zero code ${exitCode}`));
         }
+        core.addPath("/opt/matlab/" + release + "/bin");
         
         await script.downloadAndRunScript(platform, properties.matlabBatchInstallerUrl, []);
     });
