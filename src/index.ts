@@ -10,7 +10,7 @@ export async function run() {
     const platform = process.platform;
     const release = core.getInput("release");
 
-    return install.install(platform, release);
+    return install.install(platform, release,["MATLAB", "Parallel_Computing_Toolbox", "MATLAB_Compiler", "MATLAB_Compiler_SDK"]);
 }
 
 run().catch((e) => {
