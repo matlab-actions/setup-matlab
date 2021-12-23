@@ -27,7 +27,8 @@ export async function install(platform: string, release: string, products: strin
 
 
     const matlabLocation = "/opt/matlab/";
-    const key = platform + release + (products.sort().join("-"));
+    const productHash = products.sort().join("-"); // TODO: Make a real hash
+    const key = [platform, release, productHash].join("-");
     
     let cacheKey;
  
