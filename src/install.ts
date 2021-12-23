@@ -51,10 +51,11 @@ export async function install(platform: string, release: string, products: strin
             if (exitCode !== 0) {
                 return Promise.reject(Error(`MPM exited with non-zero code ${exitCode}`));
             }
-            core.addPath("/opt/matlab/" + release + "/bin");
+            
 
         });
 
+        core.addPath("/opt/matlab/" + release + "/bin");
         await script.downloadAndRunScript(platform, properties.matlabBatchInstallerUrl, []);
 
         await core.group("Saving MATLAB to cache", async () => {
