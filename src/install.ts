@@ -5,6 +5,7 @@ import properties from "./properties.json";
 import * as script from "./script";
 import * as exec from "@actions/exec";
 import * as toolCache from "@actions/tool-cache";
+import * as cache from "@actions/cache";
 
 export default install;
 
@@ -24,29 +25,46 @@ export async function install(platform: string, release: string, products: strin
         script.downloadAndRunScript(platform, properties.matlabDepsUrl, [release])
     );
 
-    // Invoke mpm installer to setup a MATLAB on the runner
-    await core.group("Setting up MATLAB using MPM", async () => {
-        const scriptPath = await toolCache.downloadTool(properties.mpmUrl);
-        await exec.exec(`chmod +x ${scriptPath}`);
 
-        const exitCode = await exec.exec(scriptPath, [
-            "install",
-            "--release=" + release,
-            "--destination=/opt/matlab/" + release,
-            "--products", products.join(" ")
-        ]);
-
-        if (exitCode !== 0) {
-            return Promise.reject(Error(`MPM exited with non-zero code ${exitCode}`));
-        }
-        core.addPath("/opt/matlab/" + release + "/bin");
-        
-        await script.downloadAndRunScript(platform, properties.matlabBatchInstallerUrl, []);
+    const matlabLocation = "/opt/matlab/";
+    const key = platform + release + products.join("-");
+    let cacheKey
+ 
+    await core.group("Retrieving MATLAB from cache if avaialble", async () => {
+        cacheKey = await cache.restoreCache([matlabLocation], key);
     });
+
+    if (cacheKey === undefined) {
+
+        // Invoke mpm installer to setup a MATLAB on the runner
+        await core.group("Setting up MATLAB using MPM", async () => {
+            const scriptPath = await toolCache.downloadTool(properties.mpmUrl);
+            await exec.exec(`chmod +x ${scriptPath}`);
+
+            const exitCode = await exec.exec(scriptPath, [
+                "install",
+                "--release=" + release,
+                "--destination=" + matlabLocation + release,
+                "--products", products.join(" ")
+            ]);
+
+            if (exitCode !== 0) {
+                return Promise.reject(Error(`MPM exited with non-zero code ${exitCode}`));
+            }
+            core.addPath("/opt/matlab/" + release + "/bin");
+
+            await script.downloadAndRunScript(platform, properties.matlabBatchInstallerUrl, []);
+
+        });
+
+        await cache.saveCache([matlabLocation], key);
+
+    }
 
     return;
 }
 
 async function retrieveFromCache(platform:string, release: string, products: string[] ) {
+   
 
 }
