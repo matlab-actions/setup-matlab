@@ -16,8 +16,9 @@ export default install;
  *
  * @param platform Operating system of the runner (e.g., "win32" or "linux").
  * @param release Release of MATLAB to be set up (e.g., "latest" or "R2020a").
+ * @param products Array of products to install (e.g. [MATLAB Simulink Simulink_Test])
  */
-export async function install(platform: string, release: string) {
+export async function install(platform: string, release: string, products: string[]) {
     // Install runtime system dependencies for MATLAB
     await core.group("Preparing system for MATLAB", () =>
         script.downloadAndRunScript(platform, properties.matlabDepsUrl, [release])
@@ -32,7 +33,7 @@ export async function install(platform: string, release: string) {
             "install",
             "--release=" + release,
             "--destination=/opt/matlab/" + release,
-            "--products", "MATLAB", "Parallel_Computing_Toolbox", "MATLAB_Compiler", "MATLAB_Compiler_SDK"
+            "--products", products.join(" ")
         ]);
 
         if (exitCode !== 0) {
@@ -44,4 +45,8 @@ export async function install(platform: string, release: string) {
     });
 
     return;
+}
+
+async function retrieveFromCache(platform:string, release: string, products: string[] ) {
+
 }

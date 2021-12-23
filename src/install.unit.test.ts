@@ -22,7 +22,7 @@ describe("install procedure", () => {
 
     const execMock = exec.exec as jest.Mock;
 
-    const doInstall = () => install.install(platform, release);
+    const doInstall = () => install.install(platform, release, ["FakeProduct1", "FakeProduct2"]);
 
     beforeEach(() => {
         downloadAndRunScriptMock = script.downloadAndRunScript as jest.Mock;
