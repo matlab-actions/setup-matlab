@@ -22,7 +22,7 @@ export async function install(platform: string, release: string) {
     );
 
     // Invoke ephemeral installer to setup a MATLAB on the runner
-    await core.group("Setting up MATLAB", async () => {
+    await core.group("Setting up MATLAB using MPM", async () => {
         await script.downloadAndRunScript(platform, properties.ephemeralInstallerUrl, [
             "--release",
             release,
