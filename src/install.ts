@@ -27,7 +27,8 @@ export async function install(platform: string, release: string, products: strin
 
 
     const matlabLocation = "/opt/matlab/";
-    const key = platform + release + products.join("-");
+    const key = platform + release + products.sort().join("-");
+    console.log("Caching with key: " + key);
     let cacheKey;
  
     await core.group("Retrieving MATLAB from cache if available", async () => {
