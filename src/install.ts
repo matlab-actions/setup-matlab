@@ -32,7 +32,7 @@ export async function install(platform: string, release: string) {
             "install",
             "--release=" + release,
             "--destination=/opt/matlab/" + release,
-            "--products", "MATLAB", "Parallel_Computing_Toolbox", "Compiler", "Compiler_SDK"
+            "--products", "MATLAB", "Parallel_Computing_Toolbox", "MATLAB_Compiler", "MATLAB_Compiler_SDK"
         ]);
 
         if (exitCode !== 0) {
