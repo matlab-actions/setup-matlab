@@ -55,6 +55,10 @@ export async function install(platform: string, release: string, products: strin
 
         });
 
+        await core.group("Saving MATLAB to cache", async () => {
+            await cache.saveCache([matlabLocation], key);
+        });
+
     }
 
     await core.group("Adding MATLAB to path", async () => {
@@ -64,9 +68,7 @@ export async function install(platform: string, release: string, products: strin
         await script.downloadAndRunScript(platform, properties.matlabBatchInstallerUrl, []);
     });
 
-    await core.group("Saving MATLAB to cache", async () => {
-        await cache.saveCache([matlabLocation], key);
-    });
+
 
     return;
 }
