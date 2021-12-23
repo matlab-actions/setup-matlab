@@ -3,6 +3,8 @@
 import * as core from "@actions/core";
 import properties from "./properties.json";
 import * as script from "./script";
+import * as exec from "@actions/exec";
+import * as toolCache from "@actions/tool-cache";
 
 export default install;
 
@@ -21,13 +23,22 @@ export async function install(platform: string, release: string) {
         script.downloadAndRunScript(platform, properties.matlabDepsUrl, [release])
     );
 
-    // Invoke ephemeral installer to setup a MATLAB on the runner
+    // Invoke mpm installer to setup a MATLAB on the runner
     await core.group("Setting up MATLAB using MPM", async () => {
-        await script.downloadAndRunScript(platform, properties.ephemeralInstallerUrl, [
-            "--release",
-            release,
+        const scriptPath = await toolCache.downloadTool(properties.mpmUrl);
+        await exec.exec(`chmod +x ${scriptPath}`);
+
+        const exitCode = await exec.exec(scriptPath, [
+            "install",
+            "--release=" + release,
+            "--destination=/opt/matlab/" + release,
+            "--products", "MATLAB", "Parallel_Computing_Toolbox", "Compiler", "Compiler_SDK"
         ]);
 
+        if (exitCode !== 0) {
+            return Promise.reject(Error(`MPM exited with non-zero code ${exitCode}`));
+        }
+        
         await script.downloadAndRunScript(platform, properties.matlabBatchInstallerUrl, []);
     });
 
