@@ -28,7 +28,7 @@ export async function install(platform: string, release: string, products: strin
 
     const matlabLocation = "/opt/matlab/";
     const key = platform + release + products.join("-");
-    let cacheKey
+    let cacheKey;
  
     await core.group("Retrieving MATLAB from cache if available", async () => {
         cacheKey = await cache.restoreCache([matlabLocation], key);
@@ -57,15 +57,16 @@ export async function install(platform: string, release: string, products: strin
 
     }
 
-    core.addPath("/opt/matlab/" + release + "/bin");
-    await script.downloadAndRunScript(platform, properties.matlabBatchInstallerUrl, []);
+    await core.group("Adding MATLAB to path", async () => {
+        core.addPath(matlabLocation + release + "/bin");
+    });
+    await core.group("Fetching matlab-batch", async () => {
+        await script.downloadAndRunScript(platform, properties.matlabBatchInstallerUrl, []);
+    });
 
     await core.group("Saving MATLAB to cache", async () => {
         await cache.saveCache([matlabLocation], key);
     });
-
-
-    
 
     return;
 }
