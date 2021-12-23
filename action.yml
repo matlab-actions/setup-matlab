@@ -8,7 +8,7 @@ inputs:
     description: >-
       MATLAB release to set up (R2020a or later)
     required: false
-    default: latest
+    default: R2021b
 runs:
   using: node12
   main: dist/index.js
