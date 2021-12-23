@@ -9,8 +9,9 @@ import * as install from "./install";
 export async function run() {
     const platform = process.platform;
     const release = core.getInput("release");
+    const products = core.getMultilineInput("products");
 
-    return install.install(platform, release,["MATLAB", "Parallel_Computing_Toolbox", "MATLAB_Compiler", "MATLAB_Compiler_SDK"]);
+    return install.install(platform, release, products);
 }
 
 run().catch((e) => {

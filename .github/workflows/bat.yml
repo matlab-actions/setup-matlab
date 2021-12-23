@@ -46,5 +46,8 @@ jobs:
         uses: ./
         with:
           release: ${{ matrix.release }}
+          products: 
+            - MATLAB
+            - Simulink
       - name: Run Sample MATLAB Command
         run: matlab-batch "${{ matrix.command }}"

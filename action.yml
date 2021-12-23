@@ -9,6 +9,11 @@ inputs:
       MATLAB release to set up (R2020a or later)
     required: false
     default: R2021b
+  products:
+    description: >-
+      Array of products to install
+    required: false
+    default: MATLAB
 runs:
   using: node12
   main: dist/index.js
