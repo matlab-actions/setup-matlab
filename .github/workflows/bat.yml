@@ -32,6 +32,12 @@ jobs:
           - os: ubuntu-18.04
             release: R2020a
             command: assert(strcmp(version('-release'),'2020a'))
+          - os: macos-latest
+            release: latest
+            command: assert(~isempty(regexp(version('-release'), '\d{4}.')))
+          - os: windows-latest
+            release: latest
+            command: assert(~isempty(regexp(version('-release'), '\d{4}.')))
     steps:
       - uses: actions/download-artifact@v2
         with:
