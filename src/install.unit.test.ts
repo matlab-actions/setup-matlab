@@ -54,4 +54,13 @@ describe("install procedure", () => {
         expect(downloadAndRunScriptMock).toHaveBeenCalledTimes(2);
         expect(core.group).toHaveBeenCalledTimes(2);
     });
+
+    ["darwin", "win32"].forEach((os) => {
+        it(`does not run deps script on ${os}`, async () => {
+            downloadAndRunScriptMock.mockResolvedValue(undefined);
+
+            await expect(install.install(os, release)).resolves.toBeUndefined();
+            expect(downloadAndRunScriptMock).toHaveBeenCalledTimes(1);
+        });
+    });
 });
