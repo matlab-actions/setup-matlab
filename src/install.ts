@@ -1,8 +1,9 @@
-// Copyright 2020 The MathWorks, Inc.
+// Copyright 2020-2022 The MathWorks, Inc.
 
 import * as core from "@actions/core";
 import properties from "./properties.json";
 import * as script from "./script";
+import * as ematlab from "./ematlab";
 
 export default install;
 
@@ -16,17 +17,21 @@ export default install;
  * @param release Release of MATLAB to be set up (e.g., "latest" or "R2020a").
  */
 export async function install(platform: string, release: string) {
-    // Install runtime system dependencies for MATLAB
-    await core.group("Preparing system for MATLAB", () =>
-        script.downloadAndRunScript(platform, properties.matlabDepsUrl, [release])
-    );
+    // Install runtime system dependencies for MATLAB on Linux
+    if (platform === "linux") {
+        await core.group("Preparing system for MATLAB", () =>
+            script.downloadAndRunScript(platform, properties.matlabDepsUrl, [release])
+        );
+    }
 
     // Invoke ephemeral installer to setup a MATLAB on the runner
     await core.group("Setting up MATLAB", () =>
-        script.downloadAndRunScript(platform, properties.ephemeralInstallerUrl, [
-            "--release",
-            release,
-        ])
+        script
+            .downloadAndRunScript(platform, properties.ephemeralInstallerUrl, [
+                "--release",
+                release,
+            ])
+            .then(ematlab.addToPath)
     );
 
     return;
