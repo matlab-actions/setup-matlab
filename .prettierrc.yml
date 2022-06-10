@@ -4,3 +4,5 @@ overrides:
   - files: "*.yml"
     options:
       tabWidth: 2
+- name: Setup MATLAB
+  uses: matlab-actions/setup-matlab@v1.0.1
