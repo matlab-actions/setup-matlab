@@ -21,7 +21,8 @@ describe("install procedure", () => {
     // they can be held static for these unit tests
     const platform = "linux";
     const release = "latest";
-    const doInstall = () => install.install(platform, release);
+    const skipActivationFlag = ""
+    const doInstall = () => install.install(platform, release, skipActivationFlag);
 
     beforeEach(() => {
         downloadAndRunScriptMock = script.downloadAndRunScript as jest.Mock;
@@ -76,7 +77,7 @@ describe("install procedure", () => {
             downloadAndRunScriptMock.mockResolvedValue(undefined);
             addToPathMock.mockResolvedValue(undefined);
 
-            await expect(install.install(os, release)).resolves.toBeUndefined();
+            await expect(install.install(os, release, skipActivationFlag)).resolves.toBeUndefined();
             expect(downloadAndRunScriptMock).toHaveBeenCalledTimes(1);
             expect(addToPathMock).toHaveBeenCalledTimes(1);
         });

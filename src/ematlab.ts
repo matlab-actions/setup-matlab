@@ -16,3 +16,7 @@ export function addToPath() {
     }
     core.addPath(path.join(root, "bin"));
 }
+
+export function skipActivationFlag(env: any): string {
+    return (env.MATHWORKS_TOKEN !== undefined && env.MATHWORKS_ACCOUNT !== undefined)? "--skip-activation": "";
+}
