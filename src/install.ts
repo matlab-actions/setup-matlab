@@ -4,6 +4,7 @@ import * as core from "@actions/core";
 import properties from "./properties.json";
 import * as script from "./script";
 import * as ematlab from "./ematlab";
+import * as matlabBatch from "./matlabBatch";
 
 export default install;
 
@@ -35,5 +36,12 @@ export async function install(platform: string, release: string, skipActivationF
             .then(ematlab.addToPath)
     );
 
+    const batchInstallDir = matlabBatch.installDir(platform);
+
+    await core.group("Setting up matlab-batch", () =>
+        script
+            .downloadAndRunScript(platform, properties.matlabBatchInstallerUrl, [batchInstallDir])
+            .then(() => core.addPath(batchInstallDir))
+    )
     return;
 }

@@ -1,4 +1,4 @@
-// Copyright 2020 The MathWorks, Inc.
+// Copyright 2020-2022 The MathWorks, Inc.
 
 import * as core from "@actions/core";
 import * as install from "./install";
@@ -33,6 +33,9 @@ describe("install procedure", () => {
         (core.group as jest.Mock).mockImplementation(async (_, func) => {
             return func();
         });
+        (core.addPath as jest.Mock).mockImplementation(async (_) => {
+            return;
+        });
     });
 
     it("ideally works", async () => {
@@ -40,8 +43,9 @@ describe("install procedure", () => {
         addToPathMock.mockResolvedValue(undefined);
 
         await expect(doInstall()).resolves.toBeUndefined();
-        expect(downloadAndRunScriptMock).toHaveBeenCalledTimes(2);
+        expect(downloadAndRunScriptMock).toHaveBeenCalledTimes(3);
         expect(addToPathMock).toHaveBeenCalledTimes(1);
+        expect(core.addPath).toHaveBeenCalledTimes(1);
     });
 
     it("rejects when the download fails", async () => {
@@ -78,7 +82,7 @@ describe("install procedure", () => {
             addToPathMock.mockResolvedValue(undefined);
 
             await expect(install.install(os, release, skipActivationFlag)).resolves.toBeUndefined();
-            expect(downloadAndRunScriptMock).toHaveBeenCalledTimes(1);
+            expect(downloadAndRunScriptMock).toHaveBeenCalledTimes(2);
             expect(addToPathMock).toHaveBeenCalledTimes(1);
         });
     });
