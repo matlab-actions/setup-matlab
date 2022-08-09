@@ -1,4 +1,5 @@
 // Copyright 2022 The MathWorks, Inc.
+
 import path from "path";
 
 export function installDir(platform: string) {
