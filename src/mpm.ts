@@ -25,7 +25,7 @@ export async function setup(platform: string, release: string) {
 
     await core.group("Setting MPM", async () => {
         const downloadPath = await toolCache.downloadTool(properties.mpmUrl);
-        core.addPath(path.dirname(batchInstallDir))
+        core.addPath(path.dirname(downloadPath))
         await exec.exec(`chmod +x ${downloadPath}`);
     });
     return;
@@ -33,8 +33,7 @@ export async function setup(platform: string, release: string) {
 
 export async function install(location: string, release: string, products: string[]) {
     await core.group("Setting up MATLAB using MPM", async () => {
-        const mpmPath = toolCache.find('mpm', 'latest');
-        const exitCode = await exec.exec(mpmPath, [
+        const exitCode = await exec.exec('mpm', [
             "install",
             "--release=" + release,
             "--destination=" + location,
