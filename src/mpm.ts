@@ -33,9 +33,8 @@ export async function setup(platform: string, release: string) {
 
 export async function install(location: string, release: string, products: string[]) {
     await core.group("Setting up MATLAB using MPM", async () => {
-        const mpmDirectory = toolCache.find('mpm', 'latest');
-        core.addPath(mpmDirectory);
-        const exitCode = await exec.exec("mpm", [
+        const mpmPath = toolCache.find('mpm', 'latest');
+        const exitCode = await exec.exec(mpmPath, [
             "install",
             "--release=" + release,
             "--destination=" + location,
