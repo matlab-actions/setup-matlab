@@ -43,7 +43,7 @@ describe("mpm setup", () => {
 
         await expect(mpm.setup(platform, release)).resolves.toBeUndefined();
         expect(downloadAndRunScriptMock).toHaveBeenCalledTimes(2);
-        expect(addPathMock).toHaveBeenCalledTimes(1);
+        expect(addPathMock).toHaveBeenCalledTimes(2);
         expect(downloadToolMock).toHaveBeenCalledTimes(1);
         expect(execMock).toHaveBeenCalledTimes(1);
     });
@@ -55,7 +55,7 @@ describe("mpm setup", () => {
 
             await expect(mpm.setup(os, release)).resolves.toBeUndefined();
             expect(downloadAndRunScriptMock).toHaveBeenCalledTimes(1);
-            expect(addPathMock).toHaveBeenCalledTimes(1);
+            expect(addPathMock).toHaveBeenCalledTimes(2);
             expect(downloadToolMock).toHaveBeenCalledTimes(1);
             expect(execMock).toHaveBeenCalledTimes(1);    
         });
@@ -91,6 +91,5 @@ describe("mpm install", () => {
 
         await expect(mpm.install(location, release, products)).resolves.toBeUndefined();
         expect(execMock).toHaveBeenCalledTimes(1);
-        // expect(addPathMock).toHaveBeenCalledTimes(1);
     });
 });

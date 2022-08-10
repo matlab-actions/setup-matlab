@@ -25,8 +25,8 @@ export async function setup(platform: string, release: string) {
 
     await core.group("Setting MPM", async () => {
         const downloadPath = await toolCache.downloadTool(properties.mpmUrl);
-        const mpmPath = await toolCache.cacheFile(downloadPath, 'mpm', 'mpm', 'latest');
-        await exec.exec(`chmod +x ${mpmPath}`);
+        core.addPath(path.dirname(batchInstallDir))
+        await exec.exec(`chmod +x ${downloadPath}`);
     });
     return;
 }
