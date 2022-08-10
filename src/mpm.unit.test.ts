@@ -21,6 +21,7 @@ describe("mpm setup", () => {
     const release = "latest";
     const platform = "linux";
 
+    const cacheFileMock = toolCache.cacheFile as jest.Mock;
     const downloadAndRunScriptMock = script.downloadAndRunScript as jest.Mock;
     const downloadToolMock = toolCache.downloadTool as jest.Mock;
     const execMock = exec.exec as jest.Mock;
@@ -37,6 +38,7 @@ describe("mpm setup", () => {
 
     it("ideally works" , async () => {
         downloadAndRunScriptMock.mockResolvedValue(undefined);
+        cacheFileMock.mockResolvedValue("/usr/local/bin/mpm");
         execMock.mockResolvedValue(0);
 
         await expect(mpm.setup(platform, release)).resolves.toBeUndefined();
@@ -48,6 +50,7 @@ describe("mpm setup", () => {
 
     ["darwin", "win32"].forEach((os) => {
         it(`does not run deps script on ${os}`, async () => {
+            cacheFileMock.mockResolvedValue("/usr/local/bin/mpm");
             downloadAndRunScriptMock.mockResolvedValue(undefined);
 
             await expect(mpm.setup(os, release)).resolves.toBeUndefined();

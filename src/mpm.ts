@@ -6,6 +6,7 @@ import * as exec from "@actions/exec";
 import * as toolCache from "@actions/tool-cache";
 import * as script from "./script";
 import * as matlabBatch from "./matlabBatch";
+import path from "path";
 
 export async function setup(platform: string, release: string) {
     if (platform === "linux") {
@@ -25,7 +26,7 @@ export async function setup(platform: string, release: string) {
     await core.group("Setting MPM", async () => {
         const downloadPath = await toolCache.downloadTool(properties.mpmUrl);
         const mpmPath = await toolCache.cacheFile(downloadPath, 'mpm', 'mpm', 'latest');
-        core.addPath(mpmPath);
+        core.addPath(path.dirname(mpmPath));
         await exec.exec(`chmod +x ${mpmPath}`);
     });
     return;

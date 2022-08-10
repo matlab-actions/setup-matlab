@@ -11,7 +11,7 @@ export async function run() {
     const matlabLocation = core.getInput("location");
     const release = core.getInput("release");
     const products = core.getMultilineInput("products");
-    await mpm.setup(release, platform);
+    await mpm.setup(platform, release);
     return mpm.install(matlabLocation, release, products);
 }
 
