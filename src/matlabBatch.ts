@@ -1,13 +1,24 @@
 // Copyright 2022 The MathWorks, Inc.
 
+import properties from "./properties.json";
 import path from "path";
+import * as core from "@actions/core";
+import * as script from "./script";
 
-export function installDir(platform: string) {
-    let batchInstallDir : string;
+export async function setup(platform: string) {
+    const batchInstallDir = defaultInstallRoot(platform, "matlab-batch")
+    script
+        .downloadAndRunScript(platform, properties.matlabBatchInstallerUrl, [batchInstallDir])
+        .then(() => core.addPath(batchInstallDir))
+    
+}
+
+export function defaultInstallRoot(platform: string, programName: string) {
+    let installRoot : string;
     if (platform === "win32") {
-        batchInstallDir = path.join("C:","Program Files", "matlab-batch");
+        installRoot = path.join("C:","Program Files", programName);
     } else {
-        batchInstallDir = path.join("/","opt","matlab-batch");
+        installRoot = path.join("/","opt",programName);
     }
-    return batchInstallDir
+    return installRoot
 }

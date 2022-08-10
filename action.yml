@@ -13,7 +13,9 @@ inputs:
     description: >-
       Array of products to install
     required: false
-    default: MATLAB
+    default: |
+      MATLAB
+      Parallel_Computing_Toolbox
   location:
     description: >-
       Destination location for MATLAB install

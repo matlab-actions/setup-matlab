@@ -38,13 +38,11 @@ describe("mpm setup", () => {
     it("ideally works" , async () => {
         downloadAndRunScriptMock.mockResolvedValue(undefined);
         downloadToolMock.mockResolvedValue("/usr/local/bin/mpm");
-        execMock.mockResolvedValue(0);
 
         await expect(mpm.setup(platform, release)).resolves.toBeUndefined();
         expect(downloadAndRunScriptMock).toHaveBeenCalledTimes(2);
         expect(addPathMock).toHaveBeenCalledTimes(2);
         expect(downloadToolMock).toHaveBeenCalledTimes(1);
-        expect(execMock).toHaveBeenCalledTimes(1);
     });
 
     ["darwin", "win32"].forEach((os) => {
@@ -56,7 +54,6 @@ describe("mpm setup", () => {
             expect(downloadAndRunScriptMock).toHaveBeenCalledTimes(1);
             expect(addPathMock).toHaveBeenCalledTimes(2);
             expect(downloadToolMock).toHaveBeenCalledTimes(1);
-            expect(execMock).toHaveBeenCalledTimes(1);    
         });
     });
 

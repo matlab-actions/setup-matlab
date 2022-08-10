@@ -6,7 +6,6 @@ import * as exec from "@actions/exec";
 import * as toolCache from "@actions/tool-cache";
 import * as script from "./script";
 import * as matlabBatch from "./matlabBatch";
-import path from "path";
 
 export async function setup(platform: string, release: string) {
     if (platform === "linux") {
@@ -15,19 +14,15 @@ export async function setup(platform: string, release: string) {
         );
     }
 
-    const batchInstallDir = matlabBatch.installDir(platform);
-
-    await core.group("Setting up matlab-batch", () =>
-        script
-            .downloadAndRunScript(platform, properties.matlabBatchInstallerUrl, [batchInstallDir])
-            .then(() => core.addPath(batchInstallDir))
+    await core.group("Setting up matlab-batch", async () =>
+        await matlabBatch.setup(platform)
     );
 
     await core.group("Setting MPM", async () => {
         const downloadPath = await toolCache.downloadTool(properties.mpmUrl);
         const mpmDir = await toolCache.cacheFile(downloadPath, 'mpm', 'mpm', 'latest');
         core.addPath(mpmDir);
-        await exec.exec(`chmod +x ${mpmDir}/mpm`);
+        // await exec.exec(`chmod +x ${mpmDir}/mpm`);
     });
     return;
 }
