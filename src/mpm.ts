@@ -40,10 +40,6 @@ export async function install(location: string, release: string, products: strin
             "--products", products.join(" ")
         ]);
 
-        // if (exitCode !== 0) {
-        //     return Promise.reject(Error(`MPM exited with non-zero code ${exitCode}`));
-        // }
-
         return
     });
 }
