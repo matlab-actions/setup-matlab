@@ -43,7 +43,7 @@ describe("mpm setup", () => {
 
         await expect(mpm.setup(platform, release)).resolves.toBeUndefined();
         expect(downloadAndRunScriptMock).toHaveBeenCalledTimes(2);
-        expect(addPathMock).toHaveBeenCalledTimes(2);
+        expect(addPathMock).toHaveBeenCalledTimes(1);
         expect(downloadToolMock).toHaveBeenCalledTimes(1);
         expect(execMock).toHaveBeenCalledTimes(1);
     });
@@ -55,7 +55,7 @@ describe("mpm setup", () => {
 
             await expect(mpm.setup(os, release)).resolves.toBeUndefined();
             expect(downloadAndRunScriptMock).toHaveBeenCalledTimes(1);
-            expect(addPathMock).toHaveBeenCalledTimes(2);
+            expect(addPathMock).toHaveBeenCalledTimes(1);
             expect(downloadToolMock).toHaveBeenCalledTimes(1);
             expect(execMock).toHaveBeenCalledTimes(1);    
         });
@@ -76,6 +76,7 @@ describe("mpm install", () => {
     const products = ["MATLAB", "Parallel_Compute_Toolbox"]
 
     const execMock = exec.exec as jest.Mock;
+    const addPathMock = core.addPath as jest.Mock;
 
     beforeEach(() => {
         // Mock core.group to simply return the output of the func it gets from
@@ -90,5 +91,6 @@ describe("mpm install", () => {
 
         await expect(mpm.install(location, release, products)).resolves.toBeUndefined();
         expect(execMock).toHaveBeenCalledTimes(1);
+        expect(addPathMock).toHaveBeenCalledTimes(1);
     });
 });

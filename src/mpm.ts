@@ -26,7 +26,6 @@ export async function setup(platform: string, release: string) {
     await core.group("Setting MPM", async () => {
         const downloadPath = await toolCache.downloadTool(properties.mpmUrl);
         const mpmPath = await toolCache.cacheFile(downloadPath, 'mpm', 'mpm', 'latest');
-        core.addPath(path.dirname(mpmPath));
         await exec.exec(`chmod +x ${mpmPath}`);
     });
     return;
@@ -34,6 +33,8 @@ export async function setup(platform: string, release: string) {
 
 export async function install(location: string, release: string, products: string[]) {
     await core.group("Setting up MATLAB using MPM", async () => {
+        const mpmDirectory = toolCache.find('mpm', 'latest');
+        core.addPath(mpmDirectory);
         const exitCode = await exec.exec("mpm", [
             "install",
             "--release=" + release,
@@ -45,5 +46,6 @@ export async function install(location: string, release: string, products: strin
         //     return Promise.reject(Error(`MPM exited with non-zero code ${exitCode}`));
         // }
 
+        return
     });
 }
