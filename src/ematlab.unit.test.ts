@@ -29,4 +29,16 @@ describe("ephemeral matlab", () => {
     it("rejects when root file does not exist", async () => {
         expect(() => ematlab.addToPath()).toThrow();
     });
+
+    it("adds --skip-activation flag if env vars are set", async () => {
+        let env = {"MATHWORKS_ACCOUNT": "janedoe@mathworks.com", "MATHWORKS_TOKEN": "token123456"};
+        let flag = ematlab.skipActivationFlag(env);
+        expect(flag).toEqual("--skip-activation")
+    })
+
+    it("doesn't add --skip-activation flag if env vars are not set", async () => {
+        let env = {};
+        let flag = ematlab.skipActivationFlag(env);
+        expect(flag).toEqual("")
+    })
 });
