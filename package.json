@@ -1,7 +1,7 @@
 {
     "name": "setup-matlab-action",
     "author": "The MathWorks, Inc.",
-    "version": "1.1.1",
+    "version": "1.2.0",
     "description": "",
     "main": "lib/index.js",
     "scripts": {
