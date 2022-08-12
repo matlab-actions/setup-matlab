@@ -1,12 +1,8 @@
-name: Perform a Release
+name: Publish
 
 on:
-  workflow_dispatch:
-    inputs:
-      npm-version-arg:
-        description: Argument to npm-version
-        default: minor
-        required: true
+  release:
+    types: [published, edited]
 
 jobs:
   build:
@@ -33,13 +29,13 @@ jobs:
       - name: Update package version
         id: update-package-version
         run: |
-          VERSION=$(npm version "${{ github.event.inputs.npm-version-arg }}")
+          git tag -d "${{ github.event.release.tag_name }}"
+          VERSION=$(npm version "${{ github.event.release.tag_name }}" --no-git-tag-version)
           echo "::set-output name=version::$VERSION"
-
-      # Update the branch with the new commit
-      - name: Push new version
-        run: git push
-
+          git add package.json package-lock.json
+          git commit -m "[skip ci] Bump $VERSION"
+          git push origin HEAD:main
+          
       # Now carry on, business as usual
       - name: Perform npm tasks
         run: npm run ci
@@ -50,8 +46,12 @@ jobs:
       - name: Commit to release branch
         id: release_info
         run: |
-          # Retrieve the previously created tag
-          TAG="${{ steps.update-package-version.outputs.version }}"
+          # Check for semantic versioning
+          echo "Preparing release for version $longVersion"
+          longVersion="${{github.event.release.tag_name}}"
+          [[ $longVersion == v[0-9]*.[0-9]*.[0-9]* ]]  || (echo "must follow semantic versioning" && exit 1)
+          majorVersion=$(echo ${longVersion%.*.*})
+          minorVersion=$(echo ${longVersion%.*})
 
           # Add the built artifacts. Using --force because dist/lib should be in
           # .gitignore
@@ -60,23 +60,21 @@ jobs:
           # Make the commit
           MESSAGE="Build for $(git rev-parse --short HEAD)"
           git commit --allow-empty -m "$MESSAGE"
+          git tag -f -a -m "Release $longVersion" $longVersion
 
-          # Create an annotated tag and push it to origin. Using -f to overwrite
-          # the tag that `npm version` made for us in a previous step
-          git tag -f -a -m "Release $TAG" $TAG
-          git push origin $TAG
-
-  release:
-    name: Release
-    runs-on: ubuntu-latest
-    needs: build
-    steps:
-      - name: Create Release
-        uses: actions/create-release@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          tag_name: ${{ needs.build.outputs.tag }}
-          release_name: Release ${{ needs.build.outputs.tag }}
-          draft: true
-          prerelease: false
+          # Get the commit of the tag you just released
+          commitHash=$(git rev-list -n 1 $longVersion)
+          
+          # Delete the old major and minor version tags locally
+          git tag -d $majorVersion || true
+          git tag -d $minorVersion || true
+          
+          # Make new major and minor version tags locally that point to the commit you got from the "git rev-list" above
+          git tag -f $majorVersion $commitHash
+          git tag -f $minorVersion $commitHash
+          
+          # Force push the new minor version tag to overwrite the old tag remotely
+          echo "Pushing new tags"
+          git push -f origin $longVersion
+          git push -f origin $majorVersion
+          git push -f origin $minorVersion
