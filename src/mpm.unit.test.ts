@@ -16,20 +16,20 @@ afterEach(() => {
 describe("setup mpm", () => {
     let tcDownloadToolMock: jest.Mock<any, any>;
     let addPathMock: jest.Mock<any, any>;
-    // let execMock: jest.Mock<any, any>; 
+    let execMock: jest.Mock<any, any>; 
 
     const platform = "linux";
 
     beforeEach(() => {
         tcDownloadToolMock = tc.downloadTool as jest.Mock;
         addPathMock = core.addPath as jest.Mock;
-        // execMock = exec.exec as jest.Mock;
+        execMock = exec.exec as jest.Mock;
     });
 
     it("ideally works", async () => {
         tcDownloadToolMock.mockResolvedValue("/path/to/mpm");
         addPathMock.mockResolvedValue(undefined);
-        // execMock.mockResolvedValue(0);
+        execMock.mockResolvedValue(0);
         await expect(mpm.setup(platform)).resolves.toBeUndefined();
     });
 
@@ -37,6 +37,11 @@ describe("setup mpm", () => {
         tcDownloadToolMock.mockRejectedValue(Error("oof"));
         addPathMock.mockResolvedValue(undefined);
 
+        await expect(mpm.setup(platform)).rejects.toBeDefined();
+    });
+
+    it("rejects on failed chmod", async () => {
+        execMock.mockResolvedValue(1);
         await expect(mpm.setup(platform)).rejects.toBeDefined();
     });
 
