@@ -16,7 +16,7 @@ afterEach(() => {
 describe("setup mpm", () => {
     let tcDownloadToolMock: jest.Mock<any, any>;
     let addPathMock: jest.Mock<any, any>;
-    // let execMock: jest.Mock<any, any>;
+    // let execMock: jest.Mock<any, any>; 
 
     const platform = "linux";
 
