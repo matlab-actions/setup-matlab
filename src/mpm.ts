@@ -7,16 +7,11 @@ import * as tc from "@actions/tool-cache";
 
 export async function setup(platform: string) {
     const mpm = await tc.downloadTool(properties.mpmUrl);
-    core.addPath(mpm);
-    const exitCode = await exec.exec(`chmod +x ${mpm}`);
-    if (exitCode !== 0) {
-        return Promise.reject(Error(`Script exited with non-zero code ${exitCode}`));
-    }
-    return
+    return mpm
 }
 
-export async function install(release: string, products: string[], location: string) {
-    const exitCode = await exec.exec('mpm', [
+export async function install(mpmPath: string, release: string, products: string[], location: string) {
+    const exitCode = await exec.exec(mpmPath, [
         "install",
         "--release=" + release,
         "--destination=" + location,

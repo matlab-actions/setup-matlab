@@ -30,18 +30,13 @@ describe("setup mpm", () => {
         tcDownloadToolMock.mockResolvedValue("/path/to/mpm");
         addPathMock.mockResolvedValue(undefined);
         execMock.mockResolvedValue(0);
-        await expect(mpm.setup(platform)).resolves.toBeUndefined();
+        await expect(mpm.setup(platform)).resolves.toBe("/path/to/mpm");
     });
 
     it("rejects when the download fails", async () => {
         tcDownloadToolMock.mockRejectedValue(Error("oof"));
         addPathMock.mockResolvedValue(undefined);
 
-        await expect(mpm.setup(platform)).rejects.toBeDefined();
-    });
-
-    it("rejects on failed chmod", async () => {
-        execMock.mockResolvedValue(1);
         await expect(mpm.setup(platform)).rejects.toBeDefined();
     });
 
@@ -60,11 +55,11 @@ describe("mpm install", () => {
 
     it("ideally works", async () => {
         execMock.mockResolvedValue(0);
-        await expect(mpm.install(release, products, location)).resolves.toBeUndefined();
+        await expect(mpm.install("mpm", release, products, location)).resolves.toBeUndefined();
     });
 
     it("rejects on failed install", async () => {
         execMock.mockResolvedValue(1);
-        await expect(mpm.install(release, products, location)).rejects.toBeDefined();
+        await expect(mpm.install("mpm", release, products, location)).rejects.toBeDefined();
     });
 });
