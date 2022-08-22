@@ -7,6 +7,10 @@ import * as tc from "@actions/tool-cache";
 
 export async function setup(platform: string) {
     const mpm = await tc.downloadTool(properties.mpmUrl);
+    const exitCode = await exec.exec(`chmod +x ${mpm}`)
+    if (exitCode != 0) {
+        Promise.reject(Error("unable to setup mpm"))
+    }
     return mpm
 }
 
