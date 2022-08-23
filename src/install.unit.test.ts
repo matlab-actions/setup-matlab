@@ -69,7 +69,7 @@ describe("install procedure", () => {
     });
 
     it("rejects when the download fails", async () => {
-        downloadAndRunScriptMock.mockRejectedValue(Error("oof"));
+        downloadAndRunScriptMock.mockRejectedValueOnce(Error("oof"));
 
         await expect(doInstall()).rejects.toBeDefined();
         expect(downloadAndRunScriptMock).toHaveBeenCalledTimes(1);

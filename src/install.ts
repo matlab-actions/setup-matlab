@@ -12,7 +12,7 @@ export async function install(platform: string, release: string, products: strin
         await core.group("Preparing system for MATLAB", async () =>
             script.downloadAndRunScript(platform, properties.matlabDepsUrl, [release])
         );
-    }
+    } 
 
     core.group("Setting up matlab-batch", async () =>
         await matlabBatch.setup(platform)
