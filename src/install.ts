@@ -19,11 +19,11 @@ export async function install(platform: string, release: string, products: strin
     );
 
     await core.group("Setting MPM", async () => {
-        await mpm.setup(platform);
+        mpmPath = await mpm.setup(platform);
     });
 
     await core.group("Setting up MATLAB using MPM", async () => {
-        await mpm.install(release, location, products);
+        await mpm.install(mpmPath, release, location, products);
     });
     return;
 }

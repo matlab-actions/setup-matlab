@@ -15,12 +15,11 @@ export async function setup(platform: string) {
     if (exitCode !== 0) {
         return Promise.reject(Error("unable to setup mpm"))
     }
-    await core.addPath(mpm);
-    return
+    return mpm
 }
 
-export async function install(release: string, destination: string, products: string[]) {
-    const exitCode = await exec.exec("mpm", [
+export async function install(mpmPath: string, release: string, destination: string, products: string[]) {
+    const exitCode = await exec.exec(mpmPath, [
         "install",
         "--release=" + release,
         "--destination=" + destination,
