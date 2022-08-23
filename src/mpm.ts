@@ -5,9 +5,10 @@ import * as script from "./script";
 import * as core from "@actions/core";
 import * as exec from "@actions/exec";
 import * as tc from "@actions/tool-cache";
+import path from "path";
 
 export async function setup(platform: string) {
-    const mpmInstallDir: string | undefined = process.env.RUNNER_TEMP? process.env.RUNNER_TEMP : script.defaultInstallRoot(platform, "mpm");
+    const mpmInstallDir: string | undefined = process.env.RUNNER_TEMP? path.join(process.env.RUNNER_TEMP,"mpm") : script.defaultInstallRoot(platform, "mpm");
     const mpm = await tc.downloadTool(properties.mpmUrl, mpmInstallDir);
     const exitCode = await exec.exec(`chmod +x ${mpm}`)
     if (exitCode !== 0) {
