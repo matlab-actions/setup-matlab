@@ -40,11 +40,11 @@ export function generateExecCommand(platform: string, scriptPath: string): strin
 }
 
 export function defaultInstallRoot(platform: string, programName: string) {
-    let installRoot : string;
+    let installRoot: string;
     if (platform === "win32") {
         installRoot = path.join("C:","Program Files", programName);
     } else {
-        installRoot = path.join("/","opt",programName);
+        installRoot = path.join("/","opt", programName);
     }
-    return installRoot
+    return installRoot;
 }
