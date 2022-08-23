@@ -20,6 +20,7 @@ export async function downloadAndRunScript(platform: string, url: string, args?:
     if (exitCode !== 0) {
         return Promise.reject(Error(`Script exited with non-zero code ${exitCode}`));
     }
+    return
 }
 
 /**

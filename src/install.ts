@@ -9,20 +9,21 @@ import * as script from "./script";
 export async function install(platform: string, release: string, products: string[], location: string) {
     let mpmPath: string;
     if (platform === "linux") {
-        await core.group("Preparing system for MATLAB", () =>
+        await core.group("Preparing system for MATLAB", async () =>
             script.downloadAndRunScript(platform, properties.matlabDepsUrl, [release])
         );
     }
 
-    await core.group("Setting up matlab-batch", async () =>
+    core.group("Setting up matlab-batch", async () =>
         await matlabBatch.setup(platform)
     );
 
-    await core.group("Setting MPM", async () => {
+    const setupMpm = core.group("Setting MPM", async () => {
         mpmPath = await mpm.setup(platform);
     });
 
     await core.group("Setting up MATLAB using MPM", async () => {
+        await setupMpm;
         await mpm.install(mpmPath, release, location, products);
     });
     return;
