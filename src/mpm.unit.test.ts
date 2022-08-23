@@ -31,15 +31,15 @@ describe("setup mpm", () => {
     });
 
     it("ideally works", async () => {
-        tcDownloadToolMock.mockResolvedValue(undefined);
-        addPathMock.mockResolvedValue(undefined);
+        tcDownloadToolMock.mockResolvedValue("/path/to/mpm");
         execMock.mockResolvedValue(0);
         await expect(mpm.setup(platform)).resolves.toBeUndefined();
     });
 
     it("works without RUNNER_TEMP", async () => {
         process.env.RUNNER_TEMP = '';
-        tcDownloadToolMock.mockResolvedValue(undefined);
+        tcDownloadToolMock.mockResolvedValue("/path/to/mpm");
+        defaultInstallRootMock.mockReturnValue("/path/to/install/root")
         addPathMock.mockResolvedValue(undefined);
         execMock.mockResolvedValue(0);
         await expect(mpm.setup(platform)).resolves.toBeUndefined();
@@ -47,20 +47,18 @@ describe("setup mpm", () => {
 
     it("rejects when the download fails", async () => {
         tcDownloadToolMock.mockRejectedValue(Error("oof"));
-        addPathMock.mockResolvedValue(undefined);
         execMock.mockResolvedValue(0);
         await expect(mpm.setup(platform)).rejects.toBeDefined();
     });
 
     it("rejects when the chmod fails", async () => {
-        tcDownloadToolMock.mockResolvedValue(undefined);
-        addPathMock.mockResolvedValue(undefined);
+        tcDownloadToolMock.mockResolvedValue("/path/to/mpm");
         execMock.mockResolvedValue(1);
         await expect(mpm.setup(platform)).rejects.toBeDefined();
     });
 
     it("rejects when add to path fails", async () => {
-        tcDownloadToolMock.mockResolvedValue(undefined);
+        tcDownloadToolMock.mockResolvedValue("/path/to/mpm");
         execMock.mockResolvedValue(0);
         addPathMock.mockRejectedValue(Error("oof"));
         await expect(mpm.setup(platform)).rejects.toBeDefined();

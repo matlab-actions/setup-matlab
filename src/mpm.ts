@@ -8,8 +8,9 @@ import * as tc from "@actions/tool-cache";
 import path from "path";
 
 export async function setup(platform: string) {
-    const mpmInstallDir: string | undefined = process.env.RUNNER_TEMP? path.join(process.env.RUNNER_TEMP,"mpm") : script.defaultInstallRoot(platform, "mpm");
-    const mpm = await tc.downloadTool(properties.mpmUrl, mpmInstallDir);
+    const mpmInstallDir: string = process.env.RUNNER_TEMP? process.env.RUNNER_TEMP : script.defaultInstallRoot(platform, "mpm");
+    const mpmInstallPath: string = path.join(mpmInstallDir, "mpm");
+    const mpm = await tc.downloadTool(properties.mpmUrl, mpmInstallPath);
     const exitCode = await exec.exec(`chmod +x ${mpm}`)
     if (exitCode !== 0) {
         return Promise.reject(Error("unable to setup mpm"))

@@ -7,6 +7,7 @@ import * as mpm from "./mpm";
 import * as script from "./script";
 
 export async function install(platform: string, release: string, products: string[], location: string) {
+    let mpmPath: string;
     if (platform === "linux") {
         await core.group("Preparing system for MATLAB", () =>
             script.downloadAndRunScript(platform, properties.matlabDepsUrl, [release])
@@ -18,7 +19,7 @@ export async function install(platform: string, release: string, products: strin
     );
 
     await core.group("Setting MPM", async () => {
-        await mpm.setup(platform)
+        await mpm.setup(platform);
     });
 
     await core.group("Setting up MATLAB using MPM", async () => {
