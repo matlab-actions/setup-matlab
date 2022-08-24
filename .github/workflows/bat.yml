@@ -50,6 +50,7 @@ jobs:
           products: |
             MATLAB
             Parallel_Computing_Toolbox
+            Optimization_Toolbox
       - name: Run all tests
         uses: matlab-actions/run-tests@v1
         with:
