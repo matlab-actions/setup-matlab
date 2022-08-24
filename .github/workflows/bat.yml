@@ -32,12 +32,18 @@ jobs:
       matrix:
         include:
           - os: ubuntu-latest
+            release: R2022a
+            command: assert(~isempty(regexp(version('-release'), '\d{4}.')))  
+          - os: ubuntu-latest
             release: R2021b
             command: assert(~isempty(regexp(version('-release'), '\d{4}.')))
           - os: ubuntu-latest
             release: R2021a
             command: assert(~isempty(regexp(version('-release'), '\d{4}.')))            
-        # Excluding the R2020a job as the pilot currently only supports R2020b
+          - os: ubuntu-latest
+            release: R2020b
+            command: assert(~isempty(regexp(version('-release'), '\d{4}.')))                     
+          # Excluding the R2020a job as the pilot currently only supports R2020b
           # - os: ubuntu-18.04
           #   release: R2020a
           #   command: assert(strcmp(version('-release'),'2020a'))
