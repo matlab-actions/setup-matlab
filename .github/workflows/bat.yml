@@ -49,7 +49,3 @@ jobs:
           products: 
             MATLAB
             Parallel_Computing_Toolbox
-            MATLAB_Compiler
-            MATLAB_Compiler_SDK
-      # - name: Run Sample MATLAB Command
-      #   run: matlab-batch "${{ matrix.command }}"
