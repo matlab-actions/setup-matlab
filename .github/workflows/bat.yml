@@ -55,5 +55,6 @@ jobs:
         uses: ./
         with:
           release: ${{ matrix.release }}
-          products: 
+          products: |
             MATLAB
+            Parallel_Computing_Toolbox
