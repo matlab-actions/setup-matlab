@@ -42,11 +42,6 @@ describe("install procedure", () => {
     });
 
     it("ideally works", async () => {
-        downloadAndRunScriptMock.mockResolvedValue(undefined);
-        matlabBatchSetupMock.mockResolvedValue(undefined);
-        mpmSetupMock.mockResolvedValue(undefined);
-        mpmInstallMock.mockResolvedValue(undefined);
-
         await expect(doInstall()).resolves.toBeUndefined();
         expect(downloadAndRunScriptMock).toHaveBeenCalledTimes(1);
         expect(matlabBatchSetupMock).toHaveBeenCalledTimes(1);
@@ -54,26 +49,29 @@ describe("install procedure", () => {
         expect(mpmInstallMock).toHaveBeenCalledTimes(1);
     });
 
-    // ["darwin", "win32"].forEach((os) => {
-    //     it(`does not run deps script on ${os}`, async () => {
-    //         mpmSetupMock.mockResolvedValue(undefined);
-    //         mpmInstallMock.mockResolvedValue(undefined);
-    
-    //         await expect(install.install(os, release, products, location)).resolves.toBeUndefined();
-    //         expect(downloadAndRunScriptMock).toHaveBeenCalledTimes(0);
-    //         expect(matlabBatchSetupMock).toHaveBeenCalledTimes(1);
-    //         expect(mpmSetupMock).toHaveBeenCalledTimes(1);
-    //         expect(mpmInstallMock).toHaveBeenCalledTimes(1);
-    //         expect(core.group).toHaveBeenCalledTimes(3);
-    //     });
-    // });
+    ["darwin", "win32"].forEach((os) => {
+        it(`does not run deps script on ${os}`, async () => {    
+            await expect(install.install(os, release, products, location)).resolves.toBeUndefined();
+            expect(downloadAndRunScriptMock).toHaveBeenCalledTimes(0);
+            expect(matlabBatchSetupMock).toHaveBeenCalledTimes(1);
+            expect(mpmSetupMock).toHaveBeenCalledTimes(1);
+            expect(mpmInstallMock).toHaveBeenCalledTimes(1);
+            expect(core.group).toHaveBeenCalledTimes(2);
+        });
+    });
 
-    // it("rejects when the download fails", async () => {
-    //     downloadAndRunScriptMock.mockRejectedValueOnce(Error("oof"));
+    it("rejects when the setup deps fails", async () => {
+        downloadAndRunScriptMock.mockRejectedValueOnce(Error("oof"));
+        await expect(doInstall()).rejects.toBeDefined();
+    });
 
-    //     await expect(doInstall()).rejects.toBeDefined();
-    //     expect(downloadAndRunScriptMock).toHaveBeenCalledTimes(1);
-    //     expect(core.group).toHaveBeenCalledTimes(1);
-    // });
+    it("rejects when the mpm install fails", async () => {
+        mpmInstallMock.mockRejectedValue(Error("oof"));
+        await expect(doInstall()).rejects.toBeDefined();
+    });
 
+    it("rejects when the matlab-batch install fails", async () => {
+        matlabBatchSetupMock.mockRejectedValueOnce(Error("oof"));
+        await expect(doInstall()).rejects.toBeDefined();
+    });
 });

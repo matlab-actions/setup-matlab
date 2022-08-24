@@ -7,29 +7,23 @@ import * as mpm from "./mpm";
 import * as script from "./script";
 
 export async function install(platform: string, release: string, products: string[], location: string) {
-    let mpmPath: string;
+    let matlabBatchSetup: Promise<void>;
     let systemDeps: Promise<void> = Promise.resolve();
     if (platform === "linux") {
         systemDeps = core.group("Preparing system for MATLAB", async () =>
-            script.downloadAndRunScript(platform, properties.matlabDepsUrl, [release])
+            await script.downloadAndRunScript(platform, properties.matlabDepsUrl, [release])
         );
     } 
 
-    core.group("Setting up matlab-batch", async () =>
-        await matlabBatch.setup(platform)
-    );
-
-    const setupMpm = core.group("Setting MPM", async () => {
-        mpmPath = await mpm.setup(platform);
-    });
-
     await core.group("Setting up MATLAB using MPM", async () => {
-        await setupMpm;
+        matlabBatchSetup = matlabBatch.setup(platform)
+        const mpmPath: string = await mpm.setup(platform);
         await mpm.install(mpmPath, release, location, products);
     });
 
-    await core.group("Finalizing", async () => {
+    await core.group("Finalizing Installation", async () => {
         await systemDeps;
+        await matlabBatchSetup;
     })
     return;
 }
