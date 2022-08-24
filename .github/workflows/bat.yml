@@ -50,7 +50,15 @@ jobs:
           products: |
             MATLAB
             Parallel_Computing_Toolbox
-            Optimization_Toolbox
+            MATLAB
+            Simulink
+            Signal_Processing_Toolbox
+            Statistics_and_Machine_Learning_Toolbox
+            Optimization_Toolbox Symbolic_Math_Toolbox
+            Image_Processing_Toolbox
+            Control_System_Toolbox
+            DSP_System_Toolbox
+            Curve_Fitting_Toolbox
       - name: Run all tests
         uses: matlab-actions/run-tests@v1
         with:
