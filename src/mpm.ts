@@ -26,6 +26,9 @@ export async function install(mpmPath: string, release: string, destination: str
         "--products", products.join(" ")
     ]);
 
+    // Add MATLAB_ROOT/bin to path
+    core.addPath(path.join(destination, "bin"))
+
     if (exitCode !== 0) {
         return Promise.reject(Error(`Script exited with non-zero code ${exitCode}`));
     }
