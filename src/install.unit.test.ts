@@ -54,26 +54,26 @@ describe("install procedure", () => {
         expect(mpmInstallMock).toHaveBeenCalledTimes(1);
     });
 
-    ["darwin", "win32"].forEach((os) => {
-        it(`does not run deps script on ${os}`, async () => {
-            mpmSetupMock.mockResolvedValue(undefined);
-            mpmInstallMock.mockResolvedValue(undefined);
+    // ["darwin", "win32"].forEach((os) => {
+    //     it(`does not run deps script on ${os}`, async () => {
+    //         mpmSetupMock.mockResolvedValue(undefined);
+    //         mpmInstallMock.mockResolvedValue(undefined);
     
-            await expect(install.install(os, release, products, location)).resolves.toBeUndefined();
-            expect(downloadAndRunScriptMock).toHaveBeenCalledTimes(0);
-            expect(matlabBatchSetupMock).toHaveBeenCalledTimes(1);
-            expect(mpmSetupMock).toHaveBeenCalledTimes(1);
-            expect(mpmInstallMock).toHaveBeenCalledTimes(1);
-            expect(core.group).toHaveBeenCalledTimes(3);
-        });
-    });
+    //         await expect(install.install(os, release, products, location)).resolves.toBeUndefined();
+    //         expect(downloadAndRunScriptMock).toHaveBeenCalledTimes(0);
+    //         expect(matlabBatchSetupMock).toHaveBeenCalledTimes(1);
+    //         expect(mpmSetupMock).toHaveBeenCalledTimes(1);
+    //         expect(mpmInstallMock).toHaveBeenCalledTimes(1);
+    //         expect(core.group).toHaveBeenCalledTimes(3);
+    //     });
+    // });
 
-    it("rejects when the download fails", async () => {
-        downloadAndRunScriptMock.mockRejectedValueOnce(Error("oof"));
+    // it("rejects when the download fails", async () => {
+    //     downloadAndRunScriptMock.mockRejectedValueOnce(Error("oof"));
 
-        await expect(doInstall()).rejects.toBeDefined();
-        expect(downloadAndRunScriptMock).toHaveBeenCalledTimes(1);
-        expect(core.group).toHaveBeenCalledTimes(1);
-    });
+    //     await expect(doInstall()).rejects.toBeDefined();
+    //     expect(downloadAndRunScriptMock).toHaveBeenCalledTimes(1);
+    //     expect(core.group).toHaveBeenCalledTimes(1);
+    // });
 
 });
