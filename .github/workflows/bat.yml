@@ -50,7 +50,10 @@ jobs:
           products: |
             MATLAB
             Parallel_Computing_Toolbox
-      - name: Run all tests
-        uses: matlab-actions/run-tests@v1
+      - name: Perform 'setup-matlab'
+        uses: ./
         with:
-          source-folder: code
+          release: ${{ matrix.release }}
+          products: |
+            MATLAB
+            Parallel_Computing_Toolbox

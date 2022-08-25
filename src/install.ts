@@ -2,26 +2,26 @@
 
 import properties from "./properties.json";
 import * as core from "@actions/core";
-import * as matlabBatch from "./matlabBatch";
+import * as matlab from "./matlab";
 import * as mpm from "./mpm";
 import * as script from "./script";
 
-export async function install(platform: string, release: string, products: string[]) {
-    let matlabBatchSetup: Promise<void>;
-    let systemDeps: Promise<void> = Promise.resolve();
+export async function install(platform: string, releaseInput: string, products: string[]) {
+    const release: string = matlab.processRelease(releaseInput);
+    // Install runtime system dependencies for MATLAB on Linux
+    if (platform === "linux") {
+        await core.group("Preparing system for MATLAB", () =>
+            script.downloadAndRunScript(platform, properties.matlabDepsUrl, [release])
+        );
+    }
 
-    await core.group("Setting up MATLAB and system dependencies", async () => {
-        if (platform === "linux") {
-            systemDeps = script.downloadAndRunScript(platform, properties.matlabDepsUrl, [release])
-        }     
-        matlabBatchSetup = matlabBatch.setup(platform)
+    await core.group("Setting up MATLAB", async () => {
         const mpmPath: string = await mpm.setup(platform);
-        await mpm.install(mpmPath, release, products);
+        const destination: string = await matlab.toolcacheLocation(release);
+
+        await mpm.install(mpmPath, release, products, destination);
+        await matlab.setupBatch(platform)
     });
 
-    await core.group("Finalizing Installation", async () => {
-        await systemDeps;
-        await matlabBatchSetup;
-    })
     return;
 }

@@ -7,8 +7,8 @@ import * as exec from "@actions/exec";
 import * as tc from "@actions/tool-cache";
 import path from "path";
 
-export async function setup(platform: string) {
-    const mpmInstallDir: string = process.env.RUNNER_TEMP? process.env.RUNNER_TEMP : script.defaultInstallRoot(platform, "mpm");
+export async function setup(platform: string): Promise<string> {
+    const mpmInstallDir: string = process.env.RUNNER_TEMP || script.defaultInstallRoot(platform, "mpm");
     const mpmInstallPath: string = path.join(mpmInstallDir, "mpm");
     const mpm = await tc.downloadTool(properties.mpmUrl, mpmInstallPath);
     const exitCode = await exec.exec(`chmod +x ${mpm}`)
@@ -18,23 +18,22 @@ export async function setup(platform: string) {
     return mpm
 }
 
-export async function install(mpmPath: string, release: string, products: string[], destination: string = defaultDestination()) {
-    const exitCode = await exec.exec(mpmPath, [
-        "install",
-        "--release=" + release,
-        "--destination=" + destination,
-        "--products", products.join(" ")
-    ]);
+export async function install(mpmPath: string, release: string, products: string[], destination: string = "") {
+    if (products.length > 0) {
+        let mpmArguments: string[] = [
+            "install",
+            `--release=${release}`,    
+        ]
+    
+        if (destination) {
+            mpmArguments.push(`--destination=${destination}`);
+        }
+        mpmArguments.push("--products", products.join(" "));
 
-    // Add MATLAB_ROOT/bin to path
-    core.addPath(path.join(destination, "bin"))
-
-    if (exitCode !== 0) {
-        return Promise.reject(Error(`Script exited with non-zero code ${exitCode}`));
+        const exitCode = await exec.exec(mpmPath, mpmArguments);
+        if (exitCode !== 0) {
+            return Promise.reject(Error(`Script exited with non-zero code ${exitCode}`));
+        }
     }
     return
-}
-
-function defaultDestination() {
-    return path.resolve(process.env.RUNNER_TEMP || "/usr/share/matlab")
 }

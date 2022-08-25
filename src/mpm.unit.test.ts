@@ -57,8 +57,10 @@ describe("setup mpm", () => {
 describe("mpm install", () => {
     let execMock: jest.Mock<any, any>;
 
+    const mpmPath = "mpm";
     const release = "R2022a";
     const products = ["MATLAB", "Compiler"];
+    const destination = "/opt/matlab"
     
     beforeEach(() => {
         execMock = exec.exec as jest.Mock;
@@ -66,11 +68,43 @@ describe("mpm install", () => {
 
     it("ideally works", async () => {
         execMock.mockResolvedValue(0);
-        await expect(mpm.install("mpm", release, products)).resolves.toBeUndefined();
+        await expect(mpm.install(mpmPath, release, products)).resolves.toBeUndefined();
+    });
+
+    it("does not install if products list is empty", async () => {
+        await expect(mpm.install(mpmPath, release, [])).resolves.toBeUndefined();
+        expect(execMock).toHaveBeenCalledTimes(0);
+    });
+
+    it("omits destination flag if destination is not supplied", async () => {
+        const expectedMpmArgs = [
+            "install",
+            `--release=${release}`,
+            "--products",
+            "MATLAB Compiler",
+        ]
+        execMock.mockResolvedValue(0);
+
+        await expect(mpm.install(mpmPath, release, products)).resolves.toBeUndefined();
+        expect(execMock.mock.calls[0][1]).toMatchObject(expectedMpmArgs);
+    });
+
+    it("sets destination flag if destination is supplied", async () => {
+        const expectedMpmArgs = [
+            "install",
+            `--release=${release}`,
+            `--destination=${destination}`,
+            "--products",
+            "MATLAB Compiler",
+        ]
+        execMock.mockResolvedValue(0);
+
+        await expect(mpm.install(mpmPath, release, products, destination)).resolves.toBeUndefined();
+        expect(execMock.mock.calls[0][1]).toMatchObject(expectedMpmArgs);
     });
 
     it("rejects on failed install", async () => {
         execMock.mockResolvedValue(1);
-        await expect(mpm.install("mpm", release, products)).rejects.toBeDefined();
+        await expect(mpm.install(mpmPath, release, products)).rejects.toBeDefined();
     });
 });
