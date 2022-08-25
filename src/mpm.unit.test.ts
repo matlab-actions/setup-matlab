@@ -13,46 +13,46 @@ afterEach(() => {
     jest.resetAllMocks();
 });
 
-// describe("setup mpm", () => {
-//     let tcDownloadToolMock: jest.Mock<any, any>;
-//     let execMock: jest.Mock<any, any>; 
-//     let defaultInstallRootMock: jest.Mock<any, any>;
-//     const platform = "linux";
+describe("setup mpm", () => {
+    let tcDownloadToolMock: jest.Mock<any, any>;
+    let execMock: jest.Mock<any, any>; 
+    let defaultInstallRootMock: jest.Mock<any, any>;
+    const platform = "linux";
 
-//     beforeEach(() => {
-//         tcDownloadToolMock = tc.downloadTool as jest.Mock;
-//         execMock = exec.exec as jest.Mock;
-//         defaultInstallRootMock = script.defaultInstallRoot as jest.Mock;
-//         process.env.RUNNER_TEMP = "/runner/workdir/tmp";
-//     });
+    beforeEach(() => {
+        tcDownloadToolMock = tc.downloadTool as jest.Mock;
+        execMock = exec.exec as jest.Mock;
+        defaultInstallRootMock = script.defaultInstallRoot as jest.Mock;
+        process.env.RUNNER_TEMP = "/runner/workdir/tmp";
+    });
 
-//     it("ideally works", async () => {
-//         tcDownloadToolMock.mockResolvedValue("/path/to/mpm");
-//         execMock.mockResolvedValue(0);
-//         await expect(mpm.setup(platform)).resolves.toBe("/path/to/mpm");
-//     });
+    it("ideally works", async () => {
+        tcDownloadToolMock.mockResolvedValue("/path/to/mpm");
+        execMock.mockResolvedValue(0);
+        await expect(mpm.setup(platform)).resolves.toBe("/path/to/mpm");
+    });
 
-//     it("works without RUNNER_TEMP", async () => {
-//         process.env.RUNNER_TEMP = '';
-//         tcDownloadToolMock.mockResolvedValue("/path/to/mpm");
-//         defaultInstallRootMock.mockReturnValue("/path/to/install/root")
-//         execMock.mockResolvedValue(0);
-//         await expect(mpm.setup(platform)).resolves.toBe("/path/to/mpm");
-//     });
+    it("works without RUNNER_TEMP", async () => {
+        process.env.RUNNER_TEMP = '';
+        tcDownloadToolMock.mockResolvedValue("/path/to/mpm");
+        defaultInstallRootMock.mockReturnValue("/path/to/install/root")
+        execMock.mockResolvedValue(0);
+        await expect(mpm.setup(platform)).resolves.toBe("/path/to/mpm");
+    });
 
-//     it("rejects when the download fails", async () => {
-//         tcDownloadToolMock.mockRejectedValue(Error("oof"));
-//         execMock.mockResolvedValue(0);
-//         await expect(mpm.setup(platform)).rejects.toBeDefined();
-//     });
+    it("rejects when the download fails", async () => {
+        tcDownloadToolMock.mockRejectedValue(Error("oof"));
+        execMock.mockResolvedValue(0);
+        await expect(mpm.setup(platform)).rejects.toBeDefined();
+    });
 
-//     it("rejects when the chmod fails", async () => {
-//         tcDownloadToolMock.mockResolvedValue("/path/to/mpm");
-//         execMock.mockResolvedValue(1);
-//         await expect(mpm.setup(platform)).rejects.toBeDefined();
-//     });
+    it("rejects when the chmod fails", async () => {
+        tcDownloadToolMock.mockResolvedValue("/path/to/mpm");
+        execMock.mockResolvedValue(1);
+        await expect(mpm.setup(platform)).rejects.toBeDefined();
+    });
 
-// });
+});
 
 describe("mpm install", () => {
     let execMock: jest.Mock<any, any>;

@@ -1,27 +1,42 @@
 // Copyright 2020-2022 The MathWorks, Inc.
 
 import * as matlab from "./matlab";
+import * as script from "./script";
 import * as core from "@actions/core";
 import * as tc from "@actions/tool-cache";
-import * as script from "./script";
 
+jest.mock("./script")
 jest.mock("@actions/core");
 jest.mock("@actions/tool-cache");
-jest.mock("./script");
 
 afterEach(() => {
     jest.resetAllMocks();
 });
 
-// describe("toolcacheLocation", () => {
-    
-//     beforeEach(() => {
-//     });
+describe("toolcacheLocation", () => {
+    let findMock: jest.Mock<any, any>;
+    let cacheFileMock: jest.Mock<any, any>; 
+    let infoMock: jest.Mock<any, any>;
+    const release = "r2022a"
 
-//     it("ideally works", async () => {
-//         await expect(matlab.toolcacheLocation("r2022a")).resolves.toBe("");
-//     });
-// });
+    beforeEach(() => {
+        findMock = tc.find as jest.Mock;
+        cacheFileMock = tc.cacheFile as jest.Mock;
+        infoMock = core.info as jest.Mock;
+    });
+
+    it("returns toolpath if in toolcache", async () => {
+        findMock.mockReturnValue("/opt/hostedtoolcache/matlab/r2022a");
+        await expect(matlab.toolcacheLocation(release)).resolves.toBe("/opt/hostedtoolcache/matlab/r2022a");
+        expect(infoMock).toHaveBeenCalledTimes(1);
+    });
+
+    it("creates cache and returns new path if not in toolcache", async () => {
+        findMock.mockReturnValue("");
+        cacheFileMock.mockReturnValue("/opt/hostedtoolcache/matlab/r2022b");
+        await expect(matlab.toolcacheLocation(release)).resolves.toBe("/opt/hostedtoolcache/matlab/r2022b");
+    })
+});
 
 describe("setup matlab-batch", () => {
     let downloadAndRunScriptMock: jest.Mock<any, any>;
@@ -57,3 +72,13 @@ describe("setup matlab-batch", () => {
     });
 
 });
+
+describe("process release", () => {
+    it("latest resolves", () => {
+        expect(matlab.processRelease("latest")).toBe("r2022a")
+    })
+
+    it("returns lowercase", () => {
+        expect(matlab.processRelease("R2021a")).toBe("r2021a")
+    })
+})

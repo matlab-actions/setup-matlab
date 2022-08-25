@@ -31,7 +31,7 @@ export async function setupBatch(platform: string) {
 export function processRelease(releaseInput: string) {
     let release: string = releaseInput;
     if (releaseInput.toLowerCase() === "latest") {
-        release = "R2022a";
+        release = "r2022a";
     }
     return release.toLowerCase()
 }
