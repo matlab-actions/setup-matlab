@@ -8,10 +8,9 @@ import * as install from "./install";
  */
 export async function run() {
     const platform = process.platform;
-    const location = core.getInput("location");
     const release = core.getInput("release");
     const products = core.getMultilineInput("products");
-    return install.install(platform, release, products, location);
+    return install.install(platform, release, products);
 }
 
 run().catch((e) => {

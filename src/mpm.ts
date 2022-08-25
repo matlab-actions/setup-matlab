@@ -18,7 +18,7 @@ export async function setup(platform: string) {
     return mpm
 }
 
-export async function install(mpmPath: string, release: string, destination: string, products: string[]) {
+export async function install(mpmPath: string, release: string, products: string[], destination: string = defaultDestination()) {
     const exitCode = await exec.exec(mpmPath, [
         "install",
         "--release=" + release,
@@ -33,4 +33,8 @@ export async function install(mpmPath: string, release: string, destination: str
         return Promise.reject(Error(`Script exited with non-zero code ${exitCode}`));
     }
     return
+}
+
+function defaultDestination() {
+    return path.resolve(process.env.RUNNER_TEMP || "/usr/share/matlab")
 }

@@ -59,7 +59,6 @@ describe("mpm install", () => {
 
     const release = "R2022a";
     const products = ["MATLAB", "Compiler"];
-    const location = "/opt/matlab";
     
     beforeEach(() => {
         execMock = exec.exec as jest.Mock;
@@ -67,11 +66,11 @@ describe("mpm install", () => {
 
     it("ideally works", async () => {
         execMock.mockResolvedValue(0);
-        await expect(mpm.install("mpm", release, location, products)).resolves.toBeUndefined();
+        await expect(mpm.install("mpm", release, products)).resolves.toBeUndefined();
     });
 
     it("rejects on failed install", async () => {
         execMock.mockResolvedValue(1);
-        await expect(mpm.install("mpm", release, location, products)).rejects.toBeDefined();
+        await expect(mpm.install("mpm", release, products)).rejects.toBeDefined();
     });
 });

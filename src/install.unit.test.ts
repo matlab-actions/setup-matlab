@@ -24,9 +24,8 @@ describe("install procedure", () => {
     const platform = "linux";
     const release = "latest";
     const products = ["MATLAB", "Parallel_Computing_Toolbox"];
-    const location = "/opt/matlab"
 
-    const doInstall = () => install.install(platform, release, products, location);
+    const doInstall = () => install.install(platform, release, products);
 
     beforeEach(() => {
         downloadAndRunScriptMock = script.downloadAndRunScript as jest.Mock;
@@ -51,7 +50,7 @@ describe("install procedure", () => {
 
     ["darwin", "win32"].forEach((os) => {
         it(`does not run deps script on ${os}`, async () => {    
-            await expect(install.install(os, release, products, location)).resolves.toBeUndefined();
+            await expect(install.install(os, release, products)).resolves.toBeUndefined();
             expect(downloadAndRunScriptMock).toHaveBeenCalledTimes(0);
             expect(matlabBatchSetupMock).toHaveBeenCalledTimes(1);
             expect(mpmSetupMock).toHaveBeenCalledTimes(1);
