@@ -9,11 +9,11 @@ import * as script from "./script";
 export async function install(platform: string, releaseInput: string, products: string[]) {
     const release: string = matlab.processRelease(releaseInput);
     // Install runtime system dependencies for MATLAB on Linux
-    if (platform === "linux") {
-        await core.group("Preparing system for MATLAB", () =>
-            script.downloadAndRunScript(platform, properties.matlabDepsUrl, [release])
-        );
-    }
+    // if (platform === "linux") {
+    //     await core.group("Preparing system for MATLAB", () =>
+    //         script.downloadAndRunScript(platform, properties.matlabDepsUrl, [release])
+    //     );
+    // }
 
     await core.group("Setting up MATLAB", async () => {
         const mpmPath: string = await mpm.setup(platform);
