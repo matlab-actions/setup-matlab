@@ -27,5 +27,7 @@ export async function install(mpmPath: string, release: string, products: string
     if (exitCode !== 0) {
         return Promise.reject(Error(`Script exited with non-zero code ${exitCode}`));
     }
+
+    tc.cacheDir(destination, "MATLAB", release);
     return
 }
