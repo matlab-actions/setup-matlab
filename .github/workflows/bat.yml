@@ -54,11 +54,3 @@ jobs:
           products: |
             MATLAB
             Parallel_Computing_Toolbox
-      - name: look in dir
-        run: ls -lah /opt/hostedtoolcache/MATLAB/r2022a/x64
-      - name: Install Simulink to existing MATLAB installation
-        uses: ./
-        with:
-          release: ${{ matrix.release }}
-          products: |
-            Simulink
