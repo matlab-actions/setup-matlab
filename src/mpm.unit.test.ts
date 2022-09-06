@@ -71,11 +71,6 @@ describe("mpm install", () => {
         await expect(mpm.install(mpmPath, release, products)).resolves.toBeUndefined();
     });
 
-    it("does not install if products list is empty", async () => {
-        await expect(mpm.install(mpmPath, release, [])).resolves.toBeUndefined();
-        expect(execMock).toHaveBeenCalledTimes(0);
-    });
-
     it("omits destination flag if destination is not supplied", async () => {
         const expectedMpmArgs = [
             "install",
