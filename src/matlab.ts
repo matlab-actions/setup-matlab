@@ -14,6 +14,7 @@ export async function toolcacheLocation(release: string): Promise<string> {
         fs.writeFileSync(".cachematlab", "");
         toolpath = await tc.cacheFile(".cachematlab", ".cachematlab", "MATLAB", release)
         io.rmRF(".cachematlab")
+        await tc.cacheDir(toolpath,  "MATLAB", release)
     }
     return toolpath
 }

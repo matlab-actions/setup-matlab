@@ -32,7 +32,11 @@ jobs:
       matrix:
         include:
           - os: ubuntu-latest
+            release: latest
+          - os: ubuntu-latest
             release: R2022a
+          - os: ubuntu-latest
+            release: r2022a
           - os: ubuntu-latest
             release: R2021b
           - os: ubuntu-latest
@@ -43,14 +47,16 @@ jobs:
       - uses: actions/download-artifact@v2
         with:
           name: built-action
-      - name: Perform 'setup-matlab'
+      - name: Install MATLAB and PCT
         uses: ./
         with:
           release: ${{ matrix.release }}
           products: |
             MATLAB
             Parallel_Computing_Toolbox
-      - name: Perform 'setup-matlab'
+      - name: look in dir
+        run: ls -lah /opt/hostedtoolcache/MATLAB/r2022a/x64
+      - name: Install Simulink to existing MATLAB installation
         uses: ./
         with:
           release: ${{ matrix.release }}
