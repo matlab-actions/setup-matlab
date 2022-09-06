@@ -26,23 +26,7 @@ jobs:
 
   integ:
     needs: bat
-    runs-on: ${{ matrix.os }}
-    strategy:
-      fail-fast: false
-      matrix:
-        include:
-          - os: ubuntu-latest
-            release: latest
-          - os: ubuntu-latest
-            release: R2022a
-          - os: ubuntu-latest
-            release: r2022a
-          - os: ubuntu-latest
-            release: R2021b
-          - os: ubuntu-latest
-            release: R2021a
-          - os: ubuntu-latest
-            release: R2020b
+    runs-on: self-hosted
     steps:
       - uses: actions/download-artifact@v2
         with:
@@ -50,7 +34,13 @@ jobs:
       - name: Install MATLAB and PCT
         uses: ./
         with:
-          release: ${{ matrix.release }}
+          release: latest
           products: |
             MATLAB
             Parallel_Computing_Toolbox
+      - name: Install Simulink on top
+        uses: ./
+        with:
+          release: latest
+          products: |
+            Simulink
