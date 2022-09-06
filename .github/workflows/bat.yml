@@ -55,5 +55,4 @@ jobs:
         with:
           release: ${{ matrix.release }}
           products: |
-            MATLAB
-            Parallel_Computing_Toolbox
+            Simulink
