@@ -7,12 +7,12 @@ import * as io from "@actions/io"
 import * as tc from "@actions/tool-cache";
 
 export async function toolcacheLocation(release: string): Promise<string> {
-    let toolpath: string = tc.find("MATLAB", "9.12.0");
+    let toolpath: string = tc.find("MATLAB", release);
     if (toolpath) {
         core.info(`Found MATLAB ${release} in cache at ${toolpath}`)
     } else {
         fs.writeFileSync(".cachematlab", "");
-        toolpath = await tc.cacheFile(".cachematlab", ".cachematlab", "MATLAB", "9.12.0")
+        toolpath = await tc.cacheFile(".cachematlab", ".cachematlab", "MATLAB", release)
         io.rmRF(".cachematlab")
     }
     return toolpath

@@ -1,7 +1,6 @@
 // Copyright 2022 The MathWorks, Inc.
 
 import properties from "./properties.json";
-import * as core from "@actions/core";
 import * as exec from "@actions/exec";
 import * as tc from "@actions/tool-cache";
 
@@ -15,8 +14,6 @@ export async function setup(platform: string): Promise<string> {
 }
 
 export async function install(mpmPath: string, release: string, products: string[], destination: string = "") {
-    const allMatlabVersions = tc.findAllVersions('MATLAB');
-    core.info(`Versions of MATLAB available: ${allMatlabVersions}`);
     let mpmArguments: string[] = [
         "install",
         `--release=${release}`,    
