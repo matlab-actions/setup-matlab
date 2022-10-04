@@ -6,7 +6,7 @@ import * as matlab from "./matlab";
 import * as mpm from "./mpm";
 import * as script from "./script";
 
-export async function install(platform: string, releaseInput: string, products: string[]) {
+export async function install(platform: string, architecture: string, releaseInput: string, products: string[]) {
     const release: string = matlab.processRelease(releaseInput);
     // Install runtime system dependencies for MATLAB on Linux
     if (platform === "linux") {
@@ -16,7 +16,7 @@ export async function install(platform: string, releaseInput: string, products: 
     }
 
     await core.group("Setting up MATLAB", async () => {
-        const mpmPath: string = await mpm.setup(platform);
+        const mpmPath: string = await mpm.setup(platform, architecture);
         const destination: string = await matlab.toolcacheLocation(release);
 
         await mpm.install(mpmPath, release, products, destination);

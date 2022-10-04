@@ -15,41 +15,69 @@ afterEach(() => {
 
 describe("setup mpm", () => {
     let tcDownloadToolMock: jest.Mock<any, any>;
+    let tcExtractZipMock: jest.Mock<any, any>;
     let execMock: jest.Mock<any, any>; 
     let defaultInstallRootMock: jest.Mock<any, any>;
-    const platform = "linux";
+    const arch = "x64";
 
     beforeEach(() => {
         tcDownloadToolMock = tc.downloadTool as jest.Mock;
+        tcExtractZipMock = tc.extractZip as jest.Mock;
         execMock = exec.exec as jest.Mock;
         defaultInstallRootMock = script.defaultInstallRoot as jest.Mock;
         process.env.RUNNER_TEMP = "/runner/workdir/tmp";
     });
 
-    it("ideally works", async () => {
-        tcDownloadToolMock.mockResolvedValue("/path/to/mpm");
-        execMock.mockResolvedValue(0);
-        await expect(mpm.setup(platform)).resolves.toBe("/path/to/mpm");
+    describe("test on all supported platforms", () => {
+        it(`works on linux`, async () => {
+            const platform = "linux";
+            tcDownloadToolMock.mockResolvedValue("/path/to/mpm");
+            execMock.mockResolvedValue(0);
+            await expect(mpm.setup(platform, arch)).resolves.toBe("/path/to/mpm");
+            expect(tcDownloadToolMock.mock.calls[0][0]).toContain("glnxa64");
+        });
+    
+        it(`works on windows`, async () => {
+            const platform = "win32";
+            tcDownloadToolMock.mockResolvedValue("/path/to/zip");
+            tcExtractZipMock.mockResolvedValue("/path/to/mpm");
+            execMock.mockResolvedValue(0);
+            await expect(mpm.setup(platform, arch)).resolves.toBe("/path/to/mpm/bin/mpm.exe");
+            expect(tcExtractZipMock).toHaveBeenCalledTimes(1);
+            expect(tcDownloadToolMock.mock.calls[0][0]).toContain("win64");
+        });
+    });
+
+    it("errors on unsupported platform", async () => {
+        await expect(() => mpm.setup('sunos', arch)).rejects.toBeDefined();
+    });
+
+    it("errors on unsupported architecture", async () => {
+        const platform = "linux";
+        await expect(() => mpm.setup(platform, 'x86')).rejects.toBeDefined();
     });
 
     it("works without RUNNER_TEMP", async () => {
+        const platform = "linux";
         process.env.RUNNER_TEMP = '';
         tcDownloadToolMock.mockResolvedValue("/path/to/mpm");
         defaultInstallRootMock.mockReturnValue("/path/to/install/root")
         execMock.mockResolvedValue(0);
-        await expect(mpm.setup(platform)).resolves.toBe("/path/to/mpm");
+        await expect(mpm.setup(platform, arch)).resolves.toBe("/path/to/mpm");
     });
 
     it("rejects when the download fails", async () => {
+        const platform = "linux";
         tcDownloadToolMock.mockRejectedValue(Error("oof"));
         execMock.mockResolvedValue(0);
-        await expect(mpm.setup(platform)).rejects.toBeDefined();
+        await expect(mpm.setup(platform, arch)).rejects.toBeDefined();
     });
 
     it("rejects when the chmod fails", async () => {
+        const platform = "linux";
         tcDownloadToolMock.mockResolvedValue("/path/to/mpm");
         execMock.mockResolvedValue(1);
-        await expect(mpm.setup(platform)).rejects.toBeDefined();
+        await expect(mpm.setup(platform, arch)).rejects.toBeDefined();
     });
 
 });
