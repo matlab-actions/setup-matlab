@@ -25,7 +25,8 @@ export async function setup(platform: string, architecture: string): Promise<str
 
     if (platform === "win32") {
        let mpmExtractedPath: string = await tc.extractZip(mpm);
-       mpm = path.join(mpmExtractedPath, "bin",  "mpm.exe");
+       mpm = path.join(mpmExtractedPath, "bin", "win64",  "mpm.exe");
+       exec.exec(`ls ${mpmExtractedPath}`);
     }
 
     const exitCode = await exec.exec(`chmod +x ${mpm}`)

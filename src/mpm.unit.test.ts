@@ -42,7 +42,7 @@ describe("setup mpm", () => {
             tcDownloadToolMock.mockResolvedValue("/path/to/zip");
             tcExtractZipMock.mockResolvedValue("/path/to/mpm");
             execMock.mockResolvedValue(0);
-            await expect(mpm.setup(platform, arch)).resolves.toBe("/path/to/mpm/bin/mpm.exe");
+            await expect(mpm.setup(platform, arch)).resolves.toBe("/path/to/mpm/bin/win64/mpm.exe");
             expect(tcExtractZipMock).toHaveBeenCalledTimes(1);
             expect(tcDownloadToolMock.mock.calls[0][0]).toContain("win64");
         });
