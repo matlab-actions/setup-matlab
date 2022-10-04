@@ -43,7 +43,7 @@ export async function install(mpmPath: string, release: string, products: string
     if (destination) {
         mpmArguments.push(`--destination=${destination}`);
     }
-    mpmArguments.push(`--products ${products.join(" ")}`);
+    mpmArguments.push(`--products="${products.join(" ")}"`);
 
     const exitCode = await exec.exec(mpmPath, mpmArguments);
     if (exitCode !== 0) {
