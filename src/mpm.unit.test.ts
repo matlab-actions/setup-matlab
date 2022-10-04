@@ -86,7 +86,7 @@ describe("mpm install", () => {
     let execMock: jest.Mock<any, any>;
 
     const mpmPath = "mpm";
-    const release = "R2022a";
+    const release = "R2022b";
     const products = ["MATLAB", "Compiler"];
     const destination = "/opt/matlab"
     

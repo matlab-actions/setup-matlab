@@ -75,7 +75,7 @@ describe("setup matlab-batch", () => {
 
 describe("process release", () => {
     it("latest resolves", () => {
-        expect(matlab.processRelease("latest")).toBe("r2022a")
+        expect(matlab.processRelease("latest")).toBe("r2022b")
     })
 
     it("returns lowercase", () => {

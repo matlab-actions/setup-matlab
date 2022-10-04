@@ -7,12 +7,13 @@ import * as io from "@actions/io"
 import * as tc from "@actions/tool-cache";
 
 export async function toolcacheLocation(release: string): Promise<string> {
-    let toolpath: string = tc.find("MATLAB", release);
+    let semVer = "0.1.0"
+    let toolpath: string = tc.find("MATLAB", semVer);
     if (toolpath) {
-        core.info(`Found MATLAB ${release} in cache at ${toolpath}`)
+        core.info(`Found MATLAB ${semVer} in cache at ${toolpath}`)
     } else {
         fs.writeFileSync(".cachematlab", "");
-        toolpath = await tc.cacheFile(".cachematlab", ".cachematlab", "MATLAB", release)
+        toolpath = await tc.cacheFile(".cachematlab", ".cachematlab", "MATLAB", semVer)
         io.rmRF(".cachematlab")
     }
     return toolpath
@@ -31,7 +32,7 @@ export async function setupBatch(platform: string) {
 export function processRelease(releaseInput: string) {
     let release: string = releaseInput;
     if (releaseInput.toLowerCase() === "latest") {
-        release = "r2022a";
+        release = "r2022b";
     }
     return release.toLowerCase()
 }
