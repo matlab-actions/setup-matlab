@@ -28,8 +28,7 @@ export async function setup(platform: string, architecture: string): Promise<str
        let mpmExtractedPath: string = await tc.extractZip(mpm);
        mpm = path.join(mpmExtractedPath, "bin", "win64",  "mpm.exe");
     } else {
-        const cmd: string = script.generateExecCommand(platform, `chmod +x ${mpm}`);
-        const exitCode = await exec.exec(cmd);
+        const exitCode = await exec.exec(`chmod +x ${mpm}`);
         if (exitCode !== 0) {
             return Promise.reject(Error("unable to setup mpm"))
         }
