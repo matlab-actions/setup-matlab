@@ -23,15 +23,14 @@ export async function setup(platform: string, architecture: string): Promise<str
     }
 
     let mpm: string = await tc.downloadTool(mpmUrl);
+    const exitCode = await exec.exec(`chmod +x ${mpm}`);
+    if (exitCode !== 0) {
+        return Promise.reject(Error("unable to setup mpm"))
+    }
 
     if (platform === "win32") {
        let mpmExtractedPath: string = await tc.extractZip(mpm);
        mpm = path.join(mpmExtractedPath, "bin", "win64",  "mpm.exe");
-    } else {
-        const exitCode = await exec.exec(`chmod +x ${mpm}`);
-        if (exitCode !== 0) {
-            return Promise.reject(Error("unable to setup mpm"))
-        }
     }
     return mpm
 }
