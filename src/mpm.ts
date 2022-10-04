@@ -16,7 +16,7 @@ export async function setup(platform: string, architecture: string): Promise<str
             mpmUrl = properties.mpmRootUrl + "win64/mpm";
             break;
         case "linux":
-            mpmUrl = "glnxa64/mpm";
+            mpmUrl = properties.mpmRootUrl + "glnxa64/mpm";
             break;
         default:
             return Promise.reject(Error(`This action is not supported on ${platform} runners using the ${architecture} architecture.`));
@@ -27,12 +27,12 @@ export async function setup(platform: string, architecture: string): Promise<str
     if (platform === "win32") {
        let mpmExtractedPath: string = await tc.extractZip(mpm);
        mpm = path.join(mpmExtractedPath, "bin", "win64",  "mpm.exe");
-    }
-
-    const cmd: string = script.generateExecCommand(platform, `chmod +x ${mpm}`);
-    const exitCode = await exec.exec(cmd);
-    if (exitCode !== 0) {
-        return Promise.reject(Error("unable to setup mpm"))
+    } else {
+        const cmd: string = script.generateExecCommand(platform, `chmod +x ${mpm}`);
+        const exitCode = await exec.exec(cmd);
+        if (exitCode !== 0) {
+            return Promise.reject(Error("unable to setup mpm"))
+        }
     }
     return mpm
 }
