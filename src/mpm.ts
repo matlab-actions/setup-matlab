@@ -1,6 +1,7 @@
 // Copyright 2022 The MathWorks, Inc.
 
 import properties from "./properties.json";
+import * as script from "./script";
 import * as exec from "@actions/exec";
 import * as tc from "@actions/tool-cache";
 import * as path from "path";
@@ -26,17 +27,17 @@ export async function setup(platform: string, architecture: string): Promise<str
     if (platform === "win32") {
        let mpmExtractedPath: string = await tc.extractZip(mpm);
        mpm = path.join(mpmExtractedPath, "bin", "win64",  "mpm.exe");
-       exec.exec(`ls ${mpmExtractedPath}`);
     }
 
-    const exitCode = await exec.exec(`chmod +x ${mpm}`)
+    const cmd: string = script.generateExecCommand(platform, `chmod +x ${mpm}`);
+    const exitCode = await exec.exec(cmd);
     if (exitCode !== 0) {
         return Promise.reject(Error("unable to setup mpm"))
     }
     return mpm
 }
 
-export async function install(mpmPath: string, release: string, products: string[], destination: string = "") {
+export async function install(platform: string, mpmPath: string, release: string, products: string[], destination: string = "") {
     let mpmArguments: string[] = [
         "install",
         `--release=${release}`,    
@@ -46,7 +47,9 @@ export async function install(mpmPath: string, release: string, products: string
     }
     mpmArguments.push("--products", products.join(" "));
 
-    const exitCode = await exec.exec(mpmPath, mpmArguments);
+    const cmd: string = script.generateExecCommand(platform, mpmPath);
+
+    const exitCode = await exec.exec(cmd, mpmArguments);
     if (exitCode !== 0) {
         return Promise.reject(Error(`Script exited with non-zero code ${exitCode}`));
     }
