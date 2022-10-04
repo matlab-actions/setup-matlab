@@ -35,7 +35,7 @@ export async function setup(platform: string, architecture: string): Promise<str
     return mpm
 }
 
-export async function install(platform: string, mpmPath: string, release: string, products: string[], destination: string = "") {
+export async function install(mpmPath: string, release: string, products: string[], destination: string = "") {
     let mpmArguments: string[] = [
         "install",
         `--release=${release}`,    
@@ -43,7 +43,7 @@ export async function install(platform: string, mpmPath: string, release: string
     if (destination) {
         mpmArguments.push(`--destination=${destination}`);
     }
-    mpmArguments.push("--products", products.join(" "));
+    mpmArguments.push(`--products ${products.join(" ")}`);
 
     const exitCode = await exec.exec(mpmPath, mpmArguments);
     if (exitCode !== 0) {

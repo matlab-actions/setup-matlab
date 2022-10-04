@@ -19,7 +19,7 @@ export async function install(platform: string, architecture: string, releaseInp
         const mpmPath: string = await mpm.setup(platform, architecture);
         const destination: string = await matlab.toolcacheLocation(release);
 
-        await mpm.install(platform, mpmPath, release, products, destination);
+        await mpm.install(mpmPath, release, products, destination);
         await matlab.setupBatch(platform)
     });
 

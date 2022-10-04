@@ -85,7 +85,6 @@ describe("setup mpm", () => {
 describe("mpm install", () => {
     let execMock: jest.Mock<any, any>;
 
-    const platform = "linux";
     const mpmPath = "mpm";
     const release = "R2022a";
     const products = ["MATLAB", "Compiler"];
@@ -97,19 +96,18 @@ describe("mpm install", () => {
 
     it("ideally works", async () => {
         execMock.mockResolvedValue(0);
-        await expect(mpm.install(platform, mpmPath, release, products)).resolves.toBeUndefined();
+        await expect(mpm.install(mpmPath, release, products)).resolves.toBeUndefined();
     });
 
     it("omits destination flag if destination is not supplied", async () => {
         const expectedMpmArgs = [
             "install",
             `--release=${release}`,
-            "--products",
-            "MATLAB Compiler",
+            "--products MATLAB Compiler",
         ]
         execMock.mockResolvedValue(0);
 
-        await expect(mpm.install(platform, mpmPath, release, products)).resolves.toBeUndefined();
+        await expect(mpm.install(mpmPath, release, products)).resolves.toBeUndefined();
         expect(execMock.mock.calls[0][1]).toMatchObject(expectedMpmArgs);
     });
 
@@ -118,17 +116,16 @@ describe("mpm install", () => {
             "install",
             `--release=${release}`,
             `--destination=${destination}`,
-            "--products",
-            "MATLAB Compiler",
+            "--products MATLAB Compiler",
         ]
         execMock.mockResolvedValue(0);
 
-        await expect(mpm.install(platform, mpmPath, release, products, destination)).resolves.toBeUndefined();
+        await expect(mpm.install(mpmPath, release, products, destination)).resolves.toBeUndefined();
         expect(execMock.mock.calls[0][1]).toMatchObject(expectedMpmArgs);
     });
 
     it("rejects on failed install", async () => {
         execMock.mockResolvedValue(1);
-        await expect(mpm.install(platform, mpmPath, release, products)).rejects.toBeDefined();
+        await expect(mpm.install(mpmPath, release, products)).rejects.toBeDefined();
     });
 });
