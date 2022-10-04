@@ -103,7 +103,7 @@ describe("mpm install", () => {
         const expectedMpmArgs = [
             "install",
             `--release=${release}`,
-            "--products=\"MATLAB Compiler\"",
+            "--products=MATLAB Compiler",
         ]
         execMock.mockResolvedValue(0);
 
@@ -116,7 +116,7 @@ describe("mpm install", () => {
             "install",
             `--release=${release}`,
             `--destination=${destination}`,
-            "--products=\"MATLAB Compiler\"",
+            "--products=MATLAB Compiler",
         ]
         execMock.mockResolvedValue(0);
 
