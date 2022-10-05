@@ -33,7 +33,7 @@ jobs:
           - os: ubuntu-latest
             release: latest
           - os: ubuntu-18.04
-            release: R2021a
+            release: R2022a
           - os: windows-latest
             release: latest
     steps:
