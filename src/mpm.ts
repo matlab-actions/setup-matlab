@@ -48,6 +48,6 @@ export async function install(mpmPath: string, release: string, products: string
     if (exitCode !== 0) {
         return Promise.reject(Error(`Script exited with non-zero code ${exitCode}`));
     }
-    core.addPath(destination);
+    core.addPath(path.join(destination, "bin"));
     return
 }
