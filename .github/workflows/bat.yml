@@ -2,7 +2,6 @@ name: Build and Test
 on: [push]
 
 env:
-  MATHWORKS_SKIP_ACTIVATION: true
   MATHWORKS_ACCOUNT: ${{ secrets.MATHWORKS_ACCOUNT }}
   MATHWORKS_TOKEN: ${{ secrets.MATHWORKS_TOKEN }}
 
@@ -33,13 +32,10 @@ jobs:
         include:
           - os: ubuntu-latest
             release: latest
-            command: assert(~isempty(regexp(version('-release'), '\d{4}.')))
           - os: ubuntu-18.04
-            release: R2020a
-            command: assert(strcmp(version('-release'),'2020a'))
+            release: R2021a
           - os: windows-latest
             release: latest
-            command: assert(~isempty(regexp(version('-release'), '\d{4}.')))
     steps:
       - uses: actions/download-artifact@v2
         with:
@@ -47,7 +43,7 @@ jobs:
       - name: Install MATLAB and PCT
         uses: ./
         with:
-          release: latest
+          release: ${{ matrix.release}}
           products: |
             MATLAB
             Parallel_Computing_Toolbox
@@ -57,3 +53,5 @@ jobs:
           release: latest
           products: |
             Simulink
+      - name: check version
+        run: matlab-batch ver
