@@ -44,7 +44,7 @@ describe("matlab tests", () => {
         })    
     });
 
-    describe("setup matlab-batch", () => {
+    describe("setupBatch", () => {
         let downloadAndRunScriptMock: jest.Mock<any, any>;
         let addPathMock: jest.Mock<any, any>;
         let tcCacheDirMock: jest.Mock<any, any>;
@@ -77,7 +77,7 @@ describe("matlab tests", () => {
 
     });
 
-    describe("process release", () => {
+    describe("getVersion", () => {
         beforeEach(() => {
             // Mock versionInfo response from http client
             jest.spyOn(http.HttpClient.prototype, 'getJson').mockImplementation(async () => {

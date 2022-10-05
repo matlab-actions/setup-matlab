@@ -1,7 +1,7 @@
 // Copyright 2022 The MathWorks, Inc.
 
 import properties from "./properties.json";
-import * as script from "./script";
+import * as core from "@actions/core";
 import * as exec from "@actions/exec";
 import * as tc from "@actions/tool-cache";
 import * as path from "path";
@@ -35,20 +35,19 @@ export async function setup(platform: string, architecture: string): Promise<str
     return mpm
 }
 
-export async function install(mpmPath: string, release: string, products: string[], destination: string = "") {
+export async function install(mpmPath: string, release: string, products: string[], destination: string) {
     let mpmArguments: string[] = [
         "install",
         `--release=${release}`,    
+        `--destination=${destination}`,
+        "--products",
     ]
-    if (destination) {
-        mpmArguments.push(`--destination=${destination}`);
-    }
-    mpmArguments.push("--products");
     mpmArguments = mpmArguments.concat(products);
 
     const exitCode = await exec.exec(mpmPath, mpmArguments);
     if (exitCode !== 0) {
         return Promise.reject(Error(`Script exited with non-zero code ${exitCode}`));
     }
+    core.addPath(destination);
     return
 }

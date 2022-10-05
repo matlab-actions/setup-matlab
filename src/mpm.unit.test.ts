@@ -2,9 +2,11 @@
 
 import * as mpm from "./mpm";
 import * as script from "./script";
+import * as core from "@actions/core";
 import * as exec from "@actions/exec";
 import * as tc from "@actions/tool-cache";
 
+jest.mock("@actions/core");
 jest.mock("@actions/exec");
 jest.mock("@actions/tool-cache");
 jest.mock("./script");
@@ -84,7 +86,7 @@ describe("setup mpm", () => {
 
 describe("mpm install", () => {
     let execMock: jest.Mock<any, any>;
-
+    let addPathMock: jest.Mock<any, any>;
     const mpmPath = "mpm";
     const release = "R2022b";
     const products = ["MATLAB", "Compiler"];
@@ -92,28 +94,10 @@ describe("mpm install", () => {
     
     beforeEach(() => {
         execMock = exec.exec as jest.Mock;
+        addPathMock = core.addPath as jest.Mock;
     });
 
     it("ideally works", async () => {
-        execMock.mockResolvedValue(0);
-        await expect(mpm.install(mpmPath, release, products)).resolves.toBeUndefined();
-    });
-
-    it("omits destination flag if destination is not supplied", async () => {
-        const expectedMpmArgs = [
-            "install",
-            `--release=${release}`,
-            "--products",
-            "MATLAB",
-            "Compiler",
-        ]
-        execMock.mockResolvedValue(0);
-
-        await expect(mpm.install(mpmPath, release, products)).resolves.toBeUndefined();
-        expect(execMock.mock.calls[0][1]).toMatchObject(expectedMpmArgs);
-    });
-
-    it("sets destination flag if destination is supplied", async () => {
         const expectedMpmArgs = [
             "install",
             `--release=${release}`,
@@ -126,10 +110,11 @@ describe("mpm install", () => {
 
         await expect(mpm.install(mpmPath, release, products, destination)).resolves.toBeUndefined();
         expect(execMock.mock.calls[0][1]).toMatchObject(expectedMpmArgs);
+        expect(addPathMock).toHaveBeenCalledTimes(1);
     });
 
     it("rejects on failed install", async () => {
         execMock.mockResolvedValue(1);
-        await expect(mpm.install(mpmPath, release, products)).rejects.toBeDefined();
+        await expect(mpm.install(mpmPath, release, products, destination)).rejects.toBeDefined();
     });
 });
