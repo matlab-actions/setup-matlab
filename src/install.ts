@@ -6,20 +6,21 @@ import * as matlab from "./matlab";
 import * as mpm from "./mpm";
 import * as script from "./script";
 
-export async function install(platform: string, architecture: string, releaseInput: string, products: string[]) {
-    const release: string = matlab.processRelease(releaseInput);
+export async function install(platform: string, architecture: string, release: string, products: string[]) {
+    const version = await matlab.getVersion(release);
+
     // Install runtime system dependencies for MATLAB on Linux
     if (platform === "linux") {
         await core.group("Preparing system for MATLAB", () =>
-            script.downloadAndRunScript(platform, properties.matlabDepsUrl, [release])
+            script.downloadAndRunScript(platform, properties.matlabDepsUrl, [version.release])
         );
     }
 
     await core.group("Setting up MATLAB", async () => {
         const mpmPath: string = await mpm.setup(platform, architecture);
-        const destination: string = await matlab.toolcacheLocation(release);
+        const destination: string = await matlab.toolcacheLocation(version);
 
-        await mpm.install(mpmPath, release, products, destination);
+        await mpm.install(mpmPath, version.release, products, destination);
         await matlab.setupBatch(platform)
     });
 

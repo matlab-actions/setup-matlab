@@ -17,19 +17,25 @@ afterEach(() => {
 
 describe("install procedure", () => {
     let downloadAndRunScriptMock: jest.Mock<any, any>;
+    let matlabGetVersionMock: jest.Mock<any, any>;    
     let matlabSetupBatchMock: jest.Mock<any, any>;
     let mpmSetupMock: jest.Mock<any, any>;
     let mpmInstallMock: jest.Mock<any, any>;
-    
+
     const platform = "linux";
-    const release = "latest";
-    const products = ["MATLAB", "Parallel_Computing_Toolbox"];
     const arch = "x64";
+    const release = "latest";
+    const version = {
+        semantic: "9.13.0",
+        release: "r2022b"
+    };
+    const products = ["MATLAB", "Parallel_Computing_Toolbox"];
 
     const doInstall = () => install.install(platform, arch, release, products);
 
     beforeEach(() => {
         downloadAndRunScriptMock = script.downloadAndRunScript as jest.Mock;
+        matlabGetVersionMock = matlab.getVersion as jest.Mock;
         matlabSetupBatchMock = matlab.setupBatch as jest.Mock;
         mpmSetupMock = mpm.setup as jest.Mock;
         mpmInstallMock = mpm.install as jest.Mock;
@@ -39,6 +45,7 @@ describe("install procedure", () => {
         (core.group as jest.Mock).mockImplementation(async (_, func) => {
             return func();
         });
+        matlabGetVersionMock.mockResolvedValue(version);
     });
 
     it("ideally works", async () => {
@@ -50,7 +57,7 @@ describe("install procedure", () => {
     });
 
     ["darwin", "win32"].forEach((os) => {
-        it(`does not run deps script on ${os}`, async () => {    
+        it(`does not run deps script on ${os}`, async () => { 
             await expect(install.install(os, arch, release, products)).resolves.toBeUndefined();
             expect(downloadAndRunScriptMock).toHaveBeenCalledTimes(0);
             expect(core.group).toHaveBeenCalledTimes(1);
@@ -58,6 +65,11 @@ describe("install procedure", () => {
             expect(mpmSetupMock).toHaveBeenCalledTimes(1);
             expect(mpmInstallMock).toHaveBeenCalledTimes(1);
         });
+    });
+
+    it("rejects for invalid MATLAB version", async () => {
+        matlabGetVersionMock.mockRejectedValue(Error("oof"));
+        await expect(doInstall()).rejects.toBeDefined();
     });
 
     it("rejects when the setup deps fails", async () => {

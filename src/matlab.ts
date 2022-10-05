@@ -5,15 +5,27 @@ import * as fs from "fs";
 import * as core from "@actions/core";
 import * as io from "@actions/io"
 import * as tc from "@actions/tool-cache";
+import * as http from "@actions/http-client"
 
-export async function toolcacheLocation(release: string): Promise<string> {
-    let semVer = "0.1.0"
-    let toolpath: string = tc.find("MATLAB", semVer);
+export interface Version {
+    release: string;
+    semantic: string;
+}
+
+interface MATLABVersionInfo {
+    latest: string;
+    semantic: {
+        [release: string]: string | undefined
+    }
+}
+
+export async function toolcacheLocation(version: Version): Promise<string> {
+    let toolpath: string = tc.find("MATLAB", version.semantic);
     if (toolpath) {
-        core.info(`Found MATLAB ${semVer} in cache at ${toolpath}`)
+        core.info(`Found MATLAB ${version.release} in cache at ${toolpath}`)
     } else {
         fs.writeFileSync(".cachematlab", "");
-        toolpath = await tc.cacheFile(".cachematlab", ".cachematlab", "MATLAB", semVer)
+        toolpath = await tc.cacheFile(".cachematlab", ".cachematlab", "MATLAB", version.semantic)
         io.rmRF(".cachematlab")
     }
     return toolpath
@@ -29,10 +41,25 @@ export async function setupBatch(platform: string) {
     return
 }
 
-export function processRelease(releaseInput: string) {
-    let release: string = releaseInput;
-    if (releaseInput.toLowerCase() === "latest") {
-        release = "r2022b";
+export async function getVersion(release: string): Promise<Version> {
+    const client: http.HttpClient = new http.HttpClient();
+    const versionInfo = await client.getJson<MATLABVersionInfo>(properties.matlabReleaseInfoUrl);
+
+    if (!versionInfo.result) {
+        return Promise.reject(Error(`Could not retrieve version info. Contact ci@mathworks.com if this problem persists.`));
     }
-    return release.toLowerCase()
+
+    let parsedRelease: string = release.toLowerCase();
+    if (parsedRelease === "latest") {
+        parsedRelease = versionInfo.result.latest;
+    }
+
+    let parsedSemantic = versionInfo.result.semantic[parsedRelease];
+    if (!parsedSemantic) {
+        return Promise.reject(Error(`Could not find version corresponding to specified release ${release}.`));
+    }
+    return {
+        semantic: parsedSemantic,
+        release: parsedRelease,
+    }
 }
