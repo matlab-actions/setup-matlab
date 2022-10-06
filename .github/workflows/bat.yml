@@ -35,9 +35,9 @@ jobs:
             check-matlab: matlabVer = ver('matlab'); assert(~isempty(V)); simulinkVer = ver('simulink'); assert(isempty(V));
             check-simulink: simulinkVer = ver('simulink'); assert(~isempty(V));
           - os: ubuntu-18.04
-            release: R2021a
-            check-matlab: matlabVer = ver('matlab'); assert(V.Release == '(R2021a)'); simulinkVer = ver('simulink'); assert(isempty(V));
-            check-simulink: simulinkVer = ver('simulink'); assert(~isempty(V));
+            release: R2022a
+            check-matlab: matlabVer = ver('matlab'); assert(V.Release == '(R2022a)'); simulinkVer = ver('simulink'); assert(isempty(V));
+            check-simulink: simulinkVer = ver('simulink'); assert(V.Release == '(R2022a)');
           - os: windows-latest
             release: latest
             check-matlab: matlabVer = ver('matlab'); assert(~isempty(V)); simulinkVer = ver('simulink'); assert(isempty(V));
@@ -58,7 +58,7 @@ jobs:
       - name: Add Simulink to existing installation
         uses: ./
         with:
-          release: latest
+          release: ${{ matrix.release}}
           products: |
             Simulink
       - name: Check Simulink version
