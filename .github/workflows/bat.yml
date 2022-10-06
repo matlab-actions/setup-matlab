@@ -32,10 +32,16 @@ jobs:
         include:
           - os: ubuntu-latest
             release: latest
+            check-matlab: matlabVer = ver('matlab'); assert(~isempty(V)); simulinkVer = ver('simulink'); assert(isempty(V));
+            check-simulink: simulinkVer = ver('simulink'); assert(~isempty(V));
           - os: ubuntu-18.04
             release: R2021a
+            check-matlab: matlabVer = ver('matlab'); assert(V.Release == '(R2021a)'); simulinkVer = ver('simulink'); assert(isempty(V));
+            check-simulink: simulinkVer = ver('simulink'); assert(~isempty(V));
           - os: windows-latest
             release: latest
+            check-matlab: matlabVer = ver('matlab'); assert(~isempty(V)); simulinkVer = ver('simulink'); assert(isempty(V));
+            check-simulink: simulinkVer = ver('simulink'); assert(~isempty(V));
     steps:
       - uses: actions/download-artifact@v2
         with:
@@ -47,11 +53,13 @@ jobs:
           products: |
             MATLAB
             Parallel_Computing_Toolbox
-      - name: Install Simulink on top
+      - name: Check MATLAB version
+        run: matlab-batch "${{ matrix.check-simulink }}"
+      - name: Add Simulink to existing installation
         uses: ./
         with:
           release: latest
           products: |
             Simulink
-      - name: check version
-        run: matlab-batch ver
+      - name: Check Simulink version
+        run: matlab-batch "${{ matrix.check-simulink }}"
