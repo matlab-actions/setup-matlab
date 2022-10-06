@@ -54,7 +54,7 @@ jobs:
             MATLAB
             Parallel_Computing_Toolbox
       - name: Check MATLAB version
-        run: matlab-batch "${{ matrix.check-simulink }}"
+        run: matlab-batch "${{ matrix.check-matlab }}"
       - name: Add Simulink to existing installation
         uses: ./
         with:
