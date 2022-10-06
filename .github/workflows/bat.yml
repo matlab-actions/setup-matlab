@@ -32,16 +32,16 @@ jobs:
         include:
           - os: ubuntu-latest
             release: latest
-            check-matlab: matlabVer = ver('matlab'); assert(~isempty(V)); simulinkVer = ver('simulink'); assert(isempty(V));
-            check-simulink: simulinkVer = ver('simulink'); assert(~isempty(V));
+            check-matlab: matlabVer = ver('matlab'); assert(~isempty(matlabVer)); simulinkVer = ver('simulink'); assert(isempty(simulinkVer));
+            check-simulink: simulinkVer = ver('simulink'); assert(~isempty(simulinkVer));
           - os: ubuntu-18.04
             release: R2022a
-            check-matlab: matlabVer = ver('matlab'); assert(V.Release == '(R2022a)'); simulinkVer = ver('simulink'); assert(isempty(V));
-            check-simulink: simulinkVer = ver('simulink'); assert(V.Release == '(R2022a)');
+            check-matlab: matlabVer = ver('matlab'); assert(matlabVer.Release == '(R2022a)'); simulinkVer = ver('simulink'); assert(isempty(simulinkVer));
+            check-simulink: simulinkVer = ver('simulink'); assert(simulinkVer.Release == '(R2022a)');
           - os: windows-latest
             release: latest
-            check-matlab: matlabVer = ver('matlab'); assert(~isempty(V)); simulinkVer = ver('simulink'); assert(isempty(V));
-            check-simulink: simulinkVer = ver('simulink'); assert(~isempty(V));
+            check-matlab: matlabVer = ver('matlab'); assert(~isempty(matlabVer)); simulinkVer = ver('simulink'); assert(isempty(simulinkVer));
+            check-simulink: simulinkVer = ver('simulink'); assert(~isempty(simulinkVer));
     steps:
       - uses: actions/download-artifact@v2
         with:
