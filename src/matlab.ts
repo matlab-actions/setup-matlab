@@ -21,12 +21,11 @@ interface MATLABVersionInfo {
 
 export async function toolcacheLocation(version: Version): Promise<string> {
     let toolpath: string = tc.find("MATLAB", version.semantic);
-    const ver = version.semantic + "-1234567"
     if (toolpath) {
-        core.info(`Found MATLAB ${ver} in cache at ${toolpath}`)
+        core.info(`Found MATLAB ${version.release} in cache at ${toolpath}`)
     } else {
         fs.writeFileSync(".cachematlab", "");
-        toolpath = await tc.cacheFile(".cachematlab", ".cachematlab", "MATLAB", ver)
+        toolpath = await tc.cacheFile(".cachematlab", ".cachematlab", "MATLAB", version.semantic)
         io.rmRF(".cachematlab")
     }
     return toolpath
