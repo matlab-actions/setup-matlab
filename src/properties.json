@@ -1,4 +1,5 @@
 {
+    "matlabBatchInstallerUrl": "https://ssd.mathworks.com/supportfiles/ci/matlab-batch/v0/install.sh",
     "matlabDepsUrl": "https://ssd.mathworks.com/supportfiles/ci/matlab-deps/v0/install.sh",
     "matlabBatchInstallerUrl": "https://ssd.mathworks.com/supportfiles/ci/matlab-batch/v0/install.sh",
     "matlabReleaseInfoUrl": "https://mw-ci-static-dev.s3.amazonaws.com/matlab-deps/v0/versions.json",
