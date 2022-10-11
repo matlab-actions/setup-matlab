@@ -25,7 +25,7 @@ jobs:
           git config user.email '<>'
       - uses: actions/setup-node@v1
         with:
-          node-version: "12"
+          node-version: "16"
 
       # Call `npm version`. It increments the version and commits the changes.
       # We'll save the output (new version string) for use in the following

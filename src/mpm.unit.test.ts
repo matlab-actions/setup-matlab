@@ -1,12 +1,10 @@
-// Copyright 2022 The MathWorks, Inc.
-
-import * as core from "@actions/core";
-import * as exec from "@actions/exec";
-import * as toolCache from "@actions/tool-cache";
-import { JwkKeyExportOptions } from "crypto";
+// Copyright 2020-2022 The MathWorks, Inc.
 
 import * as mpm from "./mpm";
 import * as script from "./script";
+import * as core from "@actions/core";
+import * as exec from "@actions/exec";
+import * as tc from "@actions/tool-cache";
 
 jest.mock("@actions/core");
 jest.mock("@actions/exec");
@@ -17,80 +15,106 @@ afterEach(() => {
     jest.resetAllMocks();
 });
 
-describe("mpm setup", () => {
-    const release = "latest";
-    const platform = "linux";
-
-    const cacheFileMock = toolCache.cacheFile as jest.Mock;
-    const downloadAndRunScriptMock = script.downloadAndRunScript as jest.Mock;
-    const downloadToolMock = toolCache.downloadTool as jest.Mock;
-    const execMock = exec.exec as jest.Mock;
-    const addPathMock = core.addPath as jest.Mock;
+describe("setup mpm", () => {
+    let tcDownloadToolMock: jest.Mock<any, any>;
+    let tcExtractZipMock: jest.Mock<any, any>;
+    let execMock: jest.Mock<any, any>; 
+    let defaultInstallRootMock: jest.Mock<any, any>;
+    const arch = "x64";
 
     beforeEach(() => {
+        tcDownloadToolMock = tc.downloadTool as jest.Mock;
+        tcExtractZipMock = tc.extractZip as jest.Mock;
+        execMock = exec.exec as jest.Mock;
+        defaultInstallRootMock = script.defaultInstallRoot as jest.Mock;
+        process.env.RUNNER_TEMP = "/runner/workdir/tmp";
+    });
 
-        // Mock core.group to simply return the output of the func it gets from
-        // the caller
-        (core.group as jest.Mock).mockImplementation(async (_, func) => {
-            return func();
+    describe("test on all supported platforms", () => {
+        it(`works on linux`, async () => {
+            const platform = "linux";
+            tcDownloadToolMock.mockResolvedValue("/path/to/mpm");
+            execMock.mockResolvedValue(0);
+            await expect(mpm.setup(platform, arch)).resolves.toBe("/path/to/mpm");
+            expect(tcDownloadToolMock.mock.calls[0][0]).toContain("glnxa64");
+        });
+    
+        it(`works on windows`, async () => {
+            const platform = "win32";
+            tcDownloadToolMock.mockResolvedValue("/path/to/zip");
+            tcExtractZipMock.mockResolvedValue("/path/to/mpm");
+            execMock.mockResolvedValue(0);
+            await expect(mpm.setup(platform, arch)).resolves.toBe("/path/to/mpm/bin/win64/mpm.exe");
+            expect(tcExtractZipMock).toHaveBeenCalledTimes(1);
+            expect(tcDownloadToolMock.mock.calls[0][0]).toContain("win64");
         });
     });
 
-    it("ideally works" , async () => {
-        downloadAndRunScriptMock.mockResolvedValue(undefined);
-        cacheFileMock.mockResolvedValue("/usr/local/bin/mpm");
+    it("errors on unsupported platform", async () => {
+        await expect(() => mpm.setup('sunos', arch)).rejects.toBeDefined();
+    });
+
+    it("errors on unsupported architecture", async () => {
+        const platform = "linux";
+        await expect(() => mpm.setup(platform, 'x86')).rejects.toBeDefined();
+    });
+
+    it("works without RUNNER_TEMP", async () => {
+        const platform = "linux";
+        process.env.RUNNER_TEMP = '';
+        tcDownloadToolMock.mockResolvedValue("/path/to/mpm");
+        defaultInstallRootMock.mockReturnValue("/path/to/install/root")
         execMock.mockResolvedValue(0);
-
-        await expect(mpm.setup(platform, release)).resolves.toBeUndefined();
-        expect(downloadAndRunScriptMock).toHaveBeenCalledTimes(2);
-        expect(addPathMock).toHaveBeenCalledTimes(1);
-        expect(downloadToolMock).toHaveBeenCalledTimes(1);
-        expect(execMock).toHaveBeenCalledTimes(1);
-    });
-
-    ["darwin", "win32"].forEach((os) => {
-        it(`does not run deps script on ${os}`, async () => {
-            cacheFileMock.mockResolvedValue("/usr/local/bin/mpm");
-            downloadAndRunScriptMock.mockResolvedValue(undefined);
-
-            await expect(mpm.setup(os, release)).resolves.toBeUndefined();
-            expect(downloadAndRunScriptMock).toHaveBeenCalledTimes(1);
-            expect(addPathMock).toHaveBeenCalledTimes(1);
-            expect(downloadToolMock).toHaveBeenCalledTimes(1);
-            expect(execMock).toHaveBeenCalledTimes(1);    
-        });
+        await expect(mpm.setup(platform, arch)).resolves.toBe("/path/to/mpm");
     });
 
     it("rejects when the download fails", async () => {
-        downloadAndRunScriptMock.mockRejectedValueOnce(Error("oh no!"));
-
-        await expect(mpm.setup(platform, release)).rejects.toBeDefined();
-        expect(downloadAndRunScriptMock).toHaveBeenCalledTimes(1);
-        expect(core.group).toHaveBeenCalledTimes(1);
+        const platform = "linux";
+        tcDownloadToolMock.mockRejectedValue(Error("oof"));
+        execMock.mockResolvedValue(0);
+        await expect(mpm.setup(platform, arch)).rejects.toBeDefined();
     });
+
+    it("rejects when the chmod fails", async () => {
+        const platform = "linux";
+        tcDownloadToolMock.mockResolvedValue("/path/to/mpm");
+        execMock.mockResolvedValue(1);
+        await expect(mpm.setup(platform, arch)).rejects.toBeDefined();
+    });
+
 });
 
 describe("mpm install", () => {
-    const location = "/opt/matlab";
-    const release = "latest";
-    const products = ["MATLAB", "Parallel_Compute_Toolbox"]
-
-    const execMock = exec.exec as jest.Mock;
-    const addPathMock = core.addPath as jest.Mock;
-
+    let execMock: jest.Mock<any, any>;
+    let addPathMock: jest.Mock<any, any>;
+    const mpmPath = "mpm";
+    const release = "R2022b";
+    const products = ["MATLAB", "Compiler"];
+    const destination = "/opt/matlab"
+    
     beforeEach(() => {
-        // Mock core.group to simply return the output of the func it gets from
-        // the caller
-        (core.group as jest.Mock).mockImplementation(async (_, func) => {
-            return func();
-        });
+        execMock = exec.exec as jest.Mock;
+        addPathMock = core.addPath as jest.Mock;
     });
 
     it("ideally works", async () => {
+        const expectedMpmArgs = [
+            "install",
+            `--release=${release}`,
+            `--destination=${destination}`,
+            "--products",
+            "MATLAB",
+            "Compiler",
+        ]
         execMock.mockResolvedValue(0);
 
-        await expect(mpm.install(location, release, products)).resolves.toBeUndefined();
-        expect(execMock).toHaveBeenCalledTimes(1);
-        // expect(addPathMock).toHaveBeenCalledTimes(1);
+        await expect(mpm.install(mpmPath, release, products, destination)).resolves.toBeUndefined();
+        expect(execMock.mock.calls[0][1]).toMatchObject(expectedMpmArgs);
+        expect(addPathMock).toHaveBeenCalledTimes(1);
+    });
+
+    it("rejects on failed install", async () => {
+        execMock.mockResolvedValue(1);
+        await expect(mpm.install(mpmPath, release, products, destination)).rejects.toBeDefined();
     });
 });

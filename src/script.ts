@@ -1,7 +1,8 @@
 // Copyright 2020-2022 The MathWorks, Inc.
 
 import * as exec from "@actions/exec";
-import * as toolCache from "@actions/tool-cache";
+import * as tc from "@actions/tool-cache";
+import path from "path";
 
 /**
  * Download and run a script on the runner.
@@ -11,7 +12,7 @@ import * as toolCache from "@actions/tool-cache";
  * @param args Arguments to pass to the script.
  */
 export async function downloadAndRunScript(platform: string, url: string, args?: string[]) {
-    const scriptPath = await toolCache.downloadTool(url);
+    const scriptPath = await tc.downloadTool(url);
     const cmd = generateExecCommand(platform, scriptPath);
 
     const exitCode = await exec.exec(cmd, args);
@@ -19,6 +20,7 @@ export async function downloadAndRunScript(platform: string, url: string, args?:
     if (exitCode !== 0) {
         return Promise.reject(Error(`Script exited with non-zero code ${exitCode}`));
     }
+    return
 }
 
 /**
@@ -36,4 +38,14 @@ export function generateExecCommand(platform: string, scriptPath: string): strin
     }
 
     return installCmd;
+}
+
+export function defaultInstallRoot(platform: string, programName: string): string {
+    let installRoot: string;
+    if (platform === "win32") {
+        installRoot = path.join("C:","Program Files", programName);
+    } else {
+        installRoot = path.join("/","opt", programName);
+    }
+    return installRoot;
 }

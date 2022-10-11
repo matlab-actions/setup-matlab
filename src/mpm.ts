@@ -3,48 +3,51 @@
 import properties from "./properties.json";
 import * as core from "@actions/core";
 import * as exec from "@actions/exec";
-import * as toolCache from "@actions/tool-cache";
-import * as script from "./script";
-import * as matlabBatch from "./matlabBatch";
-import path from "path";
+import * as tc from "@actions/tool-cache";
+import * as path from "path";
 
-export async function setup(platform: string, release: string) {
-    if (platform === "linux") {
-        await core.group("Preparing system for MATLAB", () =>
-            script.downloadAndRunScript(platform, properties.matlabDepsUrl, [release])
-        );
+export async function setup(platform: string, architecture: string): Promise<string> {
+    let mpmUrl: string;
+    if (architecture != "x64") {
+        return Promise.reject(Error(`This action is not supported on ${platform} runners using the ${architecture} architecture.`));
+    }
+    switch (platform) {
+        case "win32":
+            mpmUrl = properties.mpmRootUrl + "win64/mpm";
+            break;
+        case "linux":
+            mpmUrl = properties.mpmRootUrl + "glnxa64/mpm";
+            break;
+        default:
+            return Promise.reject(Error(`This action is not supported on ${platform} runners using the ${architecture} architecture.`));
     }
 
-    const batchInstallDir = matlabBatch.installDir(platform);
+    let mpm: string = await tc.downloadTool(mpmUrl);
+    if (platform === "win32") {
+       let mpmExtractedPath: string = await tc.extractZip(mpm);
+       mpm = path.join(mpmExtractedPath, "bin", "win64",  "mpm.exe");
+    }
 
-    await core.group("Setting up matlab-batch", () =>
-        script
-            .downloadAndRunScript(platform, properties.matlabBatchInstallerUrl, [batchInstallDir])
-            .then(() => core.addPath(batchInstallDir))
-    );
-
-    await core.group("Setting MPM", async () => {
-        const downloadPath = await toolCache.downloadTool(properties.mpmUrl);
-        const mpmPath = await toolCache.cacheFile(downloadPath, 'mpm', 'mpm', 'latest');
-        await exec.exec(`chmod +x ${mpmPath}`);
-    });
-    return;
+    const exitCode = await exec.exec(`chmod +x ${mpm}`);
+    if (exitCode !== 0) {
+        return Promise.reject(Error("unable to setup mpm"))
+    }
+    return mpm
 }
 
-export async function install(location: string, release: string, products: string[]) {
-    await core.group("Setting up MATLAB using MPM", async () => {
-        const mpmPath = toolCache.find('mpm', 'latest');
-        const exitCode = await exec.exec(mpmPath, [
-            "install",
-            "--release=" + release,
-            "--destination=" + location,
-            "--products", products.join(" ")
-        ]);
+export async function install(mpmPath: string, release: string, products: string[], destination: string) {
+    let mpmArguments: string[] = [
+        "install",
+        `--release=${release}`,    
+        `--destination=${destination}`,
+        "--products",
+    ]
+    mpmArguments = mpmArguments.concat(products);
 
-        // if (exitCode !== 0) {
-        //     return Promise.reject(Error(`MPM exited with non-zero code ${exitCode}`));
-        // }
-
-        return
-    });
+    const exitCode = await exec.exec(mpmPath, mpmArguments);
+    if (exitCode !== 0) {
+        return Promise.reject(Error(`Script exited with non-zero code ${exitCode}`));
+    }
+    core.addPath(path.join(destination, "bin"));
+    return
 }

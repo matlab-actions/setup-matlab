@@ -1,18 +1,17 @@
 // Copyright 2022 The MathWorks, Inc.
 
 import * as core from "@actions/core";
-import * as mpm from "./mpm";
+import * as install from "./install";
 
 /**
  * Gather action inputs and then run action.
  */
 export async function run() {
     const platform = process.platform;
-    const matlabLocation = core.getInput("location");
+    const architecture = process.arch;
     const release = core.getInput("release");
     const products = core.getMultilineInput("products");
-    await mpm.setup(platform, release);
-    return mpm.install(matlabLocation, release, products);
+    return install.install(platform, architecture, release, products);
 }
 
 run().catch((e) => {

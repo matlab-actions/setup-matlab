@@ -2,7 +2,6 @@ name: Build and Test
 on: [push]
 
 env:
-  MATHWORKS_SKIP_ACTIVATION: true
   MATHWORKS_ACCOUNT: ${{ secrets.MATHWORKS_ACCOUNT }}
   MATHWORKS_TOKEN: ${{ secrets.MATHWORKS_TOKEN }}
 
@@ -14,7 +13,7 @@ jobs:
       - uses: actions/checkout@v2
       - uses: actions/setup-node@v1
         with:
-          node-version: "12"
+          node-version: "16"
       - name: Perform npm tasks
         run: npm run ci
       - uses: actions/upload-artifact@v2
@@ -28,28 +27,39 @@ jobs:
     needs: bat
     runs-on: ${{ matrix.os }}
     strategy:
-      fail-fast: false
+      fail-fast: true
       matrix:
         include:
           - os: ubuntu-latest
-            release: R2021b
-            command: assert(~isempty(regexp(version('-release'), '\d{4}.')))
-        # Excluding the R2020a job as the pilot currently only supports R2020b
-          # - os: ubuntu-18.04
-          #   release: R2020a
-          #   command: assert(strcmp(version('-release'),'2020a'))
+            release: latest
+            check-matlab: matlabVer = ver('matlab'); assert(~isempty(matlabVer)); simulinkVer = ver('simulink'); assert(isempty(simulinkVer));
+            check-simulink: simulinkVer = ver('simulink'); assert(~isempty(simulinkVer));
+          - os: ubuntu-20.04
+            release: R2022a
+            check-matlab: matlabVer = ver('matlab'); assert(matlabVer.Release == string('(R2022a)')); simulinkVer = ver('simulink'); assert(isempty(simulinkVer));
+            check-simulink: simulinkVer = ver('simulink'); assert(simulinkVer.Release == string('(R2022a)'));
+          - os: windows-latest
+            release: latest
+            check-matlab: matlabVer = ver('matlab'); assert(~isempty(matlabVer)); simulinkVer = ver('simulink'); assert(isempty(simulinkVer));
+            check-simulink: simulinkVer = ver('simulink'); assert(~isempty(simulinkVer));
     steps:
       - uses: actions/download-artifact@v2
         with:
           name: built-action
-      - name: Perform 'setup-matlab'
+      - name: Install MATLAB and PCT
         uses: ./
         with:
-          release: ${{ matrix.release }}
-          products: 
+          release: ${{ matrix.release}}
+          products: |
             MATLAB
             Parallel_Computing_Toolbox
-            MATLAB_Compiler
-            MATLAB_Compiler_SDK
-      # - name: Run Sample MATLAB Command
-      #   run: matlab-batch "${{ matrix.command }}"
+      - name: Check MATLAB version
+        run: matlab-batch "${{ matrix.check-matlab }}"
+      - name: Add Simulink to existing installation
+        uses: ./
+        with:
+          release: ${{ matrix.release}}
+          products: |
+            Simulink
+      - name: Check Simulink version
+        run: matlab-batch "${{ matrix.check-simulink }}"
