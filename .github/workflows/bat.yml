@@ -34,7 +34,7 @@ jobs:
             release: latest
             check-matlab: matlabVer = ver('matlab'); assert(~isempty(matlabVer)); simulinkVer = ver('simulink'); assert(isempty(simulinkVer));
             check-simulink: simulinkVer = ver('simulink'); assert(~isempty(simulinkVer));
-          - os: ubuntu-18.04
+          - os: ubuntu-20.04
             release: R2022a
             check-matlab: matlabVer = ver('matlab'); assert(matlabVer.Release == string('(R2022a)')); simulinkVer = ver('simulink'); assert(isempty(simulinkVer));
             check-simulink: simulinkVer = ver('simulink'); assert(simulinkVer.Release == string('(R2022a)'));
