@@ -29,7 +29,7 @@ jobs:
           - os: ubuntu-20.04
             release: latest
             command: assert(~isempty(regexp(version('-release'), '\d{4}.')))
-          - os: ubuntu-22.04
+          - os: ubuntu-latest
             release: R2020a
             command: assert(strcmp(version('-release'),'2020a'))
           - os: macos-latest
