@@ -12,7 +12,7 @@ jobs:
           node-version: 16
       - name: Perform npm tasks
         run: npm run ci
-      - uses: actions/upload-artifact@v2
+      - uses: actions/upload-artifact@v3
         with:
           name: built-action
           path: |
@@ -39,7 +39,7 @@ jobs:
             release: latest
             command: assert(~isempty(regexp(version('-release'), '\d{4}.')))
     steps:
-      - uses: actions/download-artifact@v2
+      - uses: actions/download-artifact@v3
         with:
           name: built-action
       - name: Perform 'setup-matlab'
