@@ -6,13 +6,13 @@ jobs:
     name: Build and Test
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
-      - uses: actions/setup-node@v1
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
         with:
-          node-version: "12"
+          node-version: 16
       - name: Perform npm tasks
         run: npm run ci
-      - uses: actions/upload-artifact@v2
+      - uses: actions/upload-artifact@v3
         with:
           name: built-action
           path: |
@@ -29,7 +29,7 @@ jobs:
           - os: ubuntu-latest
             release: latest
             command: assert(~isempty(regexp(version('-release'), '\d{4}.')))
-          - os: ubuntu-18.04
+          - os: ubuntu-20.04
             release: R2020a
             command: assert(strcmp(version('-release'),'2020a'))
           - os: macos-latest
@@ -39,7 +39,7 @@ jobs:
             release: latest
             command: assert(~isempty(regexp(version('-release'), '\d{4}.')))
     steps:
-      - uses: actions/download-artifact@v2
+      - uses: actions/download-artifact@v3
         with:
           name: built-action
       - name: Perform 'setup-matlab'
