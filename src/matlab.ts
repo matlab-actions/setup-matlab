@@ -1,4 +1,5 @@
 // Copyright 2022 The MathWorks, Inc.
+
 import properties from "./properties.json";
 import * as script from "./script";
 import * as fs from "fs";
