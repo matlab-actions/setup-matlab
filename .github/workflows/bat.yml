@@ -10,13 +10,17 @@ jobs:
     name: Build and Test
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
-      - uses: actions/setup-node@v1
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
         with:
+<<<<<<< HEAD
           node-version: "16"
+=======
+          node-version: 16
+>>>>>>> 6c1f8748877e173dc3891e6261ee0144ab3f57d5
       - name: Perform npm tasks
         run: npm run ci
-      - uses: actions/upload-artifact@v2
+      - uses: actions/upload-artifact@v3
         with:
           name: built-action
           path: |
@@ -32,18 +36,28 @@ jobs:
         include:
           - os: ubuntu-latest
             release: latest
+<<<<<<< HEAD
             check-matlab: matlabVer = ver('matlab'); assert(~isempty(matlabVer)); simulinkVer = ver('simulink'); assert(isempty(simulinkVer));
             check-simulink: simulinkVer = ver('simulink'); assert(~isempty(simulinkVer));
           - os: ubuntu-20.04
             release: R2022a
             check-matlab: matlabVer = ver('matlab'); assert(matlabVer.Release == string('(R2022a)')); simulinkVer = ver('simulink'); assert(isempty(simulinkVer));
             check-simulink: simulinkVer = ver('simulink'); assert(simulinkVer.Release == string('(R2022a)'));
+=======
+            command: assert(~isempty(regexp(version('-release'), '\d{4}.')))
+          - os: ubuntu-20.04
+            release: R2020a
+            command: assert(strcmp(version('-release'),'2020a'))
+          - os: macos-latest
+            release: latest
+            command: assert(~isempty(regexp(version('-release'), '\d{4}.')))
+>>>>>>> 6c1f8748877e173dc3891e6261ee0144ab3f57d5
           - os: windows-latest
             release: latest
             check-matlab: matlabVer = ver('matlab'); assert(~isempty(matlabVer)); simulinkVer = ver('simulink'); assert(isempty(simulinkVer));
             check-simulink: simulinkVer = ver('simulink'); assert(~isempty(simulinkVer));
     steps:
-      - uses: actions/download-artifact@v2
+      - uses: actions/download-artifact@v3
         with:
           name: built-action
       - name: Install MATLAB and PCT
