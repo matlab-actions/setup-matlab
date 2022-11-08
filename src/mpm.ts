@@ -1,10 +1,10 @@
 // Copyright 2022 The MathWorks, Inc.
 
-import properties from "./properties.json";
 import * as core from "@actions/core";
 import * as exec from "@actions/exec";
 import * as tc from "@actions/tool-cache";
 import * as path from "path";
+import properties from "./properties.json";
 
 export async function setup(platform: string, architecture: string): Promise<string> {
     let mpmUrl: string;
@@ -30,7 +30,7 @@ export async function setup(platform: string, architecture: string): Promise<str
 
     const exitCode = await exec.exec(`chmod +x ${mpm}`);
     if (exitCode !== 0) {
-        return Promise.reject(Error("unable to setup mpm"))
+        return Promise.reject(Error("unable to setup mpm"));
     }
     return mpm
 }

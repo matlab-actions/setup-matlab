@@ -1,12 +1,12 @@
 // Copyright 2022 The MathWorks, Inc.
 
+import * as core from "@actions/core";
+import * as http from "@actions/http-client";
+import * as io from "@actions/io";
+import * as tc from "@actions/tool-cache";
+import * as fs from "fs";
 import properties from "./properties.json";
 import * as script from "./script";
-import * as fs from "fs";
-import * as core from "@actions/core";
-import * as io from "@actions/io"
-import * as tc from "@actions/tool-cache";
-import * as http from "@actions/http-client"
 
 export interface Version {
     release: string;
@@ -23,11 +23,11 @@ interface MATLABVersionInfo {
 export async function toolcacheLocation(version: Version): Promise<string> {
     let toolpath: string = tc.find("MATLAB", version.semantic);
     if (toolpath) {
-        core.info(`Found MATLAB ${version.release} in cache at ${toolpath}`)
+        core.info(`Found MATLAB ${version.release} in cache at ${toolpath}`);
     } else {
-        fs.writeFileSync(".cachematlab", "");
-        toolpath = await tc.cacheFile(".cachematlab", ".cachematlab", "MATLAB", version.semantic)
-        io.rmRF(".cachematlab")
+        fs.writeFileSync(".keep", "");
+        toolpath = await tc.cacheFile(".keep", ".keep", "MATLAB", version.semantic);
+        io.rmRF(".keep");
     }
     return toolpath
 }
@@ -38,7 +38,7 @@ export async function setupBatch(platform: string) {
         .downloadAndRunScript(platform, properties.matlabBatchInstallerUrl, [batchInstallDir])
         .then(() => {
             core.addPath(batchInstallDir);
-        })
+        });
     return
 }
 
