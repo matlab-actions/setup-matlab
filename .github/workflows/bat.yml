@@ -46,19 +46,14 @@ jobs:
       - uses: actions/download-artifact@v3
         with:
           name: built-action
-      - name: Install MATLAB (and PCT)
+      - name: Install MATLAB & Simulink (and PCT)
         uses: ./
         with:
           release: ${{ matrix.release}}
           products: |
             MATLAB
+            Simulink
       - name: Check MATLAB version
         run: matlab-batch "${{ matrix.check-matlab }}"
-      - name: Add Simulink to existing installation
-        uses: ./
-        with:
-          release: ${{ matrix.release}}
-          products: |
-            Simulink
       - name: Check Simulink version
         run: matlab-batch "${{ matrix.check-simulink }}"
