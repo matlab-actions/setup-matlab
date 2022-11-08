@@ -21,7 +21,7 @@ jobs:
       - name: Check out repository
         uses: actions/checkout@v3
       - name: Set up MATLAB
-        uses: matlab-actions/setup-matlab@v1
+        uses: matlab-actions/setup-matlab@v2-beta
       - name: Run build
         uses: matlab-actions/run-build@v1
         with:
@@ -42,7 +42,7 @@ jobs:
       - name: Check out repository
         uses: actions/checkout@v3
       - name: Set up MATLAB
-        uses: matlab-actions/setup-matlab@v1
+        uses: matlab-actions/setup-matlab@v2-beta
       - name: Run tests and generate artifacts
         uses: matlab-actions/run-tests@v1
         with:
@@ -64,7 +64,7 @@ jobs:
       - name: Check out repository
         uses: actions/checkout@v3
       - name: Set up MATLAB
-        uses: matlab-actions/setup-matlab@v1
+        uses: matlab-actions/setup-matlab@v2-beta
       - name: Run script
         uses: matlab-actions/run-command@v1
         with:
@@ -77,7 +77,7 @@ When you define your workflow in the `.github/workflows` directory of your repos
 | Input     | Description |
 |-----------|-------------|
 | `release` | (Optional) MATLAB release to set up. You can specify R2020a or a later release. If you do not specify `release`, the action sets up the latest release of MATLAB.<br/>**Example**: `R2022a`
-
+| `products` | (Optional) List of products to install. <br/> **Example**: `Simulink Simulink_Test`
 ## Notes
 When you use the **Setup MATLAB** action, you execute third-party code that is licensed under separate terms.
 
