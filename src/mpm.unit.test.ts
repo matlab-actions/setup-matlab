@@ -1,10 +1,10 @@
 // Copyright 2022 The MathWorks, Inc.
 
-import * as mpm from "./mpm";
-import * as script from "./script";
 import * as core from "@actions/core";
 import * as exec from "@actions/exec";
 import * as tc from "@actions/tool-cache";
+import * as mpm from "./mpm";
+import * as script from "./script";
 
 jest.mock("@actions/core");
 jest.mock("@actions/exec");
@@ -105,6 +105,8 @@ describe("mpm install", () => {
             "--products",
             "MATLAB",
             "Compiler",
+            "MATLAB",
+            "Parallel_Computing_Toolbox",
         ]
         execMock.mockResolvedValue(0);
 

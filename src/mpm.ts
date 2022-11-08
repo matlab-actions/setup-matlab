@@ -36,6 +36,8 @@ export async function setup(platform: string, architecture: string): Promise<str
 }
 
 export async function install(mpmPath: string, release: string, products: string[], destination: string) {
+    // Add MATLAB and PCT by default
+    products.push("MATLAB", "Parallel_Computing_Toolbox")
     let mpmArguments: string[] = [
         "install",
         `--release=${release}`,    
