@@ -35,7 +35,7 @@ export async function toolcacheLocation(version: Version): Promise<string> {
 export async function setupBatch(platform: string) {
     const batchInstallDir = script.defaultInstallRoot(platform, "matlab-batch")
     await script
-        .downloadAndRunScript(platform, properties.matlabBatchInstallerUrl, [batchInstallDir])
+        .downloadAndRunScript(platform, properties.matlabBatchUrl, [batchInstallDir])
         .then(() => {
             core.addPath(batchInstallDir);
         });
