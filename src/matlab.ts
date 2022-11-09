@@ -47,7 +47,7 @@ export async function getVersion(release: string): Promise<Version> {
     const versionInfo = await client.getJson<MATLABVersionInfo>(properties.matlabReleaseInfoUrl);
 
     if (!versionInfo.result) {
-        return Promise.reject(Error(`Could not retrieve version info. Contact ci@mathworks.com if this problem persists.`));
+        return Promise.reject(Error(`Unable to retrieve version info. Contact continuous-integration@mathworks.com if this problem persists.`));
     }
 
     let parsedRelease: string = release.toLowerCase();
@@ -57,7 +57,7 @@ export async function getVersion(release: string): Promise<Version> {
 
     let parsedSemantic = versionInfo.result.semantic[parsedRelease];
     if (!parsedSemantic) {
-        return Promise.reject(Error(`Could not find version corresponding to specified release ${release}.`));
+        return Promise.reject(Error(`Unable to find version corresponding to specified release ${release}.`));
     }
     return {
         semantic: parsedSemantic,
