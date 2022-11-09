@@ -13,7 +13,7 @@ export interface Version {
     semantic: string;
 }
 
-interface MATLABVersionInfo {
+interface MATLABReleaseInfo {
     latest: string;
     semantic: {
         [release: string]: string | undefined
@@ -44,20 +44,20 @@ export async function setupBatch(platform: string) {
 
 export async function getVersion(release: string): Promise<Version> {
     const client: http.HttpClient = new http.HttpClient();
-    const versionInfo = await client.getJson<MATLABVersionInfo>(properties.matlabReleaseInfoUrl);
+    const releaseInfo = await client.getJson<MATLABReleaseInfo>(properties.matlabReleaseInfoUrl);
 
-    if (!versionInfo.result) {
-        return Promise.reject(Error(`Unable to retrieve version info. Contact continuous-integration@mathworks.com if this problem persists.`));
+    if (!releaseInfo.result) {
+        return Promise.reject(Error(`Unable to retrieve release info. Contact continuous-integration@mathworks.com if this problem persists.`));
     }
 
     let parsedRelease: string = release.toLowerCase();
     if (parsedRelease === "latest") {
-        parsedRelease = versionInfo.result.latest;
+        parsedRelease = releaseInfo.result.latest;
     }
 
-    let parsedSemantic = versionInfo.result.semantic[parsedRelease];
+    let parsedSemantic = releaseInfo.result.semantic[parsedRelease];
     if (!parsedSemantic) {
-        return Promise.reject(Error(`Unable to find version corresponding to specified release ${release}.`));
+        return Promise.reject(Error(`Specified release ${release} is invalid or not supported. Specify a valid release R2020a or later.`));
     }
     return {
         semantic: parsedSemantic,
