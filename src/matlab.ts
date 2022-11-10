@@ -47,7 +47,7 @@ export async function getVersion(release: string): Promise<Version> {
     const releaseInfo = await client.getJson<MATLABReleaseInfo>(properties.matlabReleaseInfoUrl);
 
     if (!releaseInfo.result) {
-        return Promise.reject(Error(`Unable to retrieve MATLAB release info. Contact continuous-integration@mathworks.com if this problem persists.`));
+        return Promise.reject(Error(`Unable to retrieve the MATLAB release information. Contact MathWorks at continuous-integration@mathworks.com if the problem persists.`));
     }
 
     let parsedRelease: string = release.toLowerCase();
@@ -57,7 +57,7 @@ export async function getVersion(release: string): Promise<Version> {
 
     let parsedSemantic = releaseInfo.result.semantic[parsedRelease];
     if (!parsedSemantic) {
-        return Promise.reject(Error(`Specified release ${release} is invalid or not supported. Specify a valid release R2020a or later.`));
+        return Promise.reject(Error(`${release} is invalid or unsupported. Specify the value as R2020a or a later release.`));
     }
     return {
         semantic: parsedSemantic,
