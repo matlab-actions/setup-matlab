@@ -47,7 +47,7 @@ export async function getVersion(release: string): Promise<Version> {
     const releaseInfo = await client.getJson<MATLABReleaseInfo>(properties.matlabReleaseInfoUrl);
 
     if (!releaseInfo.result) {
-        return Promise.reject(Error(`Unable to retrieve release info. Contact continuous-integration@mathworks.com if this problem persists.`));
+        return Promise.reject(Error(`Unable to retrieve MATLAB release info. Contact continuous-integration@mathworks.com if this problem persists.`));
     }
 
     let parsedRelease: string = release.toLowerCase();

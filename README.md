@@ -77,7 +77,7 @@ When you define your workflow in the `.github/workflows` directory of your repos
 | Input     | Description |
 |-----------|-------------|
 | `release` | (Optional) MATLAB release to set up. You can specify R2020a or a later release. If you do not specify `release`, the action sets up the latest release of MATLAB.<br/>**Example**: `R2022a`
-| `products` | (Optional) List of products to install using product names separated by spaces. Replace spaces within names with underscores. [See the MathWorks website](https://www.mathworks.com/products.html) for the full list of available products and their names.<br/> **Example**: `MATLAB Simulink Deep_Learning_Toolbox Parallel_Computing_Toolbox`
+| `products` | (Optional) Space-separated list of products to install. If a product name contains white-space characters, replace them with underscores. For the full list of available products and their names, see [Products and Services](https://www.mathworks.com/products.html). By default, the task installs MATLAB and the Parallel Computing Toolbox.<br/> **Example**: `MATLAB Simulink`
 ## Notes
 When you use the **Setup MATLAB** action, you execute third-party code that is licensed under separate terms.
 
