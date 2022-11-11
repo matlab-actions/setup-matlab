@@ -30,7 +30,7 @@ export async function setup(platform: string, architecture: string): Promise<str
 
     const exitCode = await exec.exec(`chmod +x ${mpm}`);
     if (exitCode !== 0) {
-        return Promise.reject(Error("unable to setup mpm"));
+        return Promise.reject(Error("Unable to set up mpm."));
     }
     return mpm
 }
