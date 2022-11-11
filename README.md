@@ -1,8 +1,8 @@
 # Action for Setting Up MATLAB on GitHub-Hosted Runner
 
-Before you run MATLAB&reg; code and Simulink&reg; models on a [GitHub&reg;-hosted](https://docs.github.com/en/free-pro-team@latest/actions/reference/specifications-for-github-hosted-runners) runner, first use the [Setup MATLAB](#set-up-matlab) action. The action sets up the specified MATLAB release on a Linux&reg; virtual machine. If you do not specify a release, the action sets up the latest release of MATLAB.
+Before you run MATLAB&reg; code and Simulink&reg; models on a [GitHub&reg;-hosted](https://docs.github.com/en/free-pro-team@latest/actions/reference/specifications-for-github-hosted-runners) runner, first use the [Setup MATLAB](#set-up-matlab) action. The action sets up the specified MATLAB release on a Linux&reg; or Windows&reg; virtual machine. If you do not specify a release, the action sets up the latest release of MATLAB.
 
-The **Setup MATLAB** action is not supported on [self-hosted](https://docs.github.com/en/free-pro-team@latest/actions/hosting-your-own-runners/about-self-hosted-runners) runners. Currently, it is available only for public projects. It does not set up transformation products, such as MATLAB Coder&trade; and MATLAB Compiler&trade;.
+The **Setup MATLAB** action is not supported on [self-hosted](https://docs.github.com/en/free-pro-team@latest/actions/hosting-your-own-runners/about-self-hosted-runners) runners. Public licensing is not available for transformation products, such as MATLAB Coder&trade; and MATLAB Compiler&trade;.
 
 ## Usage Examples
 Once you set up MATLAB, you can build and test your MATLAB project as part of your workflow. To execute code on the runner, include the [Run MATLAB Build](https://github.com/matlab-actions/run-build/), [Run MATLAB Tests](https://github.com/matlab-actions/run-tests/), or [Run MATLAB Command](https://github.com/matlab-actions/run-command/) actions in your workflow.
