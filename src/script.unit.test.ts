@@ -1,4 +1,4 @@
-// Copyright 2020 The MathWorks, Inc.
+// Copyright 2020-2022 The MathWorks, Inc.
 
 import * as exec from "@actions/exec";
 import * as toolCache from "@actions/tool-cache";
@@ -74,3 +74,17 @@ describe("install command generator", () => {
         });
     });
 });
+
+describe("default install root", () => {
+    const testCase = (platform: string, subdirectory: string) => {
+        it(`sets correct install directory for ${platform}`, async () => {
+            const installDir = script.defaultInstallRoot(platform, "matlab-batch");
+            expect(installDir).toContain(subdirectory);
+            expect(installDir).toContain("matlab-batch")
+        })
+    };
+    
+    testCase("win32", 'Program Files');
+    testCase("darwin", "opt");
+    testCase("linux", "opt");
+})
