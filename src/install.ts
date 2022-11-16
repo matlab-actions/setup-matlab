@@ -23,7 +23,7 @@ export async function install(platform: string, architecture: string, release: s
     // Install runtime system dependencies for MATLAB on Linux
     if (platform === "linux") {
         await core.group("Preparing system for MATLAB", () =>
-            script.downloadAndRunScript(platform, properties.matlabDepsUrl, [version.release])
+            script.downloadAndRunScript(platform, properties.matlabDepsUrl, [version.release.substring(0,6)])
         );
     }
 
