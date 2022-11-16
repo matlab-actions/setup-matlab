@@ -102,6 +102,10 @@ describe("matlab tests", () => {
             expect(matlab.getVersion("R2022b")).resolves.toMatchObject(version);
         });
 
+        it("ignores update level", () => {
+            expect(matlab.getVersion("R2022bU2")).resolves.toMatchObject(version);
+        });
+
         it("rejects for unsupported release", () => {
             expect(matlab.getVersion("R2022c")).rejects.toBeDefined();
         });

@@ -36,15 +36,19 @@ export async function setup(platform: string, architecture: string): Promise<str
 }
 
 export async function install(mpmPath: string, release: string, products: string[], destination: string) {
+    // remove spaces and flatten product list
+    let parsedProducts = products.flatMap(p => p.split(" "));
     // Add MATLAB and PCT by default
-    products.push("MATLAB", "Parallel_Computing_Toolbox")
+    parsedProducts.push("MATLAB", "Parallel_Computing_Toolbox")
+    // Remove duplicates
+    parsedProducts = [...new Set(parsedProducts)];
     let mpmArguments: string[] = [
         "install",
         `--release=${release}`,    
         `--destination=${destination}`,
         "--products",
     ]
-    mpmArguments = mpmArguments.concat(products);
+    mpmArguments = mpmArguments.concat(parsedProducts);
 
     const exitCode = await exec.exec(mpmPath, mpmArguments);
     if (exitCode !== 0) {

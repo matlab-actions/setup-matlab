@@ -89,7 +89,6 @@ describe("mpm install", () => {
     let addPathMock: jest.Mock<any, any>;
     const mpmPath = "mpm";
     const release = "R2022b";
-    const products = ["MATLAB", "Compiler"];
     const destination = "/opt/matlab"
     
     beforeEach(() => {
@@ -97,7 +96,8 @@ describe("mpm install", () => {
         addPathMock = core.addPath as jest.Mock;
     });
 
-    it("ideally works", async () => {
+    it("works with multiline products list", async () => {
+        const products = ["MATLAB", "Compiler"];
         const expectedMpmArgs = [
             "install",
             `--release=${release}`,
@@ -105,7 +105,24 @@ describe("mpm install", () => {
             "--products",
             "MATLAB",
             "Compiler",
+            "Parallel_Computing_Toolbox",
+        ]
+        execMock.mockResolvedValue(0);
+
+        await expect(mpm.install(mpmPath, release, products, destination)).resolves.toBeUndefined();
+        expect(execMock.mock.calls[0][1]).toMatchObject(expectedMpmArgs);
+        expect(addPathMock).toHaveBeenCalledTimes(1);
+    });
+
+    it("works works with space separated products list", async () => {
+        const products = ["MATLAB Compiler"];
+        const expectedMpmArgs = [
+            "install",
+            `--release=${release}`,
+            `--destination=${destination}`,
+            "--products",
             "MATLAB",
+            "Compiler",
             "Parallel_Computing_Toolbox",
         ]
         execMock.mockResolvedValue(0);
@@ -116,6 +133,7 @@ describe("mpm install", () => {
     });
 
     it("rejects on failed install", async () => {
+        const products = ["MATLAB", "Compiler"];
         execMock.mockResolvedValue(1);
         await expect(mpm.install(mpmPath, release, products, destination)).rejects.toBeDefined();
     });
