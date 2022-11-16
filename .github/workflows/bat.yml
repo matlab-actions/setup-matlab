@@ -31,13 +31,13 @@ jobs:
       matrix:
         include:
           - os: ubuntu-latest
-            release: R2022bU2
+            release: latest 
             check-matlab: matlabVer = ver('matlab'); assert(~isempty(matlabVer));
             check-simulink: simulinkVer = ver('simulink'); assert(~isempty(simulinkVer));
           - os: ubuntu-20.04
-            release: R2022a
-            check-matlab: matlabVer = ver('matlab'); assert(strcmp(matlabVer.Release,'(R2022a)'));
-            check-simulink: simulinkVer = ver('simulink'); assert(strcmp(simulinkVer.Release,'(R2022a)'));
+            release: R2021bU2
+            check-matlab: matlabVer = ver('matlab'); assert(strcmp(matlabVer.Release,'(R2021b)'));
+            check-simulink: simulinkVer = ver('simulink'); assert(strcmp(simulinkVer.Release,'(R2021b)'));
           - os: windows-latest
             release: latest
             check-matlab: matlabVer = ver('matlab'); assert(~isempty(matlabVer));
@@ -57,8 +57,8 @@ jobs:
         run: matlab-batch "${{ matrix.check-matlab }}"
       - name: Check Simulink version
         run: matlab-batch "${{ matrix.check-simulink }}"
-      - name: Test with space separated products list
+      - name: Test installing second version with space separated products list
         uses: ./
         with:
-          release: ${{ matrix.release}}
+          release: R2020a
           products: Simulink_Test Deep_Learning_Toolbox
