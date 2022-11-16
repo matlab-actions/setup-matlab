@@ -50,12 +50,12 @@ export async function getVersion(release: string): Promise<Version> {
         return Promise.reject(Error(`Unable to retrieve the MATLAB release information. Contact MathWorks at continuous-integration@mathworks.com if the problem persists.`));
     }
 
-    let parsedRelease: string = release.toLowerCase().substring(0,6);
+    let parsedRelease: string = release.toLowerCase();
     if (parsedRelease === "latest") {
         parsedRelease = releaseInfo.result.latest;
     }
 
-    let parsedSemantic = releaseInfo.result.semantic[parsedRelease];
+    let parsedSemantic = releaseInfo.result.semantic[parsedRelease.substring(0,6)];
     if (!parsedSemantic) {
         return Promise.reject(Error(`${release} is invalid or unsupported. Specify the value as R2020a or a later release.`));
     }

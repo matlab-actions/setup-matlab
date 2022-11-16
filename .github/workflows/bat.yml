@@ -61,4 +61,4 @@ jobs:
         uses: ./
         with:
           release: R2020a
-          products: Simulink_Test Deep_Learning_Toolbox
+          products: Simulink_Test Simulink
