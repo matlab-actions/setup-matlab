@@ -31,7 +31,7 @@ jobs:
       matrix:
         include:
           - os: ubuntu-latest
-            release: latest
+            release: R2022bU2
             check-matlab: matlabVer = ver('matlab'); assert(~isempty(matlabVer));
             check-simulink: simulinkVer = ver('simulink'); assert(~isempty(simulinkVer));
           - os: ubuntu-20.04
@@ -57,3 +57,8 @@ jobs:
         run: matlab-batch "${{ matrix.check-matlab }}"
       - name: Check Simulink version
         run: matlab-batch "${{ matrix.check-simulink }}"
+      - name: Test with space separated products list
+        uses: ./
+        with:
+          release: ${{ matrix.release}}
+          products: Simulink_Test Deep_Learning_Toolbox
