@@ -4,6 +4,7 @@ import * as core from "@actions/core";
 import * as exec from "@actions/exec";
 import * as tc from "@actions/tool-cache";
 import * as path from "path";
+import * as matlab from "./matlab";
 import properties from "./properties.json";
 
 export async function setup(platform: string, architecture: string): Promise<string> {
@@ -35,7 +36,11 @@ export async function setup(platform: string, architecture: string): Promise<str
     return mpm
 }
 
-export async function install(mpmPath: string, release: string, products: string[], destination: string) {
+export async function install(mpmPath: string, release: string, products: string[], destination: matlab.ToolcacheLocation) {
+    if (destination.useExisting) {
+        core.addPath(path.join(destination.path, "bin"));
+        return
+    }
     // remove spaces and flatten product list
     let parsedProducts = products.flatMap(p => p.split(" "));
     // Add MATLAB and PCT by default
@@ -45,7 +50,7 @@ export async function install(mpmPath: string, release: string, products: string
     let mpmArguments: string[] = [
         "install",
         `--release=${release}`,    
-        `--destination=${destination}`,
+        `--destination=${destination.path}`,
         "--products",
     ]
     mpmArguments = mpmArguments.concat(parsedProducts);
@@ -54,6 +59,6 @@ export async function install(mpmPath: string, release: string, products: string
     if (exitCode !== 0) {
         return Promise.reject(Error(`Script exited with non-zero code ${exitCode}`));
     }
-    core.addPath(path.join(destination, "bin"));
+    core.addPath(path.join(destination.path, "bin"));
     return
 }

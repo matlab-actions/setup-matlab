@@ -1,10 +1,10 @@
 // Copyright 2022 The MathWorks, Inc.
 
+import * as core from "@actions/core";
+import * as http from "@actions/http-client";
+import * as tc from "@actions/tool-cache";
 import * as matlab from "./matlab";
 import * as script from "./script";
-import * as core from "@actions/core";
-import * as tc from "@actions/tool-cache";
-import * as http from "@actions/http-client"
 
 jest.mock("./script")
 jest.mock("@actions/core");
@@ -33,14 +33,14 @@ describe("matlab tests", () => {
 
         it("returns toolpath if in toolcache", async () => {
             findMock.mockReturnValue("/opt/hostedtoolcache/matlab/r2022b");
-            await expect(matlab.toolcacheLocation(version)).resolves.toBe("/opt/hostedtoolcache/matlab/r2022b");
+            await expect(matlab.toolcacheLocation(version)).resolves.toMatchObject({path: "/opt/hostedtoolcache/matlab/r2022b", useExisting: true});
             expect(infoMock).toHaveBeenCalledTimes(1);
         });
     
         it("creates cache and returns new path if not in toolcache", async () => {
             findMock.mockReturnValue("");
             cacheFileMock.mockReturnValue("/opt/hostedtoolcache/matlab/r2022b");
-            await expect(matlab.toolcacheLocation(version)).resolves.toBe("/opt/hostedtoolcache/matlab/r2022b");
+            await expect(matlab.toolcacheLocation(version)).resolves.toMatchObject({path: "/opt/hostedtoolcache/matlab/r2022b", useExisting: false});
         })    
     });
 

@@ -89,7 +89,7 @@ describe("mpm install", () => {
     let addPathMock: jest.Mock<any, any>;
     const mpmPath = "mpm";
     const release = "R2022b";
-    const destination = "/opt/matlab"
+    const destination = { path: "/opt/matlab", useExisting: false };
     
     beforeEach(() => {
         execMock = exec.exec as jest.Mock;
@@ -101,7 +101,7 @@ describe("mpm install", () => {
         const expectedMpmArgs = [
             "install",
             `--release=${release}`,
-            `--destination=${destination}`,
+            `--destination=${destination.path}`,
             "--products",
             "MATLAB",
             "Compiler",
@@ -119,7 +119,7 @@ describe("mpm install", () => {
         const expectedMpmArgs = [
             "install",
             `--release=${release}`,
-            `--destination=${destination}`,
+            `--destination=${destination.path}`,
             "--products",
             "MATLAB",
             "Compiler",

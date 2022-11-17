@@ -13,6 +13,11 @@ export interface Version {
     semantic: string;
 }
 
+export interface ToolcacheLocation {
+    useExisting: boolean;
+    path: string
+}
+
 interface MATLABReleaseInfo {
     latest: string;
     semantic: {
@@ -20,16 +25,18 @@ interface MATLABReleaseInfo {
     }
 }
 
-export async function toolcacheLocation(version: Version): Promise<string> {
+export async function toolcacheLocation(version: Version): Promise<ToolcacheLocation> {
     let toolpath: string = tc.find("MATLAB", version.semantic);
+    let useExisting = false;
     if (toolpath) {
         core.info(`Found MATLAB ${version.release} in cache at ${toolpath}.`);
+        useExisting = true;
     } else {
         fs.writeFileSync(".keep", "");
         toolpath = await tc.cacheFile(".keep", ".keep", "MATLAB", version.semantic);
         io.rmRF(".keep");
     }
-    return toolpath
+    return { path: toolpath, useExisting: useExisting }
 }
 
 export async function setupBatch(platform: string) {

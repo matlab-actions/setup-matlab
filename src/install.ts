@@ -29,7 +29,7 @@ export async function install(platform: string, architecture: string, release: s
 
     await core.group("Setting up MATLAB", async () => {
         const mpmPath: string = await mpm.setup(platform, architecture);
-        const destination: string = await matlab.toolcacheLocation(version);
+        const destination: matlab.ToolcacheLocation = await matlab.toolcacheLocation(version);
 
         await mpm.install(mpmPath, version.release, products, destination);
         await matlab.setupBatch(platform);
