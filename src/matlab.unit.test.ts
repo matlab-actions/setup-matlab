@@ -17,8 +17,9 @@ afterEach(() => {
 
 describe("matlab tests", () => {
     const version = {
-        semantic: "9.13.0",
-        release: "r2022b"
+        release: "r2022b",
+        updateVersion: "Latest",
+        semver: "9.13.0",
     }
     describe("toolcacheLocation", () => {
         let findMock: jest.Mock<any, any>;
@@ -74,7 +75,6 @@ describe("matlab tests", () => {
             expect(addPathMock).toHaveBeenCalledTimes(0);
             expect(tcCacheDirMock).toHaveBeenCalledTimes(0);
         });
-
     });
 
     describe("getVersion", () => {
@@ -85,7 +85,7 @@ describe("matlab tests", () => {
                     statusCode: 200,
                     result: {
                       latest: 'r2022b',
-                      semantic: {
+                      semver: {
                         r2022b: '9.13.0',
                       }
                     },
@@ -104,8 +104,9 @@ describe("matlab tests", () => {
 
         it("allows update level", () => {
             const updateVersion = {
-                semantic: "9.13.0",
-                release: "r2022bu2"
+                release: "r2022bu2",
+                updateVersion: "u2",
+                semver: "9.13.0",
             }
             expect(matlab.getVersion("R2022bU2")).resolves.toMatchObject(updateVersion);
         });

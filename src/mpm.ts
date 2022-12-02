@@ -39,6 +39,7 @@ export async function setup(platform: string, architecture: string): Promise<str
 export async function install(mpmPath: string, release: string, products: string[], destination: matlab.ToolcacheLocation) {
     if (destination.useExisting) {
         core.addPath(path.join(destination.path, "bin"));
+        core.setOutput('MATLAB_ROOT', destination.path);
         return
     }
     // remove spaces and flatten product list
@@ -60,5 +61,6 @@ export async function install(mpmPath: string, release: string, products: string
         return Promise.reject(Error(`Script exited with non-zero code ${exitCode}`));
     }
     core.addPath(path.join(destination.path, "bin"));
+    core.setOutput('MATLAB_ROOT', destination.path);
     return
 }

@@ -10,7 +10,8 @@ import * as script from "./script";
 
 export interface Version {
     release: string;
-    semantic: string;
+    updateVersion: string;
+    semver: string;
 }
 
 export interface ToolcacheLocation {
@@ -20,20 +21,20 @@ export interface ToolcacheLocation {
 
 interface MATLABReleaseInfo {
     latest: string;
-    semantic: {
+    semver: {
         [release: string]: string | undefined
     }
 }
 
 export async function toolcacheLocation(version: Version): Promise<ToolcacheLocation> {
-    let toolpath: string = tc.find("MATLAB", version.semantic);
+    let toolpath: string = tc.find("MATLAB", version.semver);
     let useExisting = false;
     if (toolpath) {
         core.info(`Found MATLAB ${version.release} in cache at ${toolpath}.`);
         useExisting = true;
     } else {
         fs.writeFileSync(".keep", "");
-        toolpath = await tc.cacheFile(".keep", ".keep", "MATLAB", version.semantic);
+        toolpath = await tc.cacheFile(".keep", ".keep", "MATLAB", version.semver);
         io.rmRF(".keep");
     }
     return { path: toolpath, useExisting: useExisting }
@@ -57,17 +58,23 @@ export async function getVersion(release: string): Promise<Version> {
         return Promise.reject(Error(`Unable to retrieve the MATLAB release information. Contact MathWorks at continuous-integration@mathworks.com if the problem persists.`));
     }
 
-    let parsedRelease: string = release.toLowerCase();
+    let parsedRelease: string = release.toLowerCase().trimStart().trimEnd();
     if (parsedRelease === "latest") {
         parsedRelease = releaseInfo.result.latest;
     }
 
-    let parsedSemantic = releaseInfo.result.semantic[parsedRelease.substring(0,6)];
-    if (!parsedSemantic) {
+    // Remove update version
+    let parsedSemver = releaseInfo.result.semver[parsedRelease.substring(0,6)];
+    let updateVersion = parsedRelease.trimStart().trimEnd().substring(6,parsedRelease.length);
+    if ( !updateVersion ) {
+        updateVersion = "Latest"
+    }
+    if (!parsedSemver) {
         return Promise.reject(Error(`${release} is invalid or unsupported. Specify the value as R2020a or a later release.`));
     }
     return {
-        semantic: parsedSemantic,
+        semver: parsedSemver,
         release: parsedRelease,
+        updateVersion: updateVersion,
     }
 }

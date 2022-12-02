@@ -26,6 +26,8 @@ jobs:
   integ:
     needs: bat
     runs-on: ${{ matrix.os }}
+    outputs:
+      matlab_root: ${{ steps.setup_matlab.outputs.MATLAB_ROOT }}
     strategy:
       fail-fast: true
       matrix:
@@ -47,12 +49,15 @@ jobs:
         with:
           name: built-action
       - name: Install MATLAB & Simulink (and PCT)
+        id: setup_matlab
         uses: ./
         with:
           release: ${{ matrix.release}}
           products: |
             MATLAB
             Simulink
+      - name: Check output
+        run: echo ${{ steps.setup_matlab.outputs.MATLAB_ROOT }} 
       - name: Check MATLAB version
         run: matlab-batch "${{ matrix.check-matlab }}"
       - name: Check Simulink version
