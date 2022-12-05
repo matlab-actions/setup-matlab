@@ -8,36 +8,31 @@ import * as fs from "fs";
 import properties from "./properties.json";
 import * as script from "./script";
 
-export interface Version {
-    release: string;
-    updateVersion: string;
-    semver: string;
-}
-
-export interface ToolcacheLocation {
-    useExisting: boolean;
-    path: string
+export interface Release {
+    name: string;
+    version: string;
+    updateNumber: string;
 }
 
 interface MATLABReleaseInfo {
     latest: string;
-    semver: {
+    version: {
         [release: string]: string | undefined
     }
 }
 
-export async function toolcacheLocation(version: Version): Promise<ToolcacheLocation> {
-    let toolpath: string = tc.find("MATLAB", version.semver);
+export async function toolcacheLocation(release: Release): Promise<[string, boolean]> {
+    let toolpath: string = tc.find("MATLAB", release.version);
     let useExisting = false;
     if (toolpath) {
-        core.info(`Found MATLAB ${version.release} in cache at ${toolpath}.`);
+        core.info(`Found MATLAB ${release.name} in cache at ${toolpath}.`);
         useExisting = true;
     } else {
         fs.writeFileSync(".keep", "");
-        toolpath = await tc.cacheFile(".keep", ".keep", "MATLAB", version.semver);
+        toolpath = await tc.cacheFile(".keep", ".keep", "MATLAB", release.version);
         io.rmRF(".keep");
     }
-    return { path: toolpath, useExisting: useExisting }
+    return [ toolpath, useExisting ]
 }
 
 export async function setupBatch(platform: string) {
@@ -50,7 +45,7 @@ export async function setupBatch(platform: string) {
     return
 }
 
-export async function getVersion(release: string): Promise<Version> {
+export async function getReleaseInfo(release: string): Promise<Release> {
     const client: http.HttpClient = new http.HttpClient();
     const releaseInfo = await client.getJson<MATLABReleaseInfo>(properties.matlabReleaseInfoUrl);
 
@@ -58,23 +53,23 @@ export async function getVersion(release: string): Promise<Version> {
         return Promise.reject(Error(`Unable to retrieve the MATLAB release information. Contact MathWorks at continuous-integration@mathworks.com if the problem persists.`));
     }
 
-    let parsedRelease: string = release.toLowerCase().trimStart().trimEnd();
-    if (parsedRelease === "latest") {
-        parsedRelease = releaseInfo.result.latest;
+    let name: string = release.toLowerCase().trim();
+    if (name === "latest") {
+        name = releaseInfo.result.latest;
     }
 
     // Remove update version
-    let parsedSemver = releaseInfo.result.semver[parsedRelease.substring(0,6)];
-    let updateVersion = parsedRelease.trim().substring(6,parsedRelease.length);
-    if ( !updateVersion ) {
-        updateVersion = "Latest"
+    let version = releaseInfo.result.version[name.substring(0,6)];
+    let updateNumber = release.toLowerCase().trim().substring(6,name.length);
+    if ( !updateNumber ) {
+        updateNumber = "Latest"
     }
-    if (!parsedSemver) {
+    if (!version) {
         return Promise.reject(Error(`${release} is invalid or unsupported. Specify the value as R2020a or a later release.`));
     }
     return {
-        semver: parsedSemver,
-        release: parsedRelease,
-        updateVersion: updateVersion,
+        name: name,
+        version: version,
+        updateNumber: updateNumber,
     }
 }

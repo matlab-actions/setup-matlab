@@ -16,10 +16,10 @@ afterEach(() => {
 });
 
 describe("matlab tests", () => {
-    const version = {
-        release: "r2022b",
-        updateVersion: "Latest",
-        semver: "9.13.0",
+    const release = {
+        name: "r2022b",
+        version: "9.13.0",
+        updateNumber: "Latest",
     }
     describe("toolcacheLocation", () => {
         let findMock: jest.Mock<any, any>;
@@ -34,14 +34,14 @@ describe("matlab tests", () => {
 
         it("returns toolpath if in toolcache", async () => {
             findMock.mockReturnValue("/opt/hostedtoolcache/matlab/r2022b");
-            await expect(matlab.toolcacheLocation(version)).resolves.toMatchObject({path: "/opt/hostedtoolcache/matlab/r2022b", useExisting: true});
+            await expect(matlab.toolcacheLocation(release)).resolves.toMatchObject(["/opt/hostedtoolcache/matlab/r2022b", true]);
             expect(infoMock).toHaveBeenCalledTimes(1);
         });
     
         it("creates cache and returns new path if not in toolcache", async () => {
             findMock.mockReturnValue("");
             cacheFileMock.mockReturnValue("/opt/hostedtoolcache/matlab/r2022b");
-            await expect(matlab.toolcacheLocation(version)).resolves.toMatchObject({path: "/opt/hostedtoolcache/matlab/r2022b", useExisting: false});
+            await expect(matlab.toolcacheLocation(release)).resolves.toMatchObject(["/opt/hostedtoolcache/matlab/r2022b", false]);
         })    
     });
 
@@ -77,15 +77,15 @@ describe("matlab tests", () => {
         });
     });
 
-    describe("getVersion", () => {
+    describe("getReleaseInfo", () => {
         beforeEach(() => {
-            // Mock versionInfo response from http client
+            // Mock MATLABReleaseInfo response from http client
             jest.spyOn(http.HttpClient.prototype, 'getJson').mockImplementation(async () => {
                 return {
                     statusCode: 200,
                     result: {
                       latest: 'r2022b',
-                      semver: {
+                      version: {
                         r2022b: '9.13.0',
                       }
                     },
@@ -95,24 +95,24 @@ describe("matlab tests", () => {
         });
 
         it("latest resolves", () => {
-            expect(matlab.getVersion("latest")).resolves.toMatchObject(version);
+            expect(matlab.getReleaseInfo("latest")).resolves.toMatchObject(release);
         });
 
         it("case insensitive", () => {
-            expect(matlab.getVersion("R2022b")).resolves.toMatchObject(version);
+            expect(matlab.getReleaseInfo("R2022b")).resolves.toMatchObject(release);
         });
 
-        it("allows update level", () => {
-            const updateVersion = {
-                release: "r2022bu2",
-                updateVersion: "u2",
-                semver: "9.13.0",
+        it("allows specifying update number", () => {
+            const releaseWithUpdateNumber = {
+                name: "r2022bu2",
+                updateNumber: "u2",
+                version: "9.13.0",
             }
-            expect(matlab.getVersion("R2022bU2")).resolves.toMatchObject(updateVersion);
+            expect(matlab.getReleaseInfo("R2022bU2")).resolves.toMatchObject(releaseWithUpdateNumber);
         });
 
         it("rejects for unsupported release", () => {
-            expect(matlab.getVersion("R2022c")).rejects.toBeDefined();
+            expect(matlab.getReleaseInfo("R2022c")).rejects.toBeDefined();
         });
 
         it("rejects if for bad http response", () => {
@@ -123,7 +123,7 @@ describe("matlab tests", () => {
                     headers: {}
                 };
             })            
-            expect(matlab.getVersion("R2022b")).rejects.toBeDefined();
+            expect(matlab.getReleaseInfo("R2022b")).rejects.toBeDefined();
         });
     });
 });

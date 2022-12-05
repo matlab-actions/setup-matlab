@@ -1,6 +1,5 @@
 // Copyright 2022 The MathWorks, Inc.
 
-import * as core from "@actions/core";
 import * as exec from "@actions/exec";
 import * as tc from "@actions/tool-cache";
 import * as path from "path";
@@ -36,12 +35,8 @@ export async function setup(platform: string, architecture: string): Promise<str
     return mpm
 }
 
-export async function install(mpmPath: string, release: string, products: string[], destination: matlab.ToolcacheLocation) {
-    if (destination.useExisting) {
-        core.addPath(path.join(destination.path, "bin"));
-        core.setOutput('MATLAB_ROOT', destination.path);
-        return
-    }
+export async function install(mpmPath: string, release: matlab.Release, products: string[], destination: string) {
+    const mpmRelease = release.name + release.updateNumber
     // remove spaces and flatten product list
     let parsedProducts = products.flatMap(p => p.split(" "));
     // Add MATLAB and PCT by default
@@ -50,8 +45,8 @@ export async function install(mpmPath: string, release: string, products: string
     parsedProducts = [...new Set(parsedProducts)];
     let mpmArguments: string[] = [
         "install",
-        `--release=${release}`,    
-        `--destination=${destination.path}`,
+        `--release=${mpmRelease}`,    
+        `--destination=${destination}`,
         "--products",
     ]
     mpmArguments = mpmArguments.concat(parsedProducts);
@@ -60,7 +55,5 @@ export async function install(mpmPath: string, release: string, products: string
     if (exitCode !== 0) {
         return Promise.reject(Error(`Script exited with non-zero code ${exitCode}`));
     }
-    core.addPath(path.join(destination.path, "bin"));
-    core.setOutput('MATLAB_ROOT', destination.path);
     return
 }

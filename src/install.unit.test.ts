@@ -17,17 +17,21 @@ afterEach(() => {
 
 describe("install procedure", () => {
     let downloadAndRunScriptMock: jest.Mock<any, any>;
-    let matlabGetVersionMock: jest.Mock<any, any>;    
+    let matlabGetReleaseInfoMock: jest.Mock<any, any>;
+    let matlabToolcacheLocationMock: jest.Mock<any, any>;
     let matlabSetupBatchMock: jest.Mock<any, any>;
     let mpmSetupMock: jest.Mock<any, any>;
     let mpmInstallMock: jest.Mock<any, any>;
+    let addPathMock: jest.Mock<any, any>;
+    let setOutputMock: jest.Mock<any, any>;
 
     const platform = "linux";
     const arch = "x64";
     const release = "latest";
-    const version = {
-        semantic: "9.13.0",
-        release: "r2022b"
+    const releaseInfo = {
+        name: "r2022b",
+        version: "9.13.0",
+        updateNumber: "latest"
     };
     const products = ["MATLAB", "Parallel_Computing_Toolbox"];
 
@@ -35,17 +39,21 @@ describe("install procedure", () => {
 
     beforeEach(() => {
         downloadAndRunScriptMock = script.downloadAndRunScript as jest.Mock;
-        matlabGetVersionMock = matlab.getVersion as jest.Mock;
+        matlabGetReleaseInfoMock = matlab.getReleaseInfo as jest.Mock;
+        matlabToolcacheLocationMock = matlab.toolcacheLocation as jest.Mock;
         matlabSetupBatchMock = matlab.setupBatch as jest.Mock;
         mpmSetupMock = mpm.setup as jest.Mock;
         mpmInstallMock = mpm.install as jest.Mock;
+        addPathMock = core.addPath as jest.Mock;
+        setOutputMock = core.setOutput as jest.Mock;
 
         // Mock core.group to simply return the output of the func it gets from
         // the caller
         (core.group as jest.Mock).mockImplementation(async (_, func) => {
             return func();
         });
-        matlabGetVersionMock.mockResolvedValue(version);
+        matlabGetReleaseInfoMock.mockResolvedValue(releaseInfo);
+        matlabToolcacheLocationMock.mockResolvedValue(["/opt/hostedtoolcache/MATLAB/9.13.0/x64", false]);
     });
 
     it("ideally works", async () => {
@@ -54,6 +62,8 @@ describe("install procedure", () => {
         expect(matlabSetupBatchMock).toHaveBeenCalledTimes(1);
         expect(mpmSetupMock).toHaveBeenCalledTimes(1);
         expect(mpmInstallMock).toHaveBeenCalledTimes(1);
+        expect(addPathMock).toHaveBeenCalledTimes(1);
+        expect(setOutputMock).toHaveBeenCalledTimes(1);
     });
 
     ["darwin", "win32"].forEach((os) => {
@@ -64,11 +74,21 @@ describe("install procedure", () => {
             expect(matlabSetupBatchMock).toHaveBeenCalledTimes(1);
             expect(mpmSetupMock).toHaveBeenCalledTimes(1);
             expect(mpmInstallMock).toHaveBeenCalledTimes(1);
+            expect(addPathMock).toHaveBeenCalledTimes(1);
+            expect(setOutputMock).toHaveBeenCalledTimes(1);
         });
     });
 
+    it("NoOp on existing install", async () => {
+        matlabToolcacheLocationMock.mockResolvedValue(["/opt/hostedtoolcache/MATLAB/9.13.0/x64", true]);
+        await expect(doInstall()).resolves.toBeUndefined();
+        expect(mpmInstallMock).toHaveBeenCalledTimes(0);
+        expect(addPathMock).toHaveBeenCalledTimes(1);
+        expect(setOutputMock).toHaveBeenCalledTimes(1);
+    });
+
     it("rejects for invalid MATLAB version", async () => {
-        matlabGetVersionMock.mockRejectedValue(Error("oof"));
+        matlabGetReleaseInfoMock.mockRejectedValue(Error("oof"));
         await expect(doInstall()).rejects.toBeDefined();
     });
 

@@ -92,21 +92,19 @@ describe("mpm install", () => {
     let addPathMock: jest.Mock<any, any>;
     let setOutputMock: jest.Mock<any, any>;
     const mpmPath = "mpm";
-    const release = "R2022b";
-    
+    const releaseInfo = {name: "R2022b", version: "9.12.0", updateNumber: "Latest"};
+    const mpmRelease = "R2022bLatest"
     beforeEach(() => {
         execMock = exec.exec as jest.Mock;
-        addPathMock = core.addPath as jest.Mock;
-        setOutputMock = core.setOutput as jest.Mock;
     });
 
     it("works with multiline products list", async () => {
-        const destination = { path: "/opt/matlab", useExisting: false };
+        const destination ="/opt/matlab";
         const products = ["MATLAB", "Compiler"];
         const expectedMpmArgs = [
             "install",
-            `--release=${release}`,
-            `--destination=${destination.path}`,
+            `--release=${mpmRelease}`,
+            `--destination=${destination}`,
             "--products",
             "MATLAB",
             "Compiler",
@@ -114,19 +112,17 @@ describe("mpm install", () => {
         ]
         execMock.mockResolvedValue(0);
 
-        await expect(mpm.install(mpmPath, release, products, destination)).resolves.toBeUndefined();
+        await expect(mpm.install(mpmPath, releaseInfo, products, destination)).resolves.toBeUndefined();
         expect(execMock.mock.calls[0][1]).toMatchObject(expectedMpmArgs);
-        expect(addPathMock).toHaveBeenCalledTimes(1);
-        expect(setOutputMock).toHaveBeenCalledTimes(1);
     });
 
     it("works works with space separated products list", async () => {
-        const destination = { path: "/opt/matlab", useExisting: false };
+        const destination = "/opt/matlab";
         const products = ["MATLAB Compiler"];
         const expectedMpmArgs = [
             "install",
-            `--release=${release}`,
-            `--destination=${destination.path}`,
+            `--release=${mpmRelease}`,
+            `--destination=${destination}`,
             "--products",
             "MATLAB",
             "Compiler",
@@ -134,27 +130,14 @@ describe("mpm install", () => {
         ]
         execMock.mockResolvedValue(0);
 
-        await expect(mpm.install(mpmPath, release, products, destination)).resolves.toBeUndefined();
+        await expect(mpm.install(mpmPath, releaseInfo, products, destination)).resolves.toBeUndefined();
         expect(execMock.mock.calls[0][1]).toMatchObject(expectedMpmArgs);
-        expect(addPathMock).toHaveBeenCalledTimes(1);
-        expect(setOutputMock).toHaveBeenCalledTimes(1);
-    });
-
-    it("NoOp on existing install", async () => {
-        const destination = { path: "/opt/matlab", useExisting: true };
-        const products = ["MATLAB", "Compiler"];
-        
-        await expect(mpm.install(mpmPath, release, products, destination)).resolves.toBeUndefined();
-        expect(addPathMock).toHaveBeenCalledTimes(1);
-        expect(setOutputMock).toHaveBeenCalledTimes(1);
-        expect(execMock).toHaveBeenCalledTimes(0);
-
     });
 
     it("rejects on failed install", async () => {
-        const destination = { path: "/opt/matlab", useExisting: false };
+        const destination = "/opt/matlab";
         const products = ["MATLAB", "Compiler"];
         execMock.mockResolvedValue(1);
-        await expect(mpm.install(mpmPath, release, products, destination)).rejects.toBeDefined();
+        await expect(mpm.install(mpmPath, releaseInfo, products, destination)).rejects.toBeDefined();
     });
 });
