@@ -61,7 +61,7 @@ jobs:
           release: ${{ matrix.release }}
           products: ${{ matrix.products }}
       - name: Check MATLAB_ROOT output is set
-        run:  '[[ " ${{ steps.setup_matlab.outputs.MATLAB_ROOT }}" != *"MATLAB"* ]] && exit 1'
+        run:  'if [[ "${{ steps.setup_matlab.outputs.MATLAB_ROOT }}" != *"MATLAB"* ]]; then exit 1; fi'
         shell: bash
       - name: Check MATLAB version
         run: matlab-batch "${{ matrix.check-matlab }}"
