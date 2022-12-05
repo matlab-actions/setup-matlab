@@ -34,14 +34,20 @@ jobs:
         include:
           - os: ubuntu-latest
             release: latest 
+            products: Simulink Simulink_Test
             check-matlab: matlabVer = ver('matlab'); assert(~isempty(matlabVer));
             check-simulink: simulinkVer = ver('simulink'); assert(~isempty(simulinkVer));
           - os: ubuntu-20.04
             release: R2021bU2
+            products: |
+              MATLAB
+              Simulink
+              Simulink_Test
             check-matlab: matlabVer = ver('matlab'); assert(strcmp(matlabVer.Release,'(R2021b)'));
             check-simulink: simulinkVer = ver('simulink'); assert(strcmp(simulinkVer.Release,'(R2021b)'));
           - os: windows-latest
             release: latest
+            products: Simulink
             check-matlab: matlabVer = ver('matlab'); assert(~isempty(matlabVer));
             check-simulink: simulinkVer = ver('simulink'); assert(~isempty(simulinkVer));
     steps:
@@ -52,18 +58,12 @@ jobs:
         id: setup_matlab
         uses: ./
         with:
-          release: ${{ matrix.release}}
-          products: |
-            MATLAB
-            Simulink
-      - name: Check output
-        run: echo ${{ steps.setup_matlab.outputs.MATLAB_ROOT }} 
+          release: ${{ matrix.release }}
+          products: ${{ matrix.products }}
+      - name: Check MATLAB_ROOT output is set
+        run:  '[[ " ${{ steps.setup_matlab.outputs.MATLAB_ROOT }}" != *"MATLAB"* ]] && exit 1'
+        shell: bash
       - name: Check MATLAB version
         run: matlab-batch "${{ matrix.check-matlab }}"
       - name: Check Simulink version
         run: matlab-batch "${{ matrix.check-simulink }}"
-      - name: Test installing second version with space separated products list
-        uses: ./
-        with:
-          release: R2020a
-          products: Simulink_Test Simulink
