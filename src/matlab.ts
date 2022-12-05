@@ -65,7 +65,7 @@ export async function getVersion(release: string): Promise<Version> {
 
     // Remove update version
     let parsedSemver = releaseInfo.result.semver[parsedRelease.substring(0,6)];
-    let updateVersion = parsedRelease.trimStart().trimEnd().substring(6,parsedRelease.length);
+    let updateVersion = parsedRelease.trim().substring(6,parsedRelease.length);
     if ( !updateVersion ) {
         updateVersion = "Latest"
     }
