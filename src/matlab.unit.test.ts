@@ -104,7 +104,7 @@ describe("matlab tests", () => {
 
         it("allows specifying update number", () => {
             const releaseWithUpdateNumber = {
-                name: "r2022bu2",
+                name: "r2022b",
                 updateNumber: "u2",
                 version: "9.13.0",
             }

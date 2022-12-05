@@ -53,14 +53,14 @@ export async function getReleaseInfo(release: string): Promise<Release> {
         return Promise.reject(Error(`Unable to retrieve the MATLAB release information. Contact MathWorks at continuous-integration@mathworks.com if the problem persists.`));
     }
 
-    let name: string = release.toLowerCase().trim();
+    let name: string = release.toLowerCase().trim().substring(0,6);
     if (name === "latest") {
         name = releaseInfo.result.latest;
     }
 
     // Remove update version
-    let version = releaseInfo.result.version[name.substring(0,6)];
-    let updateNumber = release.toLowerCase().trim().substring(6,name.length);
+    let version = releaseInfo.result.version[name];
+    let updateNumber = release.toLowerCase().trim().substring(6,release.length);
     if ( !updateNumber ) {
         updateNumber = "Latest"
     }
