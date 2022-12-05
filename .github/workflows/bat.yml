@@ -54,7 +54,7 @@ jobs:
       - uses: actions/download-artifact@v3
         with:
           name: built-action
-      - name: Install MATLAB & Simulink (and PCT)
+      - name: Install selected products
         id: setup_matlab
         uses: ./
         with:
@@ -67,3 +67,9 @@ jobs:
         run: matlab-batch "${{ matrix.check-matlab }}"
       - name: Check Simulink version
         run: matlab-batch "${{ matrix.check-simulink }}"
+      - name: Check NoOp on 2nd install
+        uses: ./
+        with:
+          release: ${{ matrix.release }}
+          products: ${{ matrix.products }}
+  
