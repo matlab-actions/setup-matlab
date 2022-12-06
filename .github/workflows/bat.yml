@@ -31,29 +31,42 @@ jobs:
       matrix:
         include:
           - os: ubuntu-latest
-            release: latest
+            release: latest 
+            products: Simulink Simulink_Test
             check-matlab: matlabVer = ver('matlab'); assert(~isempty(matlabVer));
             check-simulink: simulinkVer = ver('simulink'); assert(~isempty(simulinkVer));
           - os: ubuntu-20.04
-            release: R2022a
-            check-matlab: matlabVer = ver('matlab'); assert(strcmp(matlabVer.Release,'(R2022a)'));
-            check-simulink: simulinkVer = ver('simulink'); assert(strcmp(simulinkVer.Release,'(R2022a)'));
+            release: R2021bU2
+            products: |
+              MATLAB
+              Simulink
+            check-matlab: matlabVer = ver('matlab'); assert(strcmp(matlabVer.Release,'(R2021b)'));
+            check-simulink: simulinkVer = ver('simulink'); assert(strcmp(simulinkVer.Release,'(R2021b)'));
           - os: windows-latest
             release: latest
+            products: Simulink
             check-matlab: matlabVer = ver('matlab'); assert(~isempty(matlabVer));
             check-simulink: simulinkVer = ver('simulink'); assert(~isempty(simulinkVer));
     steps:
       - uses: actions/download-artifact@v3
         with:
           name: built-action
-      - name: Install MATLAB & Simulink (and PCT)
+      - name: Install selected products
+        id: setup_matlab
         uses: ./
         with:
-          release: ${{ matrix.release}}
-          products: |
-            MATLAB
-            Simulink
+          release: ${{ matrix.release }}
+          products: ${{ matrix.products }}
+      - name: Check matlabroot output is set
+        run:  'if [[ "${{ steps.setup_matlab.outputs.matlabroot }}" != *"MATLAB"* ]]; then exit 1; fi'
+        shell: bash
       - name: Check MATLAB version
         run: matlab-batch "${{ matrix.check-matlab }}"
       - name: Check Simulink version
         run: matlab-batch "${{ matrix.check-simulink }}"
+      - name: Check NoOp on 2nd install
+        uses: ./
+        with:
+          release: ${{ matrix.release }}
+          products: ${{ matrix.products }}
+  

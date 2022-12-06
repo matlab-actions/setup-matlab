@@ -1,4 +1,4 @@
-# Copyright 2020 The MathWorks, Inc.
+# Copyright 2020-2022 The MathWorks, Inc.
 
 name: Setup MATLAB
 description: >-
@@ -16,6 +16,10 @@ inputs:
     default: |
       MATLAB
       Parallel_Computing_Toolbox
+outputs:
+  matlabroot:
+    description: >-
+      A full path to the folder where MATLAB is installed.
 runs:
   using: node16
   main: dist/index.js

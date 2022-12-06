@@ -3,6 +3,7 @@
 import * as core from "@actions/core";
 import * as exec from "@actions/exec";
 import * as tc from "@actions/tool-cache";
+import * as path from "path";
 import * as mpm from "./mpm";
 import * as script from "./script";
 
@@ -21,30 +22,32 @@ describe("setup mpm", () => {
     let execMock: jest.Mock<any, any>; 
     let defaultInstallRootMock: jest.Mock<any, any>;
     const arch = "x64";
+    const mpmMockPath = path.join("path", "to", "mpm");
+    const zipMockPath = path.join("path", "to", "zip");
 
     beforeEach(() => {
         tcDownloadToolMock = tc.downloadTool as jest.Mock;
         tcExtractZipMock = tc.extractZip as jest.Mock;
         execMock = exec.exec as jest.Mock;
         defaultInstallRootMock = script.defaultInstallRoot as jest.Mock;
-        process.env.RUNNER_TEMP = "/runner/workdir/tmp";
+        process.env.RUNNER_TEMP = path.join("runner", "workdir", "tmp");
     });
 
     describe("test on all supported platforms", () => {
         it(`works on linux`, async () => {
             const platform = "linux";
-            tcDownloadToolMock.mockResolvedValue("/path/to/mpm");
+            tcDownloadToolMock.mockResolvedValue(mpmMockPath);
             execMock.mockResolvedValue(0);
-            await expect(mpm.setup(platform, arch)).resolves.toBe("/path/to/mpm");
+            await expect(mpm.setup(platform, arch)).resolves.toBe(mpmMockPath);
             expect(tcDownloadToolMock.mock.calls[0][0]).toContain("glnxa64");
         });
     
         it(`works on windows`, async () => {
             const platform = "win32";
-            tcDownloadToolMock.mockResolvedValue("/path/to/zip");
-            tcExtractZipMock.mockResolvedValue("/path/to/mpm");
+            tcDownloadToolMock.mockResolvedValue(zipMockPath);
+            tcExtractZipMock.mockResolvedValue(mpmMockPath);
             execMock.mockResolvedValue(0);
-            await expect(mpm.setup(platform, arch)).resolves.toBe("/path/to/mpm/bin/win64/mpm.exe");
+            await expect(mpm.setup(platform, arch)).resolves.toBe(path.join(mpmMockPath, "bin", "win64", "mpm.exe"));
             expect(tcExtractZipMock).toHaveBeenCalledTimes(1);
             expect(tcDownloadToolMock.mock.calls[0][0]).toContain("win64");
         });
@@ -62,10 +65,10 @@ describe("setup mpm", () => {
     it("works without RUNNER_TEMP", async () => {
         const platform = "linux";
         process.env.RUNNER_TEMP = '';
-        tcDownloadToolMock.mockResolvedValue("/path/to/mpm");
-        defaultInstallRootMock.mockReturnValue("/path/to/install/root")
+        tcDownloadToolMock.mockResolvedValue(mpmMockPath);
+        defaultInstallRootMock.mockReturnValue(path.join("path", "to", "install", "root"));
         execMock.mockResolvedValue(0);
-        await expect(mpm.setup(platform, arch)).resolves.toBe("/path/to/mpm");
+        await expect(mpm.setup(platform, arch)).resolves.toBe(mpmMockPath);
     });
 
     it("rejects when the download fails", async () => {
@@ -87,36 +90,54 @@ describe("setup mpm", () => {
 describe("mpm install", () => {
     let execMock: jest.Mock<any, any>;
     let addPathMock: jest.Mock<any, any>;
+    let setOutputMock: jest.Mock<any, any>;
     const mpmPath = "mpm";
-    const release = "R2022b";
-    const products = ["MATLAB", "Compiler"];
-    const destination = "/opt/matlab"
-    
+    const releaseInfo = {name: "r2022b", version: "9.13.0", update: "latest"};
+    const mpmRelease = "r2022blatest"
     beforeEach(() => {
         execMock = exec.exec as jest.Mock;
-        addPathMock = core.addPath as jest.Mock;
     });
 
-    it("ideally works", async () => {
+    it("works with multiline products list", async () => {
+        const destination ="/opt/matlab";
+        const products = ["MATLAB", "Compiler"];
         const expectedMpmArgs = [
             "install",
-            `--release=${release}`,
+            `--release=${mpmRelease}`,
             `--destination=${destination}`,
             "--products",
             "MATLAB",
             "Compiler",
-            "MATLAB",
             "Parallel_Computing_Toolbox",
         ]
         execMock.mockResolvedValue(0);
 
-        await expect(mpm.install(mpmPath, release, products, destination)).resolves.toBeUndefined();
+        await expect(mpm.install(mpmPath, releaseInfo, products, destination)).resolves.toBeUndefined();
         expect(execMock.mock.calls[0][1]).toMatchObject(expectedMpmArgs);
-        expect(addPathMock).toHaveBeenCalledTimes(1);
+    });
+
+    it("works works with space separated products list", async () => {
+        const destination = "/opt/matlab";
+        const products = ["MATLAB Compiler"];
+        const expectedMpmArgs = [
+            "install",
+            `--release=${mpmRelease}`,
+            `--destination=${destination}`,
+            "--products",
+            "MATLAB",
+            "Compiler",
+            "Parallel_Computing_Toolbox",
+        ]
+        execMock.mockResolvedValue(0);
+
+        await expect(mpm.install(mpmPath, releaseInfo, products, destination)).resolves.toBeUndefined();
+        expect(execMock.mock.calls[0][1]).toMatchObject(expectedMpmArgs);
     });
 
     it("rejects on failed install", async () => {
+        const destination = "/opt/matlab";
+        const products = ["MATLAB", "Compiler"];
         execMock.mockResolvedValue(1);
-        await expect(mpm.install(mpmPath, release, products, destination)).rejects.toBeDefined();
+        await expect(mpm.install(mpmPath, releaseInfo, products, destination)).rejects.toBeDefined();
     });
 });

@@ -1,9 +1,9 @@
 // Copyright 2022 The MathWorks, Inc.
 
-import * as core from "@actions/core";
 import * as exec from "@actions/exec";
 import * as tc from "@actions/tool-cache";
 import * as path from "path";
+import * as matlab from "./matlab";
 import properties from "./properties.json";
 
 export async function setup(platform: string, architecture: string): Promise<string> {
@@ -35,21 +35,25 @@ export async function setup(platform: string, architecture: string): Promise<str
     return mpm
 }
 
-export async function install(mpmPath: string, release: string, products: string[], destination: string) {
+export async function install(mpmPath: string, release: matlab.Release, products: string[], destination: string) {
+    const mpmRelease = release.name + release.update
+    // remove spaces and flatten product list
+    let parsedProducts = products.flatMap(p => p.split(" "));
     // Add MATLAB and PCT by default
-    products.push("MATLAB", "Parallel_Computing_Toolbox")
+    parsedProducts.push("MATLAB", "Parallel_Computing_Toolbox")
+    // Remove duplicates
+    parsedProducts = [...new Set(parsedProducts)];
     let mpmArguments: string[] = [
         "install",
-        `--release=${release}`,    
+        `--release=${mpmRelease}`,    
         `--destination=${destination}`,
         "--products",
     ]
-    mpmArguments = mpmArguments.concat(products);
+    mpmArguments = mpmArguments.concat(parsedProducts);
 
     const exitCode = await exec.exec(mpmPath, mpmArguments);
     if (exitCode !== 0) {
         return Promise.reject(Error(`Script exited with non-zero code ${exitCode}`));
     }
-    core.addPath(path.join(destination, "bin"));
     return
 }
