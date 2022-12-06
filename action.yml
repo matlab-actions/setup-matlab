@@ -16,7 +16,7 @@ inputs:
     default: |
       MATLAB
       Parallel_Computing_Toolbox
-outputs
+outputs:
   matlabroot:
     description: >-
       A full path to the folder where MATLAB is installed.
