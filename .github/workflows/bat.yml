@@ -27,7 +27,7 @@ jobs:
     needs: bat
     runs-on: ${{ matrix.os }}
     outputs:
-      matlab_root: ${{ steps.setup_matlab.outputs.MATLAB_ROOT }}
+      matlab_root: ${{ steps.setup_matlab.outputs.matlabroot }}
     strategy:
       fail-fast: true
       matrix:
@@ -41,8 +41,6 @@ jobs:
             release: R2021bU2
             products: |
               MATLAB
-              Simulink
-              Simulink_Test
             check-matlab: matlabVer = ver('matlab'); assert(strcmp(matlabVer.Release,'(R2021b)'));
             check-simulink: simulinkVer = ver('simulink'); assert(strcmp(simulinkVer.Release,'(R2021b)'));
           - os: windows-latest
