@@ -21,18 +21,18 @@ interface MATLABReleaseInfo {
     }
 }
 
-export async function toolcacheLocation(release: Release): Promise<[string, boolean]> {
+export async function makeToolcacheDir(release: Release): Promise<[string, boolean]> {
     let toolpath: string = tc.find("MATLAB", release.version);
-    let useExisting = false;
+    let alreadyExisted = false;
     if (toolpath) {
         core.info(`Found MATLAB ${release.name} in cache at ${toolpath}.`);
-        useExisting = true;
+        alreadyExisted = true;
     } else {
         fs.writeFileSync(".keep", "");
         toolpath = await tc.cacheFile(".keep", ".keep", "MATLAB", release.version);
         io.rmRF(".keep");
     }
-    return [ toolpath, useExisting ]
+    return [toolpath, alreadyExisted]
 }
 
 export async function setupBatch(platform: string) {

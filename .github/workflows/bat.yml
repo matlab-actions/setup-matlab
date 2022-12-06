@@ -41,6 +41,7 @@ jobs:
             release: R2021bU2
             products: |
               MATLAB
+              Simulink
             check-matlab: matlabVer = ver('matlab'); assert(strcmp(matlabVer.Release,'(R2021b)'));
             check-simulink: simulinkVer = ver('simulink'); assert(strcmp(simulinkVer.Release,'(R2021b)'));
           - os: windows-latest

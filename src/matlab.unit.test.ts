@@ -34,14 +34,14 @@ describe("matlab tests", () => {
 
         it("returns toolpath if in toolcache", async () => {
             findMock.mockReturnValue("/opt/hostedtoolcache/matlab/r2022b");
-            await expect(matlab.toolcacheLocation(release)).resolves.toMatchObject(["/opt/hostedtoolcache/matlab/r2022b", true]);
+            await expect(matlab.makeToolcacheDir(release)).resolves.toMatchObject(["/opt/hostedtoolcache/matlab/r2022b", true]);
             expect(infoMock).toHaveBeenCalledTimes(1);
         });
     
         it("creates cache and returns new path if not in toolcache", async () => {
             findMock.mockReturnValue("");
             cacheFileMock.mockReturnValue("/opt/hostedtoolcache/matlab/r2022b");
-            await expect(matlab.toolcacheLocation(release)).resolves.toMatchObject(["/opt/hostedtoolcache/matlab/r2022b", false]);
+            await expect(matlab.makeToolcacheDir(release)).resolves.toMatchObject(["/opt/hostedtoolcache/matlab/r2022b", false]);
         })    
     });
 
