@@ -11,7 +11,7 @@ import * as script from "./script";
 export interface Release {
     name: string;
     version: string;
-    updateNumber: string;
+    update: string;
 }
 
 interface MATLABReleaseInfo {
@@ -23,16 +23,16 @@ interface MATLABReleaseInfo {
 
 export async function makeToolcacheDir(release: Release): Promise<[string, boolean]> {
     let toolpath: string = tc.find("MATLAB", release.version);
-    let alreadyExisted = false;
+    let alreadyExists = false;
     if (toolpath) {
         core.info(`Found MATLAB ${release.name} in cache at ${toolpath}.`);
-        alreadyExisted = true;
+        alreadyExists = true;
     } else {
         fs.writeFileSync(".keep", "");
         toolpath = await tc.cacheFile(".keep", ".keep", "MATLAB", release.version);
         io.rmRF(".keep");
     }
-    return [toolpath, alreadyExisted]
+    return [toolpath, alreadyExists]
 }
 
 export async function setupBatch(platform: string) {
@@ -60,9 +60,9 @@ export async function getReleaseInfo(release: string): Promise<Release> {
 
     // Remove update version
     let version = releaseInfo.result.version[name];
-    let updateNumber = release.toLowerCase().trim().substring(6,release.length);
-    if ( !updateNumber ) {
-        updateNumber = "Latest"
+    let update = release.toLowerCase().trim().substring(6,release.length);
+    if (!update) {
+        update = "latest"
     }
     if (!version) {
         return Promise.reject(Error(`${release} is invalid or unsupported. Specify the value as R2020a or a later release.`));
@@ -70,6 +70,6 @@ export async function getReleaseInfo(release: string): Promise<Release> {
     return {
         name: name,
         version: version,
-        updateNumber: updateNumber,
+        update: update,
     }
 }

@@ -19,7 +19,7 @@ describe("matlab tests", () => {
     const release = {
         name: "r2022b",
         version: "9.13.0",
-        updateNumber: "Latest",
+        update: "latest",
     }
     describe("toolcacheLocation", () => {
         let findMock: jest.Mock<any, any>;
@@ -103,12 +103,12 @@ describe("matlab tests", () => {
         });
 
         it("allows specifying update number", () => {
-            const releaseWithUpdateNumber = {
+            const releaseWithUpdate = {
                 name: "r2022b",
-                updateNumber: "u2",
+                update: "u2",
                 version: "9.13.0",
             }
-            expect(matlab.getReleaseInfo("R2022bU2")).resolves.toMatchObject(releaseWithUpdateNumber);
+            expect(matlab.getReleaseInfo("R2022bU2")).resolves.toMatchObject(releaseWithUpdate);
         });
 
         it("rejects for unsupported release", () => {

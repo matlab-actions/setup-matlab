@@ -26,8 +26,6 @@ jobs:
   integ:
     needs: bat
     runs-on: ${{ matrix.os }}
-    outputs:
-      matlabroot: ${{ steps.setup_matlab.outputs.matlabroot }}
     strategy:
       fail-fast: true
       matrix:

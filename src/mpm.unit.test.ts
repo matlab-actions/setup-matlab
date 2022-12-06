@@ -92,8 +92,8 @@ describe("mpm install", () => {
     let addPathMock: jest.Mock<any, any>;
     let setOutputMock: jest.Mock<any, any>;
     const mpmPath = "mpm";
-    const releaseInfo = {name: "R2022b", version: "9.12.0", updateNumber: "Latest"};
-    const mpmRelease = "R2022bLatest"
+    const releaseInfo = {name: "r2022b", version: "9.13.0", update: "latest"};
+    const mpmRelease = "r2022blatest"
     beforeEach(() => {
         execMock = exec.exec as jest.Mock;
     });
