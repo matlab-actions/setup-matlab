@@ -2,11 +2,15 @@
 
 import * as core from "@actions/core";
 import * as http from "@actions/http-client";
+import * as httpjs from "http";
+import * as net from 'net';
 import * as tc from "@actions/tool-cache";
 import * as matlab from "./matlab";
 import * as script from "./script";
 
-jest.mock("./script")
+jest.mock("./script");
+jest.mock("http");
+jest.mock("net");
 jest.mock("@actions/core");
 jest.mock("@actions/http-client");
 jest.mock("@actions/tool-cache");
@@ -18,7 +22,7 @@ afterEach(() => {
 describe("matlab tests", () => {
     const release = {
         name: "r2022b",
-        version: "9.13.0",
+        version: "2022.2",
         update: "latest",
     }
     describe("toolcacheLocation", () => {
@@ -80,16 +84,10 @@ describe("matlab tests", () => {
     describe("getReleaseInfo", () => {
         beforeEach(() => {
             // Mock MATLABReleaseInfo response from http client
-            jest.spyOn(http.HttpClient.prototype, 'getJson').mockImplementation(async () => {
+            jest.spyOn(http.HttpClient.prototype, 'get').mockImplementation(async () => {
                 return {
-                    statusCode: 200,
-                    result: {
-                      latest: 'r2022b',
-                      version: {
-                        r2022b: '9.13.0',
-                      }
-                    },
-                    headers: {}
+                    message: new httpjs.IncomingMessage(new net.Socket()),
+                    readBody: () => {return Promise.resolve("r2022b")}
                 };
             })            
         });
@@ -106,7 +104,7 @@ describe("matlab tests", () => {
             const releaseWithUpdate = {
                 name: "r2022b",
                 update: "u2",
-                version: "9.13.0",
+                version: "2022.2.2",
             }
             expect(matlab.getReleaseInfo("R2022bU2")).resolves.toMatchObject(releaseWithUpdate);
         });
@@ -116,14 +114,13 @@ describe("matlab tests", () => {
         });
 
         it("rejects if for bad http response", () => {
-            jest.spyOn(http.HttpClient.prototype, 'getJson').mockImplementation(async () => {
+            jest.spyOn(http.HttpClient.prototype, 'get').mockImplementation(async () => {
                 return {
-                    statusCode: 400,
-                    result: undefined,
-                    headers: {}
+                    message: new httpjs.IncomingMessage(new net.Socket()),
+                    readBody: () => {return Promise.reject("Bam!")}
                 };
             })            
-            expect(matlab.getReleaseInfo("R2022b")).rejects.toBeDefined();
+            expect(matlab.getReleaseInfo("latest")).rejects.toBeDefined();
         });
     });
 });
