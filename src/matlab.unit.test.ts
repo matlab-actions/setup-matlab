@@ -22,8 +22,8 @@ afterEach(() => {
 describe("matlab tests", () => {
     const release = {
         name: "r2022b",
-        version: "2022.2",
-        update: "latest",
+        version: "2022.2.999",
+        update: "Latest",
     }
     describe("toolcacheLocation", () => {
         let findMock: jest.Mock<any, any>;
