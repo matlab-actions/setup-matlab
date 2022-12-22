@@ -68,7 +68,8 @@ export async function getReleaseInfo(release: string): Promise<Release> {
         update = updateMatch[0]
         version += `.${update[1]}`;
     } else {
-        update = "latest";
+        update = "Latest";
+        version += ".999"
     }
 
     return {
