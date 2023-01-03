@@ -18,6 +18,9 @@ export async function setup(platform: string, architecture: string): Promise<str
         case "linux":
             mpmUrl = properties.mpmRootUrl + "glnxa64/mpm";
             break;
+        case "darwin":
+            mpmUrl = properties.mpmRootUrl + "maci64/mpm";
+            break;
         default:
             return Promise.reject(Error(`This action is not supported on ${platform} runners using the ${architecture} architecture.`));
     }
