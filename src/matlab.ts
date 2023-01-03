@@ -14,7 +14,7 @@ export interface Release {
     update: string;
 }
 
-export async function makeToolcacheDir(release: Release): Promise<[string, boolean]> {
+export async function makeToolcacheDir(release: Release, platform: string): Promise<[string, boolean]> {
     let toolpath: string = tc.find("MATLAB", release.version);
     let alreadyExists = false;
     if (toolpath) {
@@ -24,6 +24,9 @@ export async function makeToolcacheDir(release: Release): Promise<[string, boole
         fs.writeFileSync(".keep", "");
         toolpath = await tc.cacheFile(".keep", ".keep", "MATLAB", release.version);
         io.rmRF(".keep");
+    }
+    if (platform === "darwin") {
+        toolpath = toolpath + "/MATLAB.app"
     }
     return [toolpath, alreadyExists]
 }
