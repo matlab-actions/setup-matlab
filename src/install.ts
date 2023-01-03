@@ -30,7 +30,7 @@ export async function install(platform: string, architecture: string, release: s
 
     await core.group("Setting up MATLAB", async () => {
         const mpmPath: string = await mpm.setup(platform, architecture);
-        const [destination, alreadyExists]: [string, boolean] = await matlab.makeToolcacheDir(releaseInfo);
+        const [destination, alreadyExists]: [string, boolean] = await matlab.makeToolcacheDir(releaseInfo, platform);
         if (!alreadyExists) {
             await mpm.install(mpmPath, releaseInfo, products, destination);
         }
