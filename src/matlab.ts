@@ -25,9 +25,6 @@ export async function makeToolcacheDir(release: Release, platform: string): Prom
         toolpath = await tc.cacheFile(".keep", ".keep", "MATLAB", release.version);
         io.rmRF(".keep");
     }
-    if (platform === "darwin") {
-        toolpath = toolpath + "/MATLAB.app"
-    }
     return [toolpath, alreadyExists]
 }
 

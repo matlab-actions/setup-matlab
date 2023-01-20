@@ -101,6 +101,22 @@ describe("matlab tests", () => {
             expect(matlab.getReleaseInfo("R2022b")).resolves.toMatchObject(release);
         });
 
+        it("Sets minor version according to a or b release", () => {
+            const R2022aRelease = {
+                name: "r2022a",
+                update: "Latest",
+                version: "2022.1.999",
+            }
+            expect(matlab.getReleaseInfo("R2022a")).resolves.toMatchObject(R2022aRelease);
+
+            const R2022bRelease = {
+                name: "r2022b",
+                update: "Latest",
+                version: "2022.2.999",
+            }
+            expect(matlab.getReleaseInfo("R2022b")).resolves.toMatchObject(R2022bRelease);
+        });
+
         it("allows specifying update number", () => {
             const releaseWithUpdate = {
                 name: "r2022b",
