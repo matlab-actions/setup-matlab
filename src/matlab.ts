@@ -41,7 +41,8 @@ export async function setupBatch(platform: string) {
 export async function getReleaseInfo(release: string): Promise<Release> {
     // Get release name from input parameter
     let name: string;
-    if (release.toLowerCase().trim() === "latest") {
+    let trimmedRelease = release.toLowerCase().trim()
+    if (trimmedRelease === "latest") {
         try {
             const client: http.HttpClient = new http.HttpClient();
             const latestResp = await client.get(properties.matlabLatestReleaseUrl);
@@ -51,7 +52,7 @@ export async function getReleaseInfo(release: string): Promise<Release> {
             return Promise.reject(Error(`Unable to retrieve the MATLAB release information. Contact MathWorks at continuous-integration@mathworks.com if the problem persists.`));
         }
     } else {
-        let nameMatch = release.toLowerCase().match(/r[0-9]{4}[a-b]/);
+        let nameMatch = trimmedRelease.match(/r[0-9]{4}[a-b]/);
         if (!nameMatch) {
             return Promise.reject(Error(`${release} is invalid or unsupported. Specify the value as R2020a or a later release.`));
         }
@@ -69,9 +70,9 @@ export async function getReleaseInfo(release: string): Promise<Release> {
         version += `.${update[1]}`;
     } else {
         // Notify user if Update version format is invalid
-        if (release.trim() !== name) {
-            const invalidUpdate = release.replace(name, "");
-            core.info(`Defaulting to the latest update release because ${invalidUpdate} is not a valid update release name.`);
+        if (trimmedRelease !== name && trimmedRelease !== "latest") {
+            const invalidUpdate = trimmedRelease.replace(name, "");
+            return Promise.reject(Error(`Defaulting to the latest update release because ${invalidUpdate} is not a valid update release name.`));
         }
         update = "";
         version += ".999"

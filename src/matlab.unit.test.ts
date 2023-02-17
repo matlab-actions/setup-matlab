@@ -129,13 +129,7 @@ describe("matlab tests", () => {
         });
 
         it("displays message for invalid update level input format and uses latest", () => {
-            const releaseWithUpdate = {
-                name: "r2022b",
-                update: "",
-                version: "2022.2.999",
-            }
-            expect(matlab.getReleaseInfo("r2022bUpated1")).resolves.toMatchObject(releaseWithUpdate);
-            expect(infoMock).toHaveBeenCalledTimes(1);
+            expect(matlab.getReleaseInfo("r2022bUpdate1")).rejects.toBeDefined();
         });
 
         it("rejects for unsupported release", () => {
