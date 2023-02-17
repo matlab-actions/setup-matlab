@@ -83,7 +83,9 @@ describe("matlab tests", () => {
     });
 
     describe("getReleaseInfo", () => {
+        let infoMock: jest.Mock<any, any>;
         beforeEach(() => {
+            infoMock = core.info as jest.Mock;
             // Mock MATLABReleaseInfo response from http client
             jest.spyOn(http.HttpClient.prototype, 'get').mockImplementation(async () => {
                 return {
@@ -124,6 +126,16 @@ describe("matlab tests", () => {
                 version: "2022.2.2",
             }
             expect(matlab.getReleaseInfo("R2022bU2")).resolves.toMatchObject(releaseWithUpdate);
+        });
+
+        it("displays message for invalid update level input format and uses latest", () => {
+            const releaseWithUpdate = {
+                name: "r2022b",
+                update: "",
+                version: "2022.2.999",
+            }
+            expect(matlab.getReleaseInfo("r2022bUpated1")).resolves.toMatchObject(releaseWithUpdate);
+            expect(infoMock).toHaveBeenCalledTimes(1);
         });
 
         it("rejects for unsupported release", () => {
