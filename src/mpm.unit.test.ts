@@ -100,8 +100,8 @@ describe("setup mpm", () => {
 describe("mpm install", () => {
     let execMock: jest.Mock<any, any>;
     const mpmPath = "mpm";
-    const releaseInfo = {name: "r2022b", version: "9.13.0", update: "latest"};
-    const mpmRelease = "r2022blatest"
+    const releaseInfo = {name: "r2022b", version: "9.13.0", update: ""};
+    const mpmRelease = "r2022b"
     beforeEach(() => {
         execMock = exec.exec as jest.Mock;
     });

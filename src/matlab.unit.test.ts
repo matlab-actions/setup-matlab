@@ -23,7 +23,7 @@ describe("matlab tests", () => {
     const release = {
         name: "r2022b",
         version: "2022.2.999",
-        update: "Latest",
+        update: "",
     }
     const platform = "linux";
     describe("toolcacheLocation", () => {
@@ -104,14 +104,14 @@ describe("matlab tests", () => {
         it("Sets minor version according to a or b release", () => {
             const R2022aRelease = {
                 name: "r2022a",
-                update: "Latest",
+                update: "",
                 version: "2022.1.999",
             }
             expect(matlab.getReleaseInfo("R2022a")).resolves.toMatchObject(R2022aRelease);
 
             const R2022bRelease = {
                 name: "r2022b",
-                update: "Latest",
+                update: "",
                 version: "2022.2.999",
             }
             expect(matlab.getReleaseInfo("R2022b")).resolves.toMatchObject(R2022bRelease);
