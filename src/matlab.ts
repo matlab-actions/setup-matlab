@@ -71,7 +71,7 @@ export async function getReleaseInfo(release: string): Promise<Release> {
         // Notify user if Update version format is invalid
         if (release.trim() !== name) {
             const invalidUpdate = release.replace(name, "");
-            core.info(`Update version ${invalidUpdate} is invalid. Defaulting to latest update.`);
+            core.info(`Defaulting to the latest update release because ${invalidUpdate} is not a valid update release name.`);
         }
         update = "";
         version += ".999"
