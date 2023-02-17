@@ -41,7 +41,7 @@ export async function setupBatch(platform: string) {
 export async function getReleaseInfo(release: string): Promise<Release> {
     // Get release name from input parameter
     let name: string;
-    if ( release.toLowerCase().trim() === "latest") {
+    if (release.toLowerCase().trim() === "latest") {
         try {
             const client: http.HttpClient = new http.HttpClient();
             const latestResp = await client.get(properties.matlabLatestReleaseUrl);
@@ -52,7 +52,7 @@ export async function getReleaseInfo(release: string): Promise<Release> {
         }
     } else {
         let nameMatch = release.toLowerCase().match(/r[0-9]{4}[a-b]/);
-        if ( !nameMatch ) {
+        if (!nameMatch) {
             return Promise.reject(Error(`${release} is invalid or unsupported. Specify the value as R2020a or a later release.`));
         }
         name = nameMatch[0];
@@ -61,7 +61,7 @@ export async function getReleaseInfo(release: string): Promise<Release> {
     // create semantic version of format year.semiannual.update from release
     let year = name.slice(1,5);
     let semiannual = name[5] === "a"? "1": "2";
-    let updateMatch = release.toLowerCase().match(/u[0-9]/);
+    let updateMatch = release.toLowerCase().match(/u[0-9]+/);
     let version = `${year}.${semiannual}`;
     let update: string;
     if (updateMatch) {
