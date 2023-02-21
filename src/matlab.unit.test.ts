@@ -2,11 +2,15 @@
 
 import * as core from "@actions/core";
 import * as http from "@actions/http-client";
+import * as httpjs from "http";
+import * as net from 'net';
 import * as tc from "@actions/tool-cache";
 import * as matlab from "./matlab";
 import * as script from "./script";
 
-jest.mock("./script")
+jest.mock("./script");
+jest.mock("http");
+jest.mock("net");
 jest.mock("@actions/core");
 jest.mock("@actions/http-client");
 jest.mock("@actions/tool-cache");
@@ -18,9 +22,10 @@ afterEach(() => {
 describe("matlab tests", () => {
     const release = {
         name: "r2022b",
-        version: "9.13.0",
-        update: "latest",
+        version: "2022.2.999",
+        update: "",
     }
+    const platform = "linux";
     describe("toolcacheLocation", () => {
         let findMock: jest.Mock<any, any>;
         let cacheFileMock: jest.Mock<any, any>; 
@@ -34,14 +39,14 @@ describe("matlab tests", () => {
 
         it("returns toolpath if in toolcache", async () => {
             findMock.mockReturnValue("/opt/hostedtoolcache/matlab/r2022b");
-            await expect(matlab.makeToolcacheDir(release)).resolves.toMatchObject(["/opt/hostedtoolcache/matlab/r2022b", true]);
+            await expect(matlab.makeToolcacheDir(release, platform)).resolves.toMatchObject(["/opt/hostedtoolcache/matlab/r2022b", true]);
             expect(infoMock).toHaveBeenCalledTimes(1);
         });
     
         it("creates cache and returns new path if not in toolcache", async () => {
             findMock.mockReturnValue("");
             cacheFileMock.mockReturnValue("/opt/hostedtoolcache/matlab/r2022b");
-            await expect(matlab.makeToolcacheDir(release)).resolves.toMatchObject(["/opt/hostedtoolcache/matlab/r2022b", false]);
+            await expect(matlab.makeToolcacheDir(release, platform)).resolves.toMatchObject(["/opt/hostedtoolcache/matlab/r2022b", false]);
         })    
     });
 
@@ -78,18 +83,14 @@ describe("matlab tests", () => {
     });
 
     describe("getReleaseInfo", () => {
+        let infoMock: jest.Mock<any, any>;
         beforeEach(() => {
+            infoMock = core.info as jest.Mock;
             // Mock MATLABReleaseInfo response from http client
-            jest.spyOn(http.HttpClient.prototype, 'getJson').mockImplementation(async () => {
+            jest.spyOn(http.HttpClient.prototype, 'get').mockImplementation(async () => {
                 return {
-                    statusCode: 200,
-                    result: {
-                      latest: 'r2022b',
-                      version: {
-                        r2022b: '9.13.0',
-                      }
-                    },
-                    headers: {}
+                    message: new httpjs.IncomingMessage(new net.Socket()),
+                    readBody: () => {return Promise.resolve("r2022b")}
                 };
             })            
         });
@@ -102,13 +103,33 @@ describe("matlab tests", () => {
             expect(matlab.getReleaseInfo("R2022b")).resolves.toMatchObject(release);
         });
 
+        it("Sets minor version according to a or b release", () => {
+            const R2022aRelease = {
+                name: "r2022a",
+                update: "",
+                version: "2022.1.999",
+            }
+            expect(matlab.getReleaseInfo("R2022a")).resolves.toMatchObject(R2022aRelease);
+
+            const R2022bRelease = {
+                name: "r2022b",
+                update: "",
+                version: "2022.2.999",
+            }
+            expect(matlab.getReleaseInfo("R2022b")).resolves.toMatchObject(R2022bRelease);
+        });
+
         it("allows specifying update number", () => {
             const releaseWithUpdate = {
                 name: "r2022b",
                 update: "u2",
-                version: "9.13.0",
+                version: "2022.2.2",
             }
             expect(matlab.getReleaseInfo("R2022bU2")).resolves.toMatchObject(releaseWithUpdate);
+        });
+
+        it("displays message for invalid update level input format and uses latest", () => {
+            expect(matlab.getReleaseInfo("r2022bUpdate1")).rejects.toBeDefined();
         });
 
         it("rejects for unsupported release", () => {
@@ -116,14 +137,13 @@ describe("matlab tests", () => {
         });
 
         it("rejects if for bad http response", () => {
-            jest.spyOn(http.HttpClient.prototype, 'getJson').mockImplementation(async () => {
+            jest.spyOn(http.HttpClient.prototype, 'get').mockImplementation(async () => {
                 return {
-                    statusCode: 400,
-                    result: undefined,
-                    headers: {}
+                    message: new httpjs.IncomingMessage(new net.Socket()),
+                    readBody: () => {return Promise.reject("Bam!")}
                 };
             })            
-            expect(matlab.getReleaseInfo("R2022b")).rejects.toBeDefined();
+            expect(matlab.getReleaseInfo("latest")).rejects.toBeDefined();
         });
     });
 });

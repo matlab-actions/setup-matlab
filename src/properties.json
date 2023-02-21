@@ -1,6 +1,6 @@
 {
     "matlabBatchUrl": "https://ssd.mathworks.com/supportfiles/ci/matlab-batch/v0/install.sh",
     "matlabDepsUrl": "https://ssd.mathworks.com/supportfiles/ci/matlab-deps/v0/install.sh",
-    "matlabReleaseInfoUrl": "https://mw-ci-static-dev.s3.amazonaws.com/matlab-deps/v0/versions.json",
+    "matlabLatestReleaseUrl": "https://ssd.mathworks.com/supportfiles/ci/matlab-release/v0/latest",
     "mpmRootUrl": "https://www.mathworks.com/mpm/"
 }

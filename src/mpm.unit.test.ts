@@ -51,6 +51,16 @@ describe("setup mpm", () => {
             expect(tcExtractZipMock).toHaveBeenCalledTimes(1);
             expect(tcDownloadToolMock.mock.calls[0][0]).toContain("win64");
         });
+
+        it(`works on mac`, async () => {
+            const platform = "darwin";
+            tcDownloadToolMock.mockResolvedValue(zipMockPath);
+            tcExtractZipMock.mockResolvedValue(mpmMockPath);
+            execMock.mockResolvedValue(0);
+            await expect(mpm.setup(platform, arch)).resolves.toBe(path.join(mpmMockPath, "bin", "maci64", "mpm"));
+            expect(tcExtractZipMock).toHaveBeenCalledTimes(1);
+            expect(tcDownloadToolMock.mock.calls[0][0]).toContain("maci64");
+        });
     });
 
     it("errors on unsupported platform", async () => {
@@ -89,11 +99,9 @@ describe("setup mpm", () => {
 
 describe("mpm install", () => {
     let execMock: jest.Mock<any, any>;
-    let addPathMock: jest.Mock<any, any>;
-    let setOutputMock: jest.Mock<any, any>;
     const mpmPath = "mpm";
-    const releaseInfo = {name: "r2022b", version: "9.13.0", update: "latest"};
-    const mpmRelease = "r2022blatest"
+    const releaseInfo = {name: "r2022b", version: "9.13.0", update: ""};
+    const mpmRelease = "r2022b"
     beforeEach(() => {
         execMock = exec.exec as jest.Mock;
     });

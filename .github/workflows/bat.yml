@@ -47,6 +47,11 @@ jobs:
             products: Simulink
             check-matlab: matlabVer = ver('matlab'); assert(~isempty(matlabVer));
             check-simulink: simulinkVer = ver('simulink'); assert(~isempty(simulinkVer));
+          - os: macos-latest
+            release: latest
+            products: Simulink
+            check-matlab: matlabVer = ver('matlab'); assert(~isempty(matlabVer));
+            check-simulink: simulinkVer = ver('simulink'); assert(~isempty(simulinkVer));
     steps:
       - uses: actions/download-artifact@v3
         with:

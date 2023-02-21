@@ -18,6 +18,9 @@ export async function setup(platform: string, architecture: string): Promise<str
         case "linux":
             mpmUrl = properties.mpmRootUrl + "glnxa64/mpm";
             break;
+        case "darwin":
+            mpmUrl = properties.mpmRootUrl + "maci64/mpm";
+            break;
         default:
             return Promise.reject(Error(`This action is not supported on ${platform} runners using the ${architecture} architecture.`));
     }
@@ -26,7 +29,10 @@ export async function setup(platform: string, architecture: string): Promise<str
     if (platform === "win32") {
        let mpmExtractedPath: string = await tc.extractZip(mpm);
        mpm = path.join(mpmExtractedPath, "bin", "win64",  "mpm.exe");
-    }
+    } else if (platform === "darwin") {
+        let mpmExtractedPath: string = await tc.extractZip(mpm);
+        mpm = path.join(mpmExtractedPath, "bin", "maci64",  "mpm");
+     }
 
     const exitCode = await exec.exec(`chmod +x ${mpm}`);
     if (exitCode !== 0) {

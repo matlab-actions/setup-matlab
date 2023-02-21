@@ -22,8 +22,8 @@ jobs:
         uses: actions/checkout@v3
       - name: Set up MATLAB
         uses: matlab-actions/setup-matlab@v2-beta
-	with:
-	  products: Simulink Simulink_Test
+        with:
+          products: Simulink Simulink_Test
       - name: Run build
         uses: matlab-actions/run-build@v1
         with:
