@@ -31,11 +31,12 @@ export async function install(platform: string, release: string, skipActivationF
             .downloadAndRunScript(platform, properties.ephemeralInstallerUrl, [
                 "--release",
                 release,
-                skipActivationFlag,])
+                skipActivationFlag,
+            ])
             .then(ematlab.addToPath);
 
         const batchInstallDir = matlabBatch.installDir(platform);
-        
+
         const batchResult = script
             .downloadAndRunScript(platform, properties.matlabBatchInstallerUrl, [batchInstallDir])
             .then(() => core.addPath(batchInstallDir));
