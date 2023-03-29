@@ -59,10 +59,10 @@ describe("install procedure", () => {
     it("rejects when executing the command returns with a non-zero code", async () => {
         downloadAndRunScriptMock
             .mockResolvedValueOnce(undefined)
-            .mockRejectedValueOnce(Error("oof"));
+            .mockRejectedValue(Error("oof"));
 
         await expect(doInstall()).rejects.toBeDefined();
-        expect(downloadAndRunScriptMock).toHaveBeenCalledTimes(2);
+        expect(downloadAndRunScriptMock).toHaveBeenCalledTimes(3);
         expect(addToPathMock).toHaveBeenCalledTimes(0);
         expect(core.group).toHaveBeenCalledTimes(2);
     });
@@ -72,7 +72,7 @@ describe("install procedure", () => {
         addToPathMock.mockRejectedValueOnce(Error("oof"));
 
         await expect(doInstall()).rejects.toBeDefined();
-        expect(downloadAndRunScriptMock).toHaveBeenCalledTimes(2);
+        expect(downloadAndRunScriptMock).toHaveBeenCalledTimes(3);
         expect(addToPathMock).toHaveBeenCalledTimes(1);
     });
 
