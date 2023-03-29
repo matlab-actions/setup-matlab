@@ -47,4 +47,6 @@ jobs:
         with:
           release: ${{ matrix.release }}
       - name: Run Sample MATLAB Command
-        run: matlab -batch "${{ matrix.command }}"
+        uses: matlab-actions/run-command@v1
+        with:
+          command: ${{ matrix.command }}
