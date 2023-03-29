@@ -25,23 +25,23 @@ export async function install(platform: string, release: string, skipActivationF
         );
     }
 
-    // Invoke ephemeral installer to setup a MATLAB on the runner
-    await core.group("Setting up MATLAB", () =>
-        script
+    // Set up MATLAB and matlab-batch
+    await core.group("Setting up MATLAB", () => {
+        const matlabResult = script
             .downloadAndRunScript(platform, properties.ephemeralInstallerUrl, [
                 "--release",
                 release,
                 skipActivationFlag,
             ])
-            .then(ematlab.addToPath)
-    );
+            .then(ematlab.addToPath);
 
-    const batchInstallDir = matlabBatch.installDir(platform);
+        const batchInstallDir = matlabBatch.installDir(platform);
 
-    await core.group("Setting up matlab-batch", () =>
-        script
+        const batchResult = script
             .downloadAndRunScript(platform, properties.matlabBatchInstallerUrl, [batchInstallDir])
-            .then(() => core.addPath(batchInstallDir))
-    )
+            .then(() => core.addPath(batchInstallDir));
+
+        return Promise.all([matlabResult, batchResult]);
+    });
     return;
 }
