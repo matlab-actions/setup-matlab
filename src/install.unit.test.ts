@@ -92,6 +92,15 @@ describe("install procedure", () => {
         expect(setOutputMock).toHaveBeenCalledTimes(1);
     });
 
+    it("rejects for unsupported MATLAB release", async () => {
+        matlabGetReleaseInfoMock.mockResolvedValue({
+            name: "r2020a",
+            version: "9.8.0",
+            updateNumber: "latest"    
+        });
+        await expect(install.install(platform, arch, "r2020a", products)).rejects.toBeDefined();
+    });
+
     it("rejects for invalid MATLAB version", async () => {
         matlabGetReleaseInfoMock.mockRejectedValue(Error("oof"));
         await expect(doInstall()).rejects.toBeDefined();
