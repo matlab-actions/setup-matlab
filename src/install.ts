@@ -20,6 +20,9 @@ import * as path from "path";
  */
 export async function install(platform: string, architecture: string, release: string, products: string[]) {
     const releaseInfo = await matlab.getReleaseInfo(release);
+    if (releaseInfo.name < "r2020b") {
+        return Promise.reject(Error(`Release '${releaseInfo.name}' is not supported. Use 'R2020b' or a later release.`));
+    }
 
     // Install runtime system dependencies for MATLAB on Linux
     if (platform === "linux") {
