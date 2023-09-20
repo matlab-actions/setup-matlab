@@ -79,6 +79,7 @@ export async function getReleaseInfo(release: string): Promise<Release> {
         update = "";
         version += ".999"
         if (name.includes("prerelease")) {
+            name = name.replace("prerelease", "")
             version += "-prerelease";
             isPrerelease = true;
         }

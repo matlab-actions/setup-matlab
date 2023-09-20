@@ -103,7 +103,7 @@ describe("matlab tests", () => {
         it("prerelease-latest resolves", () => {
             const prereleaseName = "r2022bprerelease"
             const prerelease = {
-                name: prereleaseName,
+                name: "r2022b",
                 version: "2022.2.999-prerelease",
                 update: "",
                 isPrerelease: true,
