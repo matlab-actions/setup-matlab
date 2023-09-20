@@ -24,6 +24,7 @@ describe("matlab tests", () => {
         name: "r2022b",
         version: "2022.2.999",
         update: "",
+        isPrerelease: false,
     }
     const platform = "linux";
     describe("toolcacheLocation", () => {
@@ -99,6 +100,23 @@ describe("matlab tests", () => {
             expect(matlab.getReleaseInfo("latest")).resolves.toMatchObject(release);
         });
 
+        it("prerelease-latest resolves", () => {
+            const prereleaseName = "r2022bprerelease"
+            const prerelease = {
+                name: prereleaseName,
+                version: "2022.2.999-prerelease",
+                update: "",
+                isPrerelease: true,
+            }
+            jest.spyOn(http.HttpClient.prototype, 'get').mockImplementation(async () => {
+                return {
+                    message: new httpjs.IncomingMessage(new net.Socket()),
+                    readBody: () => {return Promise.resolve(prereleaseName)}
+                };
+            })            
+            expect(matlab.getReleaseInfo("prerelease-latest")).resolves.toMatchObject(prerelease);
+        });
+
         it("case insensitive", () => {
             expect(matlab.getReleaseInfo("R2022b")).resolves.toMatchObject(release);
         });
@@ -108,6 +126,7 @@ describe("matlab tests", () => {
                 name: "r2022a",
                 update: "",
                 version: "2022.1.999",
+                isPrerelease: false,
             }
             expect(matlab.getReleaseInfo("R2022a")).resolves.toMatchObject(R2022aRelease);
 
@@ -115,6 +134,7 @@ describe("matlab tests", () => {
                 name: "r2022b",
                 update: "",
                 version: "2022.2.999",
+                isPrerelease: false,
             }
             expect(matlab.getReleaseInfo("R2022b")).resolves.toMatchObject(R2022bRelease);
         });
@@ -124,6 +144,7 @@ describe("matlab tests", () => {
                 name: "r2022b",
                 update: "u2",
                 version: "2022.2.2",
+                isPrerelease: false,
             }
             expect(matlab.getReleaseInfo("R2022bU2")).resolves.toMatchObject(releaseWithUpdate);
         });

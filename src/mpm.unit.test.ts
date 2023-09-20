@@ -100,7 +100,7 @@ describe("setup mpm", () => {
 describe("mpm install", () => {
     let execMock: jest.Mock<any, any>;
     const mpmPath = "mpm";
-    const releaseInfo = {name: "r2022b", version: "9.13.0", update: ""};
+    const releaseInfo = {name: "r2022b", version: "2022.2.999", update: "", isPrerelease: false};
     const mpmRelease = "r2022b"
     beforeEach(() => {
         execMock = exec.exec as jest.Mock;
@@ -139,6 +139,26 @@ describe("mpm install", () => {
         execMock.mockResolvedValue(0);
 
         await expect(mpm.install(mpmPath, releaseInfo, products, destination)).resolves.toBeUndefined();
+        expect(execMock.mock.calls[0][1]).toMatchObject(expectedMpmArgs);
+    });
+
+    it("works with prerelease", async () => {
+        const prereleaseInfo = {name: "r2022b", version: "2022.2.999", update: "", isPrerelease: true};
+        const destination ="/opt/matlab";
+        const products = ["MATLAB", "Compiler"];
+        const expectedMpmArgs = [
+            "install",
+            `--release=${mpmRelease}`,
+            `--destination=${destination}`,
+            "--release-status=Prerelease",
+            "--products",
+            "MATLAB",
+            "Compiler",
+            "Parallel_Computing_Toolbox",
+        ]
+        execMock.mockResolvedValue(0);
+
+        await expect(mpm.install(mpmPath, prereleaseInfo, products, destination)).resolves.toBeUndefined();
         expect(execMock.mock.calls[0][1]).toMatchObject(expectedMpmArgs);
     });
 

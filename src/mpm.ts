@@ -53,9 +53,11 @@ export async function install(mpmPath: string, release: matlab.Release, products
         "install",
         `--release=${mpmRelease}`,    
         `--destination=${destination}`,
-        "--products",
     ]
-    mpmArguments = mpmArguments.concat(parsedProducts);
+    if (release.isPrerelease) {
+        mpmArguments = mpmArguments.concat(["--release-status=Prerelease"]);
+    }
+    mpmArguments = mpmArguments.concat(["--products", ...parsedProducts]);
 
     const exitCode = await exec.exec(mpmPath, mpmArguments);
     if (exitCode !== 0) {
