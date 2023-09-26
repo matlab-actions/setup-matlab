@@ -27,10 +27,10 @@ export async function setup(platform: string, architecture: string): Promise<str
 
     let mpm: string = await tc.downloadTool(mpmUrl);
     if (platform === "win32") {
-       let mpmExtractedPath: string = await tc.extractZip(mpm);
+       const mpmExtractedPath: string = await tc.extractZip(mpm);
        mpm = path.join(mpmExtractedPath, "bin", "win64",  "mpm.exe");
     } else if (platform === "darwin") {
-        let mpmExtractedPath: string = await tc.extractZip(mpm);
+        const mpmExtractedPath: string = await tc.extractZip(mpm);
         mpm = path.join(mpmExtractedPath, "bin", "maci64",  "mpm");
      }
 

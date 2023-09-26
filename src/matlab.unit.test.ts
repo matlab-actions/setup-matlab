@@ -25,11 +25,10 @@ describe("matlab tests", () => {
         version: "2022.2.999",
         update: "",
     }
-    const platform = "linux";
     describe("toolcacheLocation", () => {
-        let findMock: jest.Mock<any, any>;
-        let cacheFileMock: jest.Mock<any, any>; 
-        let infoMock: jest.Mock<any, any>;
+        let findMock: jest.Mock;
+        let cacheFileMock: jest.Mock;
+        let infoMock: jest.Mock;
 
         beforeEach(() => {
             findMock = tc.find as jest.Mock;
@@ -39,22 +38,22 @@ describe("matlab tests", () => {
 
         it("returns toolpath if in toolcache", async () => {
             findMock.mockReturnValue("/opt/hostedtoolcache/matlab/r2022b");
-            await expect(matlab.makeToolcacheDir(release, platform)).resolves.toMatchObject(["/opt/hostedtoolcache/matlab/r2022b", true]);
+            await expect(matlab.makeToolcacheDir(release)).resolves.toMatchObject(["/opt/hostedtoolcache/matlab/r2022b", true]);
             expect(infoMock).toHaveBeenCalledTimes(1);
         });
     
         it("creates cache and returns new path if not in toolcache", async () => {
             findMock.mockReturnValue("");
             cacheFileMock.mockReturnValue("/opt/hostedtoolcache/matlab/r2022b");
-            await expect(matlab.makeToolcacheDir(release, platform)).resolves.toMatchObject(["/opt/hostedtoolcache/matlab/r2022b", false]);
+            await expect(matlab.makeToolcacheDir(release)).resolves.toMatchObject(["/opt/hostedtoolcache/matlab/r2022b", false]);
         })    
     });
 
     describe("setupBatch", () => {
-        let downloadAndRunScriptMock: jest.Mock<any, any>;
-        let addPathMock: jest.Mock<any, any>;
-        let tcCacheDirMock: jest.Mock<any, any>;
-        let tcFindMock: jest.Mock<any, any>;
+        let downloadAndRunScriptMock: jest.Mock;
+        let addPathMock: jest.Mock;
+        let tcCacheDirMock: jest.Mock;
+        let tcFindMock: jest.Mock;
         const platform = "linux";
 
         beforeEach(() => {
@@ -83,10 +82,7 @@ describe("matlab tests", () => {
     });
 
     describe("getReleaseInfo", () => {
-        let infoMock: jest.Mock<any, any>;
         beforeEach(() => {
-            infoMock = core.info as jest.Mock;
-            // Mock MATLABReleaseInfo response from http client
             jest.spyOn(http.HttpClient.prototype, 'get').mockImplementation(async () => {
                 return {
                     message: new httpjs.IncomingMessage(new net.Socket()),

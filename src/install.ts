@@ -17,8 +17,9 @@ import * as path from "path";
  * @param architecture Architecture of the runner (e.g. "x64", or "x86").
  * @param release Release of MATLAB to be set up (e.g. "latest" or "R2020a").
  * @param products A list of products to install (e.g. ["MATLAB", "Simulink"]).
+ * @param useCache whether to use the cache to restore & save the MATLAB installation
  */
-export async function install(platform: string, architecture: string, release: string, products: string[]) {
+export async function install(platform: string, architecture: string, release: string, products: string[], useCache: string) {
     const releaseInfo = await matlab.getReleaseInfo(release);
     if (releaseInfo.name < "r2020b") {
         return Promise.reject(Error(`Release '${releaseInfo.name}' is not supported. Use 'R2020b' or a later release.`));
@@ -32,12 +33,17 @@ export async function install(platform: string, architecture: string, release: s
     }
 
     await core.group("Setting up MATLAB", async () => {
-        const mpmPath: string = await mpm.setup(platform, architecture);
-        let [destination, alreadyExists]: [string, boolean] = await matlab.makeToolcacheDir(releaseInfo, platform);
+        if (useCache.toLowerCase() === "true") {
+            core.info("Restoring MATLAB from cache")
+            // restoreMATLABFromCache();
+        }
+
+        let [destination, alreadyExists]: [string, boolean] = await matlab.makeToolcacheDir(releaseInfo);
         if (platform === "darwin") {
             destination = destination + "/MATLAB.app";
         }
         if (!alreadyExists) {
+            const mpmPath: string = await mpm.setup(platform, architecture);
             await mpm.install(mpmPath, releaseInfo, products, destination);
         }
         core.addPath(path.join(destination, "bin"));

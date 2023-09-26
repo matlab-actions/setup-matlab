@@ -16,14 +16,14 @@ afterEach(() => {
 });
 
 describe("install procedure", () => {
-    let downloadAndRunScriptMock: jest.Mock<any, any>;
-    let matlabGetReleaseInfoMock: jest.Mock<any, any>;
-    let matlabMakeToolcacheDirMock: jest.Mock<any, any>;
-    let matlabSetupBatchMock: jest.Mock<any, any>;
-    let mpmSetupMock: jest.Mock<any, any>;
-    let mpmInstallMock: jest.Mock<any, any>;
-    let addPathMock: jest.Mock<any, any>;
-    let setOutputMock: jest.Mock<any, any>;
+    let downloadAndRunScriptMock: jest.Mock;
+    let matlabGetReleaseInfoMock: jest.Mock;
+    let matlabMakeToolcacheDirMock: jest.Mock;
+    let matlabSetupBatchMock: jest.Mock;
+    let mpmSetupMock: jest.Mock;
+    let mpmInstallMock: jest.Mock;
+    let addPathMock: jest.Mock;
+    let setOutputMock: jest.Mock;
 
     const platform = "linux";
     const arch = "x64";
@@ -34,8 +34,9 @@ describe("install procedure", () => {
         updateNumber: "latest"
     };
     const products = ["MATLAB", "Parallel_Computing_Toolbox"];
+    const useCache = "false";
 
-    const doInstall = () => install.install(platform, arch, release, products);
+    const doInstall = () => install.install(platform, arch, release, products, useCache);
 
     beforeEach(() => {
         downloadAndRunScriptMock = script.downloadAndRunScript as jest.Mock;
@@ -67,13 +68,13 @@ describe("install procedure", () => {
     });
 
     it("installs to MATLAB.app on mac", async () => {
-        await expect(install.install("darwin", arch, release, products)).resolves.toBeUndefined();
+        await expect(install.install("darwin", arch, release, products, useCache)).resolves.toBeUndefined();
         expect(mpmInstallMock.mock.calls[0][3]).toMatch("MATLAB.app");
     });
 
     ["darwin", "win32"].forEach((os) => {
         it(`does not run deps script on ${os}`, async () => { 
-            await expect(install.install(os, arch, release, products)).resolves.toBeUndefined();
+            await expect(install.install(os, arch, release, products, useCache)).resolves.toBeUndefined();
             expect(downloadAndRunScriptMock).toHaveBeenCalledTimes(0);
             expect(core.group).toHaveBeenCalledTimes(1);
             expect(matlabSetupBatchMock).toHaveBeenCalledTimes(1);
@@ -98,7 +99,7 @@ describe("install procedure", () => {
             version: "9.8.0",
             updateNumber: "latest"    
         });
-        await expect(install.install(platform, arch, "r2020a", products)).rejects.toBeDefined();
+        await expect(install.install(platform, arch, "r2020a", products, useCache)).rejects.toBeDefined();
     });
 
     it("rejects for invalid MATLAB version", async () => {
