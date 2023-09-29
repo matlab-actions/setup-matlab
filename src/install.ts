@@ -41,7 +41,7 @@ export async function install(platform: string, architecture: string, release: s
         }
 
         if (useCache.toLowerCase() === "true") {
-            cacheHit = await cache.restoreMATLAB(releaseInfo, platform, products, destination);
+            cacheHit = await cache.restoreMATLAB(releaseInfo, platform, architecture, products, destination);
         }
 
         if (!alreadyExists && !cacheHit) {

@@ -18,7 +18,7 @@ inputs:
       Parallel_Computing_Toolbox
   use-cache:
     description: >-
-      Big blah
+      Whether to use GitHub cache to optimize installation. Supported values: true, false
     required: false
     default: false
 outputs:

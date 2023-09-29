@@ -6,9 +6,9 @@ import * as crypto from "crypto";
 import { State } from './cache-state';
 import { Release } from './matlab';
 
-export async function restoreMATLAB(release: Release, platform: string, products: string[], matlabPath: string): Promise<boolean> {
+export async function restoreMATLAB(release: Release, platform: string, architecture: string, products: string[], matlabPath: string): Promise<boolean> {
     const installHash = crypto.createHash('sha256').update(products.join('|')).digest('hex')
-    const keyPrefix = `matlab-cache-${platform}-${release.version}`;
+    const keyPrefix = `matlab-cache-${platform}-${architecture}-${release.version}`;
     const primaryKey = `${keyPrefix}-${installHash}`;
     const cacheKey: string | undefined = await cache.restoreCache([matlabPath], primaryKey);
 

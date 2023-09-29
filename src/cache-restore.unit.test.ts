@@ -16,6 +16,7 @@ describe("cache-restore", () => {
     let saveStateMock: jest.Mock;
 
     const platform = "linux";
+    const arch = "x64";
     const release = {
         name: "r2022b",
         version: "9.13.0",
@@ -31,13 +32,13 @@ describe("cache-restore", () => {
     
     it("returns true if cache is found", async () => {
         restoreCacheMock.mockReturnValue("matched-cache-key");
-        await expect(restoreMATLAB(release, platform, products, location)).resolves.toBe(true);
+        await expect(restoreMATLAB(release, platform, arch, products, location)).resolves.toBe(true);
         expect(saveStateMock).toHaveBeenCalledTimes(3);
     });
 
 
     it("returns false if cache is not found", async () => {
-        await expect(restoreMATLAB(release, platform, products, location)).resolves.toBe(false);
+        await expect(restoreMATLAB(release, platform, arch, products, location)).resolves.toBe(false);
         expect(saveStateMock).toHaveBeenCalledTimes(2);
     });
 });
