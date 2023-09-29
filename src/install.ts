@@ -1,4 +1,4 @@
-// Copyright 2020-2022 The MathWorks, Inc.
+// Copyright 2020-2023 The MathWorks, Inc.
 
 import * as core from "@actions/core";
 import * as matlab from "./matlab";
@@ -6,7 +6,7 @@ import * as mpm from "./mpm";
 import properties from "./properties.json";
 import * as script from "./script";
 import * as path from "path";
-import { restoreMATLABFromCache } from './cache-restore';
+import * as cache from './cache-restore';
 
 /**
  * Set up an instance of MATLAB on the runner.
@@ -35,7 +35,7 @@ export async function install(platform: string, architecture: string, release: s
 
     await core.group("Setting up MATLAB", async () => {
         if (useCache.toLowerCase() === "true") {
-            restoreMATLABFromCache(releaseInfo, platform, products);
+            cache.restoreMATLAB(releaseInfo, platform, products);
         }
 
         let [destination, alreadyExists]: [string, boolean] = await matlab.makeToolcacheDir(releaseInfo);

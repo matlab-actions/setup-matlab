@@ -9,7 +9,7 @@
         "format": "prettier --write .",
         "format-check": "prettier --check .",
         "lint": "eslint \"**/*.ts\" --fix",
-        "package": "ncc build src/index.ts -o dist/setup --minify && ncc build src/cache-save.ts -o dist/cache-save --minify",
+        "package": "ncc build src/index.ts -o dist/setup --minify && ncc build src/post.ts -o dist/cache-save --minify",
         "test": "jest",
         "all": "npm run lint && npm test && npm run package",
         "ci": "npm run clean && npm ci && npm run all"

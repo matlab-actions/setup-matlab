@@ -1,6 +1,7 @@
-// Copyright 2020-2022 The MathWorks, Inc.
+// Copyright 2020-2023 The MathWorks, Inc.
 
 import * as core from "@actions/core";
+import * as cache from './cache-restore';
 import * as install from "./install";
 import * as matlab from "./matlab";
 import * as mpm from "./mpm";
@@ -10,6 +11,7 @@ jest.mock("@actions/core");
 jest.mock("./matlab");
 jest.mock("./mpm");
 jest.mock("./script");
+jest.mock("./cache-restore");
 
 afterEach(() => {
     jest.resetAllMocks();
@@ -24,6 +26,7 @@ describe("install procedure", () => {
     let mpmInstallMock: jest.Mock;
     let addPathMock: jest.Mock;
     let setOutputMock: jest.Mock;
+    let restoreMATLABMock: jest.Mock;
 
     const platform = "linux";
     const arch = "x64";
@@ -47,6 +50,7 @@ describe("install procedure", () => {
         mpmInstallMock = mpm.install as jest.Mock;
         addPathMock = core.addPath as jest.Mock;
         setOutputMock = core.setOutput as jest.Mock;
+        restoreMATLABMock = cache.restoreMATLAB as jest.Mock;
 
         // Mock core.group to simply return the output of the func it gets from
         // the caller
@@ -120,5 +124,15 @@ describe("install procedure", () => {
     it("rejects when the matlab-batch install fails", async () => {
         matlabSetupBatchMock.mockRejectedValueOnce(Error("oof"));
         await expect(doInstall()).rejects.toBeDefined();
+    });
+
+    it("Does not restore cache if useCache is false", async () => {
+        await expect(doInstall()).resolves.toBeUndefined();
+        expect(restoreMATLABMock).toHaveBeenCalledTimes(0);
+    });
+
+    it("Restores cache if useCache is true", async () => {
+        await expect(install.install(platform, arch, release, products, "true")).resolves.toBeUndefined();
+        expect(restoreMATLABMock).toHaveBeenCalledTimes(1);
     });
 });
