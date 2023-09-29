@@ -26,12 +26,14 @@ async function cacheMATLAB() {
         return;
     }
 
-    const state = core.getState(State.CacheMatchedKey);
+    const matchedKey = core.getState(State.CacheMatchedKey);
     const primaryKey = core.getState(State.CachePrimaryKey);
-    const matlabPath = [core.getState(State.MatlabCachePath)];
+    const matlabPath: string[] = JSON.parse(
+        core.getState(State.MatlabCachePath) || '[]'
+    );
 
-    if (primaryKey === state) {
-        core.info(`Cache hit occurred on the primary key ${primaryKey}, not saving cache.`);
+    if (primaryKey === matchedKey) {
+        core.info(`Cache hit occurred for key: ${primaryKey}, not saving cache.`);
         return;
     }
 

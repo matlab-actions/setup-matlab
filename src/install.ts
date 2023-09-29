@@ -6,6 +6,7 @@ import * as mpm from "./mpm";
 import properties from "./properties.json";
 import * as script from "./script";
 import * as path from "path";
+import { restoreMATLABFromCache } from './cache-restore';
 
 /**
  * Set up an instance of MATLAB on the runner.
@@ -34,8 +35,7 @@ export async function install(platform: string, architecture: string, release: s
 
     await core.group("Setting up MATLAB", async () => {
         if (useCache.toLowerCase() === "true") {
-            core.info("Restoring MATLAB from cache")
-            // restoreMATLABFromCache();
+            restoreMATLABFromCache(releaseInfo, platform, products);
         }
 
         let [destination, alreadyExists]: [string, boolean] = await matlab.makeToolcacheDir(releaseInfo);
