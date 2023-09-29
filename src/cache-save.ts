@@ -22,7 +22,7 @@ export async function run() {
 async function cacheMATLAB() {
     const useCache = core.getInput('use-cache');
 
-    if (!useCache) {
+    if (useCache.toLowerCase() !== "true") {
         return;
     }
 

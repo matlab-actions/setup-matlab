@@ -11,7 +11,7 @@ import {State} from './cache-state';
 export async function restoreMATLABFromCache(release: Release, platform: string, products: string[]) {
     let matlabPath: string = tc.find("MATLAB", release.version);
     const installHash = crypto.createHash('sha256').update(products.join('|')).digest('hex')
-    const keyPrefix = `matlab-cache-${platform}-${release}`;
+    const keyPrefix = `matlab-cache-${platform}-${release.version}`;
     const primaryKey = `${keyPrefix}-${installHash}`;
     const cacheKey: string | undefined = await cache.restoreCache([matlabPath], primaryKey);
 
