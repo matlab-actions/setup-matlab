@@ -34,15 +34,17 @@ export async function install(platform: string, architecture: string, release: s
     }
 
     await core.group("Setting up MATLAB", async () => {
-        if (useCache.toLowerCase() === "true") {
-            cache.restoreMATLAB(releaseInfo, platform, products);
-        }
-
         let [destination, alreadyExists]: [string, boolean] = await matlab.makeToolcacheDir(releaseInfo);
+        let cacheHit = false;
         if (platform === "darwin") {
             destination = destination + "/MATLAB.app";
         }
-        if (!alreadyExists) {
+
+        if (useCache.toLowerCase() === "true") {
+            cacheHit = await cache.restoreMATLAB(releaseInfo, platform, products, destination);
+        }
+
+        if (!alreadyExists && !cacheHit) {
             const mpmPath: string = await mpm.setup(platform, architecture);
             await mpm.install(mpmPath, releaseInfo, products, destination);
         }

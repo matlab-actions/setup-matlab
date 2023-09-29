@@ -129,10 +129,23 @@ describe("install procedure", () => {
     it("Does not restore cache if useCache is false", async () => {
         await expect(doInstall()).resolves.toBeUndefined();
         expect(restoreMATLABMock).toHaveBeenCalledTimes(0);
+        expect(mpmSetupMock).toHaveBeenCalledTimes(1);
+        expect(mpmInstallMock).toHaveBeenCalledTimes(1);
     });
 
-    it("Restores cache if useCache is true", async () => {
+    it("Does not install if useCache is true and there is cache hit", async () => {
+        restoreMATLABMock.mockResolvedValue(true);
         await expect(install.install(platform, arch, release, products, "true")).resolves.toBeUndefined();
         expect(restoreMATLABMock).toHaveBeenCalledTimes(1);
+        expect(mpmSetupMock).toHaveBeenCalledTimes(0);
+        expect(mpmInstallMock).toHaveBeenCalledTimes(0);
+    });
+
+    it("Does install if useCache is true and there is no cache hit", async () => {
+        restoreMATLABMock.mockResolvedValue(false);
+        await expect(install.install(platform, arch, release, products, "true")).resolves.toBeUndefined();
+        expect(restoreMATLABMock).toHaveBeenCalledTimes(1);
+        expect(mpmSetupMock).toHaveBeenCalledTimes(1);
+        expect(mpmInstallMock).toHaveBeenCalledTimes(1);
     });
 });
