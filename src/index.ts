@@ -1,4 +1,4 @@
-// Copyright 2020-2022 The MathWorks, Inc.
+// Copyright 2020-2023 The MathWorks, Inc.
 
 import * as core from "@actions/core";
 import * as install from "./install";
