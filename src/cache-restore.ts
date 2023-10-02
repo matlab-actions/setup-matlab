@@ -13,7 +13,7 @@ export async function restoreMATLAB(release: Release, platform: string, architec
     const cacheKey: string | undefined = await cache.restoreCache([matlabPath], primaryKey);
 
     core.saveState(State.CachePrimaryKey, primaryKey);
-    core.saveState(State.MatlabCachePath, [matlabPath]);
+    core.saveState(State.MatlabCachePath, matlabPath);
 
     if (!cacheKey) {
         core.info(`${keyPrefix} cache is not found`);
