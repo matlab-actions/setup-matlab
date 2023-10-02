@@ -1,4 +1,4 @@
-// Copyright 2020-2022 The MathWorks, Inc.
+// Copyright 2020-2023 The MathWorks, Inc.
 
 import * as core from "@actions/core";
 import * as install from "./install";
@@ -11,7 +11,8 @@ export async function run() {
     const architecture = process.arch;
     const release = core.getInput("release");
     const products = core.getMultilineInput("products");
-    return install.install(platform, architecture, release, products);
+    const cache = core.getBooleanInput("cache");
+    return install.install(platform, architecture, release, products, cache);
 }
 
 run().catch((e) => {

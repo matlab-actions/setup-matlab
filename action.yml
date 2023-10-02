@@ -1,4 +1,4 @@
-# Copyright 2020-2022 The MathWorks, Inc.
+# Copyright 2020-2023 The MathWorks, Inc.
 
 name: Setup MATLAB
 description: >-
@@ -16,10 +16,17 @@ inputs:
     default: |
       MATLAB
       Parallel_Computing_Toolbox
+  cache:
+    description: >-
+      Option to store MATLAB in the GitHub Actions cache, specified as false or true
+    required: false
+    default: false
 outputs:
   matlabroot:
     description: >-
-      A full path to the folder where MATLAB is installed.
+      A full path to the folder where MATLAB is installed
 runs:
   using: node16
-  main: dist/index.js
+  main: dist/setup/index.js
+  post: dist/cache-save/index.js
+  post-if: success()

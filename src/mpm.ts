@@ -1,4 +1,4 @@
-// Copyright 2022 The MathWorks, Inc.
+// Copyright 2022-2023 The MathWorks, Inc.
 
 import * as exec from "@actions/exec";
 import * as tc from "@actions/tool-cache";
@@ -27,10 +27,10 @@ export async function setup(platform: string, architecture: string): Promise<str
 
     let mpm: string = await tc.downloadTool(mpmUrl);
     if (platform === "win32") {
-       let mpmExtractedPath: string = await tc.extractZip(mpm);
+       const mpmExtractedPath: string = await tc.extractZip(mpm);
        mpm = path.join(mpmExtractedPath, "bin", "win64",  "mpm.exe");
     } else if (platform === "darwin") {
-        let mpmExtractedPath: string = await tc.extractZip(mpm);
+        const mpmExtractedPath: string = await tc.extractZip(mpm);
         mpm = path.join(mpmExtractedPath, "bin", "maci64",  "mpm");
      }
 

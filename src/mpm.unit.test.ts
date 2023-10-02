@@ -1,6 +1,5 @@
-// Copyright 2022 The MathWorks, Inc.
+// Copyright 2022-2023 The MathWorks, Inc.
 
-import * as core from "@actions/core";
 import * as exec from "@actions/exec";
 import * as tc from "@actions/tool-cache";
 import * as path from "path";
@@ -17,10 +16,10 @@ afterEach(() => {
 });
 
 describe("setup mpm", () => {
-    let tcDownloadToolMock: jest.Mock<any, any>;
-    let tcExtractZipMock: jest.Mock<any, any>;
-    let execMock: jest.Mock<any, any>; 
-    let defaultInstallRootMock: jest.Mock<any, any>;
+    let tcDownloadToolMock: jest.Mock;
+    let tcExtractZipMock: jest.Mock;
+    let execMock: jest.Mock;
+    let defaultInstallRootMock: jest.Mock;
     const arch = "x64";
     const mpmMockPath = path.join("path", "to", "mpm");
     const zipMockPath = path.join("path", "to", "zip");
@@ -98,7 +97,7 @@ describe("setup mpm", () => {
 });
 
 describe("mpm install", () => {
-    let execMock: jest.Mock<any, any>;
+    let execMock: jest.Mock;
     const mpmPath = "mpm";
     const releaseInfo = {name: "r2022b", version: "9.13.0", update: ""};
     const mpmRelease = "r2022b"
