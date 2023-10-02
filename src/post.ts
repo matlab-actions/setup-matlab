@@ -4,8 +4,10 @@ import * as core from "@actions/core";
 import { cacheMATLAB } from "./cache-save";
 
 export async function run() {
-    const useCache = core.getInput('use-cache');
-    await cacheMATLAB(useCache);
+    const cache = core.getBooleanInput('cache');
+    if (cache) {
+        await cacheMATLAB();
+    }
 }
 
 run().catch((e) => {

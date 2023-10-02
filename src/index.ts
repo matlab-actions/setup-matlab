@@ -11,8 +11,8 @@ export async function run() {
     const architecture = process.arch;
     const release = core.getInput("release");
     const products = core.getMultilineInput("products");
-    const useCache = core.getInput("use-cache");
-    return install.install(platform, architecture, release, products, useCache);
+    const cache = core.getBooleanInput("cache");
+    return install.install(platform, architecture, release, products, cache);
 }
 
 run().catch((e) => {

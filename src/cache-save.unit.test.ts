@@ -20,20 +20,15 @@ describe("cache-save", () => {
         getStateMock = core.getState as jest.Mock;
     });
 
-    it("no ops if useCache is false", async () => {
-        await expect(cacheMATLAB('false')).resolves.toBeUndefined();
-        expect(saveCacheMock).toHaveBeenCalledTimes(0);
-    });
-
-    it("saves cache if useCache is true and key does not equal matched key", async () => {
+    it("saves cache if key does not equal matched key", async () => {
         getStateMock.mockReturnValueOnce("matched-key").mockReturnValueOnce("primary-key")
-        await expect(cacheMATLAB('true')).resolves.toBeUndefined();
+        await expect(cacheMATLAB()).resolves.toBeUndefined();
         expect(saveCacheMock).toHaveBeenCalledTimes(1);
     });
 
-    it("does not re-save cache if useCache is true and key equals matched key", async () => {
+    it("does not re-save cache if key equals matched key", async () => {
         getStateMock.mockReturnValueOnce("cache-key").mockReturnValueOnce("cache-key")
-        await expect(cacheMATLAB('true')).resolves.toBeUndefined();
+        await expect(cacheMATLAB()).resolves.toBeUndefined();
         expect(saveCacheMock).toHaveBeenCalledTimes(0);
     });
 });

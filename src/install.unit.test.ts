@@ -37,7 +37,7 @@ describe("install procedure", () => {
         updateNumber: "latest"
     };
     const products = ["MATLAB", "Parallel_Computing_Toolbox"];
-    const useCache = "false";
+    const useCache = false;
 
     const doInstall = () => install.install(platform, arch, release, products, useCache);
 
@@ -135,7 +135,7 @@ describe("install procedure", () => {
 
     it("Does not install if useCache is true and there is cache hit", async () => {
         restoreMATLABMock.mockResolvedValue(true);
-        await expect(install.install(platform, arch, release, products, "true")).resolves.toBeUndefined();
+        await expect(install.install(platform, arch, release, products, true)).resolves.toBeUndefined();
         expect(restoreMATLABMock).toHaveBeenCalledTimes(1);
         expect(mpmSetupMock).toHaveBeenCalledTimes(0);
         expect(mpmInstallMock).toHaveBeenCalledTimes(0);
@@ -143,7 +143,7 @@ describe("install procedure", () => {
 
     it("Does install if useCache is true and there is no cache hit", async () => {
         restoreMATLABMock.mockResolvedValue(false);
-        await expect(install.install(platform, arch, release, products, "true")).resolves.toBeUndefined();
+        await expect(install.install(platform, arch, release, products, true)).resolves.toBeUndefined();
         expect(restoreMATLABMock).toHaveBeenCalledTimes(1);
         expect(mpmSetupMock).toHaveBeenCalledTimes(1);
         expect(mpmInstallMock).toHaveBeenCalledTimes(1);

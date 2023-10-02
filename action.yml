@@ -16,9 +16,9 @@ inputs:
     default: |
       MATLAB
       Parallel_Computing_Toolbox
-  use-cache:
+  cache:
     description: >-
-      Whether to use GitHub cache to optimize installation. Supported values: true, false
+      Whether to use GitHub cache to optimize installation.
     required: false
     default: false
 outputs:

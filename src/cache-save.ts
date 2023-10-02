@@ -4,11 +4,7 @@ import * as core from '@actions/core';
 import * as cache from '@actions/cache';
 import {State} from './cache-state';
 
-export async function cacheMATLAB(useCache: string) {
-    if (useCache.toLowerCase() !== "true") {
-        return;
-    }
-
+export async function cacheMATLAB() {
     const matchedKey = core.getState(State.CacheMatchedKey);
     const primaryKey = core.getState(State.CachePrimaryKey);
     const matlabPath: string[] = JSON.parse(
