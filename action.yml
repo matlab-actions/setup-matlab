@@ -18,13 +18,13 @@ inputs:
       Parallel_Computing_Toolbox
   cache:
     description: >-
-      Whether to use GitHub cache to optimize installation.
+      Option to store MATLAB in the GitHub Actions cache, specified as false or true
     required: false
     default: false
 outputs:
   matlabroot:
     description: >-
-      A full path to the folder where MATLAB is installed.
+      A full path to the folder where MATLAB is installed
 runs:
   using: node16
   main: dist/setup/index.js
