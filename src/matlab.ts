@@ -1,6 +1,7 @@
 // Copyright 2022-2023 The MathWorks, Inc.
 
 import * as core from "@actions/core";
+import * as exec from "@actions/exec";
 import * as http from "@actions/http-client";
 import * as io from "@actions/io";
 import * as tc from "@actions/tool-cache";
@@ -47,6 +48,10 @@ export async function setupBatch(platform: string) {
 
     let matlabBatch: string = await tc.downloadTool(matlabBatchUrl);
     let cachedPath = await tc.cacheFile(matlabBatch, `matlab-batch${matlabBatchExt}`, "matlab-batch", "v1");
+    const exitCode = await exec.exec(`chmod +x ${cachedPath}`);
+    if (exitCode !== 0) {
+        return Promise.reject(Error("Unable to set up mpm."));
+    }
     core.addPath(cachedPath);
     return
 }
