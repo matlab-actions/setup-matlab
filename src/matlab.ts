@@ -29,8 +29,10 @@ export async function makeToolcacheDir(release: Release): Promise<[string, boole
 
 export async function setupBatch(platform: string) {
     let matlabBatchUrl: string;
+    let matlabBatchExt: string = "";
     switch (platform) {
         case "win32":
+            matlabBatchExt = ".exe";
             matlabBatchUrl = properties.matlabBatchRootUrl + "win64/matlab-batch.exe";
             break;
         case "linux":
@@ -44,7 +46,8 @@ export async function setupBatch(platform: string) {
     }
 
     let matlabBatch: string = await tc.downloadTool(matlabBatchUrl);
-    core.addPath(matlabBatch);
+    let cachedPath = await tc.cacheFile(matlabBatch, `matlab-batch${matlabBatchExt}`, "matlab-batch", "v1");
+    core.addPath(cachedPath);
     return
 }
 
