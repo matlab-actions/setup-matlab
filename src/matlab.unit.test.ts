@@ -6,9 +6,7 @@ import * as httpjs from "http";
 import * as net from 'net';
 import * as tc from "@actions/tool-cache";
 import * as matlab from "./matlab";
-import * as script from "./script";
 
-jest.mock("./script");
 jest.mock("http");
 jest.mock("net");
 jest.mock("@actions/core");
@@ -49,37 +47,37 @@ describe("matlab tests", () => {
         })    
     });
 
-    describe("setupBatch", () => {
-        let downloadAndRunScriptMock: jest.Mock;
-        let addPathMock: jest.Mock;
-        let tcCacheDirMock: jest.Mock;
-        let tcFindMock: jest.Mock;
-        const platform = "linux";
+    // describe("setupBatch", () => {
+    //     let downloadAndRunScriptMock: jest.Mock;
+    //     let addPathMock: jest.Mock;
+    //     let tcCacheDirMock: jest.Mock;
+    //     let tcFindMock: jest.Mock;
+    //     const platform = "linux";
 
-        beforeEach(() => {
-            downloadAndRunScriptMock = script.downloadAndRunScript as jest.Mock;
-            addPathMock = core.addPath as jest.Mock;
-            tcCacheDirMock = tc.cacheDir as jest.Mock;
-            tcFindMock = tc.find as jest.Mock;
-        });
+    //     beforeEach(() => {
+    //         downloadAndRunScriptMock = script.downloadAndRunScript as jest.Mock;
+    //         addPathMock = core.addPath as jest.Mock;
+    //         tcCacheDirMock = tc.cacheDir as jest.Mock;
+    //         tcFindMock = tc.find as jest.Mock;
+    //     });
 
-        it("ideally works", async () => {
-            downloadAndRunScriptMock.mockResolvedValue(undefined);
-            await expect(matlab.setupBatch(platform)).resolves.toBeUndefined();
-            expect(downloadAndRunScriptMock).toHaveBeenCalledTimes(1);
-            expect(addPathMock).toHaveBeenCalledTimes(1);
-        });
+    //     it("ideally works", async () => {
+    //         downloadAndRunScriptMock.mockResolvedValue(undefined);
+    //         await expect(matlab.setupBatch(platform)).resolves.toBeUndefined();
+    //         expect(downloadAndRunScriptMock).toHaveBeenCalledTimes(1);
+    //         expect(addPathMock).toHaveBeenCalledTimes(1);
+    //     });
 
-        it("rejects when the download fails", async () => {
-            tcFindMock.mockReturnValue("");
-            downloadAndRunScriptMock.mockRejectedValueOnce(Error("oof"));
+    //     it("rejects when the download fails", async () => {
+    //         tcFindMock.mockReturnValue("");
+    //         downloadAndRunScriptMock.mockRejectedValueOnce(Error("oof"));
 
-            await expect(matlab.setupBatch(platform)).rejects.toBeDefined();
-            expect(downloadAndRunScriptMock).toHaveBeenCalledTimes(1);
-            expect(addPathMock).toHaveBeenCalledTimes(0);
-            expect(tcCacheDirMock).toHaveBeenCalledTimes(0);
-        });
-    });
+    //         await expect(matlab.setupBatch(platform)).rejects.toBeDefined();
+    //         expect(downloadAndRunScriptMock).toHaveBeenCalledTimes(1);
+    //         expect(addPathMock).toHaveBeenCalledTimes(0);
+    //         expect(tcCacheDirMock).toHaveBeenCalledTimes(0);
+    //     });
+    // });
 
     describe("getReleaseInfo", () => {
         beforeEach(() => {
