@@ -6,7 +6,6 @@ import * as io from "@actions/io";
 import * as tc from "@actions/tool-cache";
 import * as fs from "fs";
 import properties from "./properties.json";
-import * as script from "./script";
 
 export interface Release {
     name: string;
@@ -29,12 +28,23 @@ export async function makeToolcacheDir(release: Release): Promise<[string, boole
 }
 
 export async function setupBatch(platform: string) {
-    const batchInstallDir = script.defaultInstallRoot(platform, "matlab-batch")
-    await script
-        .downloadAndRunScript(platform, properties.matlabBatchUrl, [batchInstallDir])
-        .then(() => {
-            core.addPath(batchInstallDir);
-        });
+    let matlabBatchUrl: string;
+    switch (platform) {
+        case "win32":
+            matlabBatchUrl = properties.matlabBatchRootUrl + "win64/matlab-batch.exe";
+            break;
+        case "linux":
+            matlabBatchUrl = properties.matlabBatchRootUrl + "glnxa64/matlab-batch";
+            break;
+        case "darwin":
+            matlabBatchUrl = properties.matlabBatchRootUrl + "maci64/matlab-batch";
+            break;
+        default:
+            return Promise.reject(Error(`This action is not supported on ${platform} runners.`));
+    }
+
+    let matlabBatch: string = await tc.downloadTool(matlabBatchUrl);
+    core.addPath(matlabBatch);
     return
 }
 
