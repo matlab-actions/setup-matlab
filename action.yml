@@ -15,7 +15,6 @@ inputs:
     required: false
     default: |
       MATLAB
-      Parallel_Computing_Toolbox
   cache:
     description: >-
       Option to store MATLAB in the GitHub Actions cache, specified as false or true
