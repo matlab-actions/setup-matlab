@@ -109,7 +109,6 @@ describe("mpm install", () => {
             "--products",
             "MATLAB",
             "Compiler",
-            "Parallel_Computing_Toolbox",
         ]
         execMock.mockResolvedValue(0);
 
@@ -127,7 +126,6 @@ describe("mpm install", () => {
             "--products",
             "MATLAB",
             "Compiler",
-            "Parallel_Computing_Toolbox",
         ]
         execMock.mockResolvedValue(0);
 
