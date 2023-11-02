@@ -6,6 +6,7 @@ import * as http from "@actions/http-client";
 import * as io from "@actions/io";
 import * as tc from "@actions/tool-cache";
 import * as fs from "fs";
+import * as path from "path";
 import properties from "./properties.json";
 
 export interface Release {
@@ -49,7 +50,7 @@ export async function setupBatch(platform: string) {
     let matlabBatch: string = await tc.downloadTool(matlabBatchUrl);
     let cachedPath = await tc.cacheFile(matlabBatch, `matlab-batch${matlabBatchExt}`, "matlab-batch", "v1");
     core.addPath(cachedPath);
-    const exitCode = await exec.exec(`chmod +x matlab-batch${matlabBatchExt}`);
+    const exitCode = await exec.exec(`chmod +x ${path.join(cachedPath, 'matlab-batch'+matlabBatchExt)}`);
     if (exitCode !== 0) {
         return Promise.reject(Error("Unable to set up mpm."));
     }
