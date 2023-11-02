@@ -48,11 +48,11 @@ export async function setupBatch(platform: string) {
 
     let matlabBatch: string = await tc.downloadTool(matlabBatchUrl);
     let cachedPath = await tc.cacheFile(matlabBatch, `matlab-batch${matlabBatchExt}`, "matlab-batch", "v1");
-    const exitCode = await exec.exec(`chmod +x ${cachedPath}`);
+    core.addPath(cachedPath);
+    const exitCode = await exec.exec(`chmod +x matlab-batch${matlabBatchExt}`);
     if (exitCode !== 0) {
         return Promise.reject(Error("Unable to set up mpm."));
     }
-    core.addPath(cachedPath);
     return
 }
 
