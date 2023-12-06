@@ -51,7 +51,7 @@ export async function install(platform: string, architecture: string, release: s
         core.addPath(path.join(destination, "bin"));
         core.setOutput('matlabroot', destination);
 
-        await matlab.setupBatch(platform);
+        await matlab.setupBatch(platform, architecture);
     });
 
     return;
