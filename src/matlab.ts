@@ -29,7 +29,11 @@ export async function makeToolcacheDir(release: Release): Promise<[string, boole
     return [toolpath, alreadyExists]
 }
 
-export async function setupBatch(platform: string) {
+export async function setupBatch(platform: string, architecture: string) {
+    if (architecture != "x64") {
+        return Promise.reject(Error(`This action is not supported on ${platform} runners using the ${architecture} architecture.`));
+    }
+
     let matlabBatchUrl: string;
     let matlabBatchExt: string = "";
     switch (platform) {

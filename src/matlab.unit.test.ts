@@ -1,15 +1,18 @@
 // Copyright 2022-2023 The MathWorks, Inc.
 
 import * as core from "@actions/core";
+import * as exec from "@actions/exec";
 import * as http from "@actions/http-client";
 import * as httpjs from "http";
 import * as net from 'net';
+import * as path from "path";
 import * as tc from "@actions/tool-cache";
 import * as matlab from "./matlab";
 
 jest.mock("http");
 jest.mock("net");
 jest.mock("@actions/core");
+jest.mock("@actions/exec");
 jest.mock("@actions/http-client");
 jest.mock("@actions/tool-cache");
 
@@ -23,6 +26,7 @@ describe("matlab tests", () => {
         version: "2022.2.999",
         update: "",
     }
+    
     describe("toolcacheLocation", () => {
         let findMock: jest.Mock;
         let cacheFileMock: jest.Mock;
@@ -47,37 +51,69 @@ describe("matlab tests", () => {
         })    
     });
 
-    // describe("setupBatch", () => {
-    //     let downloadAndRunScriptMock: jest.Mock;
-    //     let addPathMock: jest.Mock;
-    //     let tcCacheDirMock: jest.Mock;
-    //     let tcFindMock: jest.Mock;
-    //     const platform = "linux";
+    describe("setupBatch", () => {
+        let tcDownloadToolMock: jest.Mock;
+        let cacheFileMock: jest.Mock;
+        let execMock: jest.Mock;
+        const arch = "x64";
+        const batchMockPath = path.join("path", "to", "matlab-batch");
+    
+        beforeEach(() => {
+            tcDownloadToolMock = tc.downloadTool as jest.Mock;
+            cacheFileMock = tc.cacheFile as jest.Mock;
+            execMock = exec.exec as jest.Mock;
+            process.env.RUNNER_TEMP = path.join("runner", "workdir", "tmp");
 
-    //     beforeEach(() => {
-    //         downloadAndRunScriptMock = script.downloadAndRunScript as jest.Mock;
-    //         addPathMock = core.addPath as jest.Mock;
-    //         tcCacheDirMock = tc.cacheDir as jest.Mock;
-    //         tcFindMock = tc.find as jest.Mock;
-    //     });
-
-    //     it("ideally works", async () => {
-    //         downloadAndRunScriptMock.mockResolvedValue(undefined);
-    //         await expect(matlab.setupBatch(platform)).resolves.toBeUndefined();
-    //         expect(downloadAndRunScriptMock).toHaveBeenCalledTimes(1);
-    //         expect(addPathMock).toHaveBeenCalledTimes(1);
-    //     });
-
-    //     it("rejects when the download fails", async () => {
-    //         tcFindMock.mockReturnValue("");
-    //         downloadAndRunScriptMock.mockRejectedValueOnce(Error("oof"));
-
-    //         await expect(matlab.setupBatch(platform)).rejects.toBeDefined();
-    //         expect(downloadAndRunScriptMock).toHaveBeenCalledTimes(1);
-    //         expect(addPathMock).toHaveBeenCalledTimes(0);
-    //         expect(tcCacheDirMock).toHaveBeenCalledTimes(0);
-    //     });
-    // });
+            tcDownloadToolMock.mockResolvedValue(batchMockPath);
+            cacheFileMock.mockResolvedValue(batchMockPath);
+            execMock.mockResolvedValue(0);
+        });
+    
+        describe("test on all supported platforms", () => {
+            it(`works on linux`, async () => {
+                const platform = "linux";
+                await expect(matlab.setupBatch(platform, arch)).resolves.toBeUndefined();
+                expect(cacheFileMock).toHaveBeenCalledTimes(1);
+            });
+        
+            it(`works on windows`, async () => {
+                const platform = "win32";
+                await expect(matlab.setupBatch(platform, arch)).resolves.toBeUndefined();
+            });
+    
+            it(`works on mac`, async () => {
+                const platform = "darwin";
+                await expect(matlab.setupBatch(platform, arch)).resolves.toBeUndefined();
+            });
+        });
+    
+        it("errors on unsupported platform", async () => {
+            await expect(() => matlab.setupBatch('sunos', arch)).rejects.toBeDefined();
+        });
+    
+        it("errors on unsupported architecture", async () => {
+            const platform = "linux";
+            await expect(() => matlab.setupBatch(platform, 'x86')).rejects.toBeDefined();
+        });
+    
+        it("works without RUNNER_TEMP", async () => {
+            const platform = "linux";
+            process.env.RUNNER_TEMP = '';
+            await expect(matlab.setupBatch(platform, arch)).resolves.toBeUndefined();
+        });
+    
+        it("rejects when the download fails", async () => {
+            const platform = "linux";
+            tcDownloadToolMock.mockRejectedValue(Error("oof"));
+            await expect(matlab.setupBatch(platform, arch)).rejects.toBeDefined();
+        });
+    
+        it("rejects when the chmod fails", async () => {
+            const platform = "linux";
+            execMock.mockResolvedValue(1);
+            await expect(matlab.setupBatch(platform, arch)).rejects.toBeDefined();
+        });
+    });
 
     describe("getReleaseInfo", () => {
         beforeEach(() => {
