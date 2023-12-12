@@ -41,7 +41,8 @@ export async function install(platform: string, architecture: string, release: s
         }
 
         if (useCache) {
-            cacheHit = await cache.restoreMATLAB(releaseInfo, platform, architecture, products, destination);
+            const supportFilesDir = matlab.getSupportPackagesPath(platform, releaseInfo.name);
+            cacheHit = await cache.restoreMATLAB(releaseInfo, platform, architecture, products, destination, supportFilesDir);
         }
 
         if (!alreadyExists && !cacheHit) {

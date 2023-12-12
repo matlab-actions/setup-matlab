@@ -6,6 +6,7 @@ import * as http from "@actions/http-client";
 import * as io from "@actions/io";
 import * as tc from "@actions/tool-cache";
 import * as fs from "fs";
+import { homedir } from "os";
 import * as path from "path";
 import properties from "./properties.json";
 
@@ -106,4 +107,22 @@ export async function getReleaseInfo(release: string): Promise<Release> {
         version: version,
         update: update,
     }
+}
+
+export function getSupportPackagesPath(platform: string, release: string): string | undefined {
+    let supportPackagesDir;
+    switch (platform) {
+        case "win32":
+            supportPackagesDir = path.join("C", "ProgramData", "MATLAB", "SupportPackages", release);
+            break;
+        case "linux":
+            supportPackagesDir = path.join(homedir(), "MATLAB", "SupportPackages", release);
+            break;
+        case "darwin":
+            supportPackagesDir = path.join(homedir(), "MATLAB", "SupportPackages", release);
+            break;
+        default:
+            Error(`This action is not supported on ${platform} runners.`);
+    }
+    return supportPackagesDir;
 }
