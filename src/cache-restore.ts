@@ -26,7 +26,6 @@ export async function restoreMATLAB(release: Release, platform: string, architec
     }
 
     core.saveState(State.CacheMatchedKey, cacheKey);
-    core.info(`Restored support packages to: ${supportPackagesPath}`);
     core.info(`Cache restored from key: ${cacheKey}`);
     return true
 }

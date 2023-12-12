@@ -121,7 +121,7 @@ export function getSupportPackagesPath(platform: string, release: string): strin
     let capitalizedRelease = release[0].toUpperCase() + release.slice(1, release.length);
     switch (platform) {
         case "win32":
-            supportPackagesDir = path.join("C", "ProgramData", "MATLAB", "SupportPackages", capitalizedRelease);
+            supportPackagesDir = path.join("C:", "ProgramData", "MATLAB", "SupportPackages", capitalizedRelease);
             break;
         case "linux":
             supportPackagesDir = path.join(homedir(), "Documents", "MATLAB", "SupportPackages", capitalizedRelease);
