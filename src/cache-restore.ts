@@ -10,7 +10,11 @@ export async function restoreMATLAB(release: Release, platform: string, architec
     const installHash = crypto.createHash('sha256').update(products.sort().join('|')).digest('hex')
     const keyPrefix = `matlab-cache-${platform}-${architecture}-${release.version}`;
     const primaryKey = `${keyPrefix}-${installHash}`;
-    const cacheKey: string | undefined = await cache.restoreCache([matlabPath], primaryKey);
+    const cachePaths = [matlabPath]
+    if (supportPackagesPath) {
+        cachePaths.push(supportPackagesPath);
+    }
+    const cacheKey: string | undefined = await cache.restoreCache(cachePaths, primaryKey);
 
     core.saveState(State.CachePrimaryKey, primaryKey);
     core.saveState(State.MatlabCachePath, matlabPath);
