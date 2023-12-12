@@ -23,9 +23,16 @@ export async function makeToolcacheDir(release: Release): Promise<[string, boole
         core.info(`Found MATLAB ${release.name} in cache at ${toolpath}.`);
         alreadyExists = true;
     } else {
-        fs.writeFileSync(".keep", "");
-        toolpath = await tc.cacheFile(".keep", ".keep", "MATLAB", release.version);
-        io.rmRF(".keep");
+        if (process.platform == "win32") {
+            const runnerTemp = process.env["RUNNER_TEMP"] || "";
+            toolpath = path.join(runnerTemp, "MATLAB", release.name);
+            await io.mkdirP(toolpath);
+        }
+        else {
+            fs.writeFileSync(".keep", "");
+            toolpath = await tc.cacheFile(".keep", ".keep", "MATLAB", release.version);
+            io.rmRF(".keep");
+        }
     }
     return [toolpath, alreadyExists]
 }
