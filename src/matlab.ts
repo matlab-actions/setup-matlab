@@ -111,18 +111,20 @@ export async function getReleaseInfo(release: string): Promise<Release> {
 
 export function getSupportPackagesPath(platform: string, release: string): string | undefined {
     let supportPackagesDir;
+    let capitalizedRelease = release[0].toUpperCase() + release.slice(1, release.length);
     switch (platform) {
         case "win32":
-            supportPackagesDir = path.join("C", "ProgramData", "MATLAB", "SupportPackages", release);
+            supportPackagesDir = path.join("C", "ProgramData", "MATLAB", "SupportPackages", capitalizedRelease);
             break;
         case "linux":
-            supportPackagesDir = path.join(homedir(), "MATLAB", "SupportPackages", release);
+            supportPackagesDir = path.join(homedir(), "MATLAB", "SupportPackages", capitalizedRelease);
             break;
         case "darwin":
-            supportPackagesDir = path.join(homedir(), "MATLAB", "SupportPackages", release);
+            supportPackagesDir = path.join(homedir(), "MATLAB", "SupportPackages", capitalizedRelease);
             break;
         default:
-            Error(`This action is not supported on ${platform} runners.`);
+            throw(`This action is not supported on ${platform} runners.`);
     }
     return supportPackagesDir;
 }
+
