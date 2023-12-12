@@ -33,12 +33,12 @@ describe("cache-restore", () => {
     it("returns true if cache is found", async () => {
         restoreCacheMock.mockReturnValue("matched-cache-key");
         await expect(restoreMATLAB(release, platform, arch, products, location)).resolves.toBe(true);
-        expect(saveStateMock).toHaveBeenCalledTimes(3);
+        expect(saveStateMock).toHaveBeenCalledTimes(4);
     });
 
 
     it("returns false if cache is not found", async () => {
         await expect(restoreMATLAB(release, platform, arch, products, location)).resolves.toBe(false);
-        expect(saveStateMock).toHaveBeenCalledTimes(2);
+        expect(saveStateMock).toHaveBeenCalledTimes(3);
     });
 });

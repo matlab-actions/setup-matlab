@@ -6,7 +6,7 @@ import * as crypto from "crypto";
 import { State } from './cache-state';
 import { Release } from './matlab';
 
-export async function restoreMATLAB(release: Release, platform: string, architecture: string, products: string[], matlabPath: string): Promise<boolean> {
+export async function restoreMATLAB(release: Release, platform: string, architecture: string, products: string[], matlabPath: string, supportPackagesPath?: string): Promise<boolean> {
     const installHash = crypto.createHash('sha256').update(products.sort().join('|')).digest('hex')
     const keyPrefix = `matlab-cache-${platform}-${architecture}-${release.version}`;
     const primaryKey = `${keyPrefix}-${installHash}`;
@@ -14,6 +14,7 @@ export async function restoreMATLAB(release: Release, platform: string, architec
 
     core.saveState(State.CachePrimaryKey, primaryKey);
     core.saveState(State.MatlabCachePath, matlabPath);
+    core.saveState(State.SupportPackagesCachePath, supportPackagesPath);
 
     if (!cacheKey) {
         core.info(`${keyPrefix} cache is not found`);
