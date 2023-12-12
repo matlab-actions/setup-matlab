@@ -117,10 +117,10 @@ export function getSupportPackagesPath(platform: string, release: string): strin
             supportPackagesDir = path.join("C", "ProgramData", "MATLAB", "SupportPackages", capitalizedRelease);
             break;
         case "linux":
-            supportPackagesDir = path.join(homedir(), "MATLAB", "SupportPackages", capitalizedRelease);
+            supportPackagesDir = path.join(homedir(), "Documents", "MATLAB", "SupportPackages", capitalizedRelease);
             break;
         case "darwin":
-            supportPackagesDir = path.join(homedir(), "MATLAB", "SupportPackages", capitalizedRelease);
+            supportPackagesDir = path.join(homedir(), "Documents", "MATLAB", "SupportPackages", capitalizedRelease);
             break;
         default:
             throw(`This action is not supported on ${platform} runners.`);
