@@ -7,14 +7,12 @@ import properties from "./properties.json";
 
 export async function setup(platform: string, architecture: string): Promise<string> {
     let mpmUrl: string;
-    let ext = "";
     if (architecture != "x64") {
         return Promise.reject(Error(`This action is not supported on ${platform} runners using the ${architecture} architecture.`));
     }
     switch (platform) {
         case "win32":
             mpmUrl = properties.mpmRootUrl + "win64/mpm";
-            ext = ".exe";
             break;
         case "linux":
             mpmUrl = properties.mpmRootUrl + "glnxa64/mpm";
@@ -27,13 +25,12 @@ export async function setup(platform: string, architecture: string): Promise<str
     }
 
     let mpm: string = await tc.downloadTool(mpmUrl);
-    let mpmPath= await tc.cacheFile(mpm, `mpm${ext}`, "mpm", "1.0.0");
 
-    const exitCode = await exec.exec(`chmod +x ${mpmPath}`);
+    const exitCode = await exec.exec(`chmod +x ${mpm}`);
     if (exitCode !== 0) {
         return Promise.reject(Error("Unable to set up mpm."));
     }
-    return mpmPath
+    return mpm
 }
 
 export async function install(mpmPath: string, release: matlab.Release, products: string[], destination: string) {
