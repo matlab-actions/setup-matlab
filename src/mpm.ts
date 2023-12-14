@@ -7,12 +7,14 @@ import properties from "./properties.json";
 
 export async function setup(platform: string, architecture: string): Promise<string> {
     let mpmUrl: string;
+    let ext = "";
     if (architecture != "x64") {
         return Promise.reject(Error(`This action is not supported on ${platform} runners using the ${architecture} architecture.`));
     }
     switch (platform) {
         case "win32":
-            mpmUrl = properties.mpmRootUrl + "win64/mpm";
+            mpmUrl = properties.mpmRootUrl + "win64/mpm.exe";
+            ext = ".exe";
             break;
         case "linux":
             mpmUrl = properties.mpmRootUrl + "glnxa64/mpm";
