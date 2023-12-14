@@ -2,7 +2,6 @@
 
 import * as exec from "@actions/exec";
 import * as tc from "@actions/tool-cache";
-import * as path from "path";
 import * as matlab from "./matlab";
 import properties from "./properties.json";
 
@@ -26,13 +25,6 @@ export async function setup(platform: string, architecture: string): Promise<str
     }
 
     let mpm: string = await tc.downloadTool(mpmUrl);
-    if (platform === "win32") {
-       const mpmExtractedPath: string = await tc.extractZip(mpm);
-       mpm = path.join(mpmExtractedPath, "bin", "win64",  "mpm.exe");
-    } else if (platform === "darwin") {
-        const mpmExtractedPath: string = await tc.extractZip(mpm);
-        mpm = path.join(mpmExtractedPath, "bin", "maci64",  "mpm");
-     }
 
     const exitCode = await exec.exec(`chmod +x ${mpm}`);
     if (exitCode !== 0) {
