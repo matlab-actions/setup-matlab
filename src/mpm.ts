@@ -8,12 +8,14 @@ import properties from "./properties.json";
 
 export async function setup(platform: string, architecture: string): Promise<string> {
     let mpmUrl: string;
+    let ext = "";
     if (architecture != "x64") {
         return Promise.reject(Error(`This action is not supported on ${platform} runners using the ${architecture} architecture.`));
     }
     switch (platform) {
         case "win32":
             mpmUrl = properties.mpmRootUrl + "win64/mpm";
+            ext = ".exe";
             break;
         case "linux":
             mpmUrl = properties.mpmRootUrl + "glnxa64/mpm";
@@ -25,16 +27,15 @@ export async function setup(platform: string, architecture: string): Promise<str
             return Promise.reject(Error(`This action is not supported on ${platform} runners using the ${architecture} architecture.`));
     }
 
-    let mpm: string = await tc.downloadTool(mpmUrl);
-    if (platform === "win32") {
-       const mpmExtractedPath: string = await tc.extractZip(mpm);
-       mpm = path.join(mpmExtractedPath, "bin", "win64",  "mpm.exe");
-    } else if (platform === "darwin") {
-        const mpmExtractedPath: string = await tc.extractZip(mpm);
-        mpm = path.join(mpmExtractedPath, "bin", "maci64",  "mpm");
-     }
 
-    const exitCode = await exec.exec(`chmod +x ${mpm}`);
+    let runner_temp = process.env["RUNNER_TEMP"]
+    if (!runner_temp) {
+        return Promise.reject(Error("Unable to find runner temporary directory."));
+    }
+    let mpmDest = path.join(runner_temp, `mpm${ext}`);
+    let mpm: string = await tc.downloadTool(mpmUrl, mpmDest);
+
+    const exitCode = await exec.exec(`chmod +x "${mpm}"`);
     if (exitCode !== 0) {
         return Promise.reject(Error("Unable to set up mpm."));
     }

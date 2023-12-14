@@ -1,10 +1,6 @@
 name: Build and Test
 on: [push]
 
-env:
-  MATHWORKS_ACCOUNT: ${{ secrets.MATHWORKS_ACCOUNT }}
-  MATHWORKS_TOKEN: ${{ secrets.MATHWORKS_TOKEN }}
-
 jobs:
   bat:
     name: Build and Test
@@ -27,7 +23,7 @@ jobs:
     needs: bat
     runs-on: ${{ matrix.os }}
     strategy:
-      fail-fast: true
+      fail-fast: false
       matrix:
         include:
           - os: ubuntu-latest
@@ -66,9 +62,13 @@ jobs:
         run:  'if [[ "${{ steps.setup_matlab.outputs.matlabroot }}" != *"MATLAB"* ]]; then exit 1; fi'
         shell: bash
       - name: Check MATLAB version
-        run: matlab-batch "${{ matrix.check-matlab }}"
+        uses: matlab-actions/run-command@v1
+        with:
+          command: "${{ matrix.check-matlab }}"
       - name: Check Simulink version
-        run: matlab-batch "${{ matrix.check-simulink }}"
+        uses: matlab-actions/run-command@v1
+        with:
+          command: "${{ matrix.check-simulink }}"
       - name: Check NoOp on 2nd install
         uses: ./
         with:
