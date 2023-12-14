@@ -2,17 +2,20 @@
 
 import * as exec from "@actions/exec";
 import * as tc from "@actions/tool-cache";
+import * as path from "path";
 import * as matlab from "./matlab";
 import properties from "./properties.json";
 
 export async function setup(platform: string, architecture: string): Promise<string> {
     let mpmUrl: string;
+    let ext = "";
     if (architecture != "x64") {
         return Promise.reject(Error(`This action is not supported on ${platform} runners using the ${architecture} architecture.`));
     }
     switch (platform) {
         case "win32":
             mpmUrl = properties.mpmRootUrl + "win64/mpm";
+            ext = ".exe";
             break;
         case "linux":
             mpmUrl = properties.mpmRootUrl + "glnxa64/mpm";
@@ -24,9 +27,12 @@ export async function setup(platform: string, architecture: string): Promise<str
             return Promise.reject(Error(`This action is not supported on ${platform} runners using the ${architecture} architecture.`));
     }
 
-    let mpm: string = await tc.downloadTool(mpmUrl);
 
-    const exitCode = await exec.exec(`chmod +x ${mpm}`);
+
+    let mpmDest = path.join(process.env["RUNNER_TEMP"] || "", `mpm${ext}`);
+    let mpm: string = await tc.downloadTool(mpmUrl, mpmDest);
+
+    const exitCode = await exec.exec(`chmod +x "${mpm}"`);
     if (exitCode !== 0) {
         return Promise.reject(Error("Unable to set up mpm."));
     }
