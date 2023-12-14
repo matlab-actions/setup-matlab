@@ -29,7 +29,7 @@ export async function setup(platform: string, architecture: string): Promise<str
     let mpm: string = await tc.downloadTool(mpmUrl);
     let mpmPath= await tc.cacheFile(mpm, `mpm${ext}`, "mpm", "1.0.0");
 
-    const exitCode = await exec.exec(`chmod +x mpmPath`);
+    const exitCode = await exec.exec(`chmod +x ${mpmPath}`);
     if (exitCode !== 0) {
         return Promise.reject(Error("Unable to set up mpm."));
     }
