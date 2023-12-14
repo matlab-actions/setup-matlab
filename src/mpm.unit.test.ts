@@ -17,6 +17,7 @@ afterEach(() => {
 
 describe("setup mpm", () => {
     let tcDownloadToolMock: jest.Mock;
+    let tcCacheFileMock: jest.Mock;
     let execMock: jest.Mock;
     let defaultInstallRootMock: jest.Mock;
     const arch = "x64";
@@ -24,15 +25,17 @@ describe("setup mpm", () => {
 
     beforeEach(() => {
         tcDownloadToolMock = tc.downloadTool as jest.Mock;
+        tcCacheFileMock = tc.cacheFile as jest.Mock;
         execMock = exec.exec as jest.Mock;
         defaultInstallRootMock = script.defaultInstallRoot as jest.Mock;
+        tcDownloadToolMock.mockResolvedValue(mpmMockPath);
+        tcCacheFileMock.mockResolvedValue(mpmMockPath);
         process.env.RUNNER_TEMP = path.join("runner", "workdir", "tmp");
     });
 
     describe("test on all supported platforms", () => {
         it(`works on linux`, async () => {
             const platform = "linux";
-            tcDownloadToolMock.mockResolvedValue(mpmMockPath);
             execMock.mockResolvedValue(0);
             await expect(mpm.setup(platform, arch)).resolves.toBe(mpmMockPath);
             expect(tcDownloadToolMock.mock.calls[0][0]).toContain("glnxa64");
@@ -40,7 +43,6 @@ describe("setup mpm", () => {
     
         it(`works on windows`, async () => {
             const platform = "win32";
-            tcDownloadToolMock.mockResolvedValue(mpmMockPath);
             execMock.mockResolvedValue(0);
             await expect(mpm.setup(platform, arch)).resolves.toBe(mpmMockPath);
             expect(tcDownloadToolMock.mock.calls[0][0]).toContain("win64");
@@ -48,7 +50,6 @@ describe("setup mpm", () => {
 
         it(`works on mac`, async () => {
             const platform = "darwin";
-            tcDownloadToolMock.mockResolvedValue(mpmMockPath);
             execMock.mockResolvedValue(0);
             await expect(mpm.setup(platform, arch)).resolves.toBe(mpmMockPath);
             expect(tcDownloadToolMock.mock.calls[0][0]).toContain("maci64");
