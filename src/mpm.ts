@@ -28,8 +28,11 @@ export async function setup(platform: string, architecture: string): Promise<str
     }
 
 
-
-    let mpmDest = path.join(process.env["RUNNER_TEMP"] || "", `mpm${ext}`);
+    let runner_temp = process.env["RUNNER_TEMP"]
+    if (!runner_temp) {
+        return Promise.reject(Error("Unable to find runner temporary directory."));
+    }
+    let mpmDest = path.join(runner_temp, `mpm${ext}`);
     let mpm: string = await tc.downloadTool(mpmUrl, mpmDest);
 
     const exitCode = await exec.exec(`chmod +x "${mpm}"`);

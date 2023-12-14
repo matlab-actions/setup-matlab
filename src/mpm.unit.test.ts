@@ -65,13 +65,13 @@ describe("setup mpm", () => {
         await expect(() => mpm.setup(platform, 'x86')).rejects.toBeDefined();
     });
 
-    it("works without RUNNER_TEMP", async () => {
+    it("Errors without RUNNER_TEMP", async () => {
         const platform = "linux";
         process.env.RUNNER_TEMP = '';
         tcDownloadToolMock.mockResolvedValue(mpmMockPath);
         defaultInstallRootMock.mockReturnValue(path.join("path", "to", "install", "root"));
         execMock.mockResolvedValue(0);
-        await expect(mpm.setup(platform, arch)).resolves.toBe(mpmMockPath);
+        await expect(mpm.setup(platform, arch)).rejects.toBeDefined();
     });
 
     it("rejects when the download fails", async () => {
