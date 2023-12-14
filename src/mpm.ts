@@ -13,7 +13,7 @@ export async function setup(platform: string, architecture: string): Promise<str
     }
     switch (platform) {
         case "win32":
-            mpmUrl = properties.mpmRootUrl + "win64/mpm.exe";
+            mpmUrl = properties.mpmRootUrl + "win64/mpm";
             ext = ".exe";
             break;
         case "linux":
