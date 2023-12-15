@@ -17,16 +17,13 @@ afterEach(() => {
 
 describe("setup mpm", () => {
     let tcDownloadToolMock: jest.Mock;
-    let tcExtractZipMock: jest.Mock;
     let execMock: jest.Mock;
     let defaultInstallRootMock: jest.Mock;
     const arch = "x64";
     const mpmMockPath = path.join("path", "to", "mpm");
-    const zipMockPath = path.join("path", "to", "zip");
 
     beforeEach(() => {
         tcDownloadToolMock = tc.downloadTool as jest.Mock;
-        tcExtractZipMock = tc.extractZip as jest.Mock;
         execMock = exec.exec as jest.Mock;
         defaultInstallRootMock = script.defaultInstallRoot as jest.Mock;
         process.env.RUNNER_TEMP = path.join("runner", "workdir", "tmp");
@@ -43,21 +40,17 @@ describe("setup mpm", () => {
     
         it(`works on windows`, async () => {
             const platform = "win32";
-            tcDownloadToolMock.mockResolvedValue(zipMockPath);
-            tcExtractZipMock.mockResolvedValue(mpmMockPath);
+            tcDownloadToolMock.mockResolvedValue(mpmMockPath);
             execMock.mockResolvedValue(0);
-            await expect(mpm.setup(platform, arch)).resolves.toBe(path.join(mpmMockPath, "bin", "win64", "mpm.exe"));
-            expect(tcExtractZipMock).toHaveBeenCalledTimes(1);
+            await expect(mpm.setup(platform, arch)).resolves.toBe(path.join(mpmMockPath));
             expect(tcDownloadToolMock.mock.calls[0][0]).toContain("win64");
         });
 
         it(`works on mac`, async () => {
             const platform = "darwin";
-            tcDownloadToolMock.mockResolvedValue(zipMockPath);
-            tcExtractZipMock.mockResolvedValue(mpmMockPath);
+            tcDownloadToolMock.mockResolvedValue(mpmMockPath);
             execMock.mockResolvedValue(0);
-            await expect(mpm.setup(platform, arch)).resolves.toBe(path.join(mpmMockPath, "bin", "maci64", "mpm"));
-            expect(tcExtractZipMock).toHaveBeenCalledTimes(1);
+            await expect(mpm.setup(platform, arch)).resolves.toBe(path.join(mpmMockPath));
             expect(tcDownloadToolMock.mock.calls[0][0]).toContain("maci64");
         });
     });
@@ -71,13 +64,13 @@ describe("setup mpm", () => {
         await expect(() => mpm.setup(platform, 'x86')).rejects.toBeDefined();
     });
 
-    it("works without RUNNER_TEMP", async () => {
+    it("errors without RUNNER_TEMP", async () => {
         const platform = "linux";
         process.env.RUNNER_TEMP = '';
         tcDownloadToolMock.mockResolvedValue(mpmMockPath);
         defaultInstallRootMock.mockReturnValue(path.join("path", "to", "install", "root"));
         execMock.mockResolvedValue(0);
-        await expect(mpm.setup(platform, arch)).resolves.toBe(mpmMockPath);
+        await expect(mpm.setup(platform, arch)).rejects.toBeDefined();
     });
 
     it("rejects when the download fails", async () => {
