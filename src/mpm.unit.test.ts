@@ -43,15 +43,17 @@ describe("setup mpm", () => {
     
         it(`works on windows`, async () => {
             const platform = "win32";
+            tcDownloadToolMock.mockResolvedValue(mpmMockPath);
             execMock.mockResolvedValue(0);
-            await expect(mpm.setup(platform, arch)).resolves.toBe(mpmMockPath);
+            await expect(mpm.setup(platform, arch)).resolves.toBe(path.join(mpmMockPath));
             expect(tcDownloadToolMock.mock.calls[0][0]).toContain("win64");
         });
 
         it(`works on mac`, async () => {
             const platform = "darwin";
+            tcDownloadToolMock.mockResolvedValue(mpmMockPath);
             execMock.mockResolvedValue(0);
-            await expect(mpm.setup(platform, arch)).resolves.toBe(mpmMockPath);
+            await expect(mpm.setup(platform, arch)).resolves.toBe(path.join(mpmMockPath));
             expect(tcDownloadToolMock.mock.calls[0][0]).toContain("maci64");
         });
     });
@@ -65,7 +67,7 @@ describe("setup mpm", () => {
         await expect(() => mpm.setup(platform, 'x86')).rejects.toBeDefined();
     });
 
-    it("Errors without RUNNER_TEMP", async () => {
+    it("errors without RUNNER_TEMP", async () => {
         const platform = "linux";
         process.env.RUNNER_TEMP = '';
         tcDownloadToolMock.mockResolvedValue(mpmMockPath);

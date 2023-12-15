@@ -27,7 +27,6 @@ export async function setup(platform: string, architecture: string): Promise<str
             return Promise.reject(Error(`This action is not supported on ${platform} runners using the ${architecture} architecture.`));
     }
 
-
     let runner_temp = process.env["RUNNER_TEMP"]
     if (!runner_temp) {
         return Promise.reject(Error("Unable to find runner temporary directory."));
