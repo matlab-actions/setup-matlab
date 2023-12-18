@@ -1,10 +1,12 @@
 // Copyright 2020-2022 The MathWorks, Inc.
 
 import * as exec from "@actions/exec";
+import * as io from "@actions/io";
 import * as toolCache from "@actions/tool-cache";
 import * as script from "./script";
 
 jest.mock("@actions/exec");
+jest.mock("@actions/io");
 jest.mock("@actions/tool-cache");
 
 afterEach(() => {
@@ -56,6 +58,8 @@ describe("script downloader/runner", () => {
 });
 
 describe("install command generator", () => {
+    const whichMock = io.which as jest.Mock;
+
     const scriptPath = "hello.sh";
 
     beforeAll(() => {
@@ -64,13 +68,20 @@ describe("install command generator", () => {
 
     it("does not change the command on Windows", () => {
         const cmd = script.generateExecCommand("win32", scriptPath);
-        expect(cmd).toEqual(`bash ${scriptPath}`);
+        expect(cmd).resolves.toEqual(`bash ${scriptPath}`);
     });
 
     ["darwin", "linux"].forEach((platform) => {
         it(`calls the command with sudo on ${platform}`, () => {
+            whichMock.mockResolvedValue("path/to/sudo"); 
             const cmd = script.generateExecCommand(platform, scriptPath);
-            expect(cmd).toEqual(`sudo -E bash ${scriptPath}`);
+            expect(cmd).resolves.toEqual(`sudo -E bash ${scriptPath}`);
+        });
+
+        it(`calls the command without sudo on ${platform}`, () => {
+            whichMock.mockRejectedValue("No sudo!");
+            const cmd = script.generateExecCommand(platform, scriptPath);
+            expect(cmd).resolves.toEqual(`bash ${scriptPath}`);
         });
     });
 });
