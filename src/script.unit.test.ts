@@ -79,7 +79,7 @@ describe("install command generator", () => {
         });
 
         it(`calls the command without sudo on ${platform}`, () => {
-            whichMock.mockRejectedValue("No sudo!");
+            whichMock.mockResolvedValue("");
             const cmd = script.generateExecCommand(platform, scriptPath);
             expect(cmd).resolves.toEqual(`bash ${scriptPath}`);
         });

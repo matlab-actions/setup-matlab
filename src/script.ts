@@ -35,11 +35,9 @@ export async function generateExecCommand(platform: string, scriptPath: string):
     let installCmd = `bash ${scriptPath}`;
 
     if (platform !== "win32") {
-        try {
-            await io.which("sudo", true);
+        const sudo = await io.which("sudo");
+        if (sudo) {
             installCmd = `sudo -E ${installCmd}`;
-        } catch {
-            // Sudo not available, do not prepend
         }
     }
 
