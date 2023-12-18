@@ -1,4 +1,4 @@
-// Copyright 2020-2022 The MathWorks, Inc.
+// Copyright 2020-2023 The MathWorks, Inc.
 
 import * as exec from "@actions/exec";
 import * as io from "@actions/io";
