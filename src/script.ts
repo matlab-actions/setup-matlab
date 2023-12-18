@@ -1,6 +1,7 @@
-// Copyright 2020-2022 The MathWorks, Inc.
+// Copyright 2020-2023 The MathWorks, Inc.
 
 import * as exec from "@actions/exec";
+import * as io from "@actions/io";
 import * as tc from "@actions/tool-cache";
 import path from "path";
 
@@ -13,7 +14,7 @@ import path from "path";
  */
 export async function downloadAndRunScript(platform: string, url: string, args?: string[]) {
     const scriptPath = await tc.downloadTool(url);
-    const cmd = generateExecCommand(platform, scriptPath);
+    const cmd = await generateExecCommand(platform, scriptPath);
 
     const exitCode = await exec.exec(cmd, args);
 
@@ -29,12 +30,17 @@ export async function downloadAndRunScript(platform: string, url: string, args?:
  * @param platform Operating system of the runner (e.g. "win32" or "linux").
  * @param scriptPath Path to the script (on runner's filesystem).
  */
-export function generateExecCommand(platform: string, scriptPath: string): string {
+export async function generateExecCommand(platform: string, scriptPath: string): Promise<string> {
     // Run the install script using bash
     let installCmd = `bash ${scriptPath}`;
 
     if (platform !== "win32") {
-        installCmd = `sudo -E ${installCmd}`;
+        try {
+            await io.which("sudo", true);
+            installCmd = `sudo -E ${installCmd}`;
+        } catch {
+            // Sudo not available, do not prepend
+        }
     }
 
     return installCmd;
