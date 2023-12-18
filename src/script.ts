@@ -38,14 +38,12 @@ export async function generateExecCommand(platform: string, scriptPath: string):
         try {
             await io.which("sudo", true);
             installCmd = `sudo -E ${installCmd}`;
-            return installCmd;
         } catch {
             // Sudo not available, do not prepend
-            return installCmd;
         }
-    } else {
-        return installCmd;
     }
+
+    return installCmd;
 }
 
 export function defaultInstallRoot(platform: string, programName: string): string {
