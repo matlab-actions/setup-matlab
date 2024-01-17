@@ -54,7 +54,7 @@ async function windowsToolpath(platform: string, release: Release): Promise<stri
     fs.writeFileSync(".keep", "");
     let actualToolCachePath = await tc.cacheFile(".keep", ".keep", "MATLAB", release.version);
     io.rmRF(".keep");
-    let defaultToolCachePath = actualToolCacheRoot.replace(actualToolCacheRoot, defaultToolCacheRoot);
+    let defaultToolCachePath = actualToolCachePath.replace(actualToolCacheRoot, defaultToolCacheRoot);
     fs.mkdirSync(path.dirname(defaultToolCachePath));
     fs.symlinkSync(actualToolCachePath, defaultToolCachePath, 'junction');
 
