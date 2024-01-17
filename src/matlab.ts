@@ -55,14 +55,12 @@ async function windowsToolpath(platform: string, release: Release): Promise<stri
     let actualToolCacheDir = await tc.cacheFile(".keep", ".keep", "MATLAB", release.version);
     io.rmRF(".keep");
     let defaultToolCacheDir = actualToolCacheDir.replace(actualToolCacheRoot, defaultToolCacheRoot);
-    core.info(path.dirname(defaultToolCacheDir));
-    core.info(path.dirname(actualToolCacheDir));
-    core.info("Making dir");
     fs.mkdirSync(path.dirname(defaultToolCacheDir), {recursive: true});
-    core.info("linking dir");
     fs.symlinkSync(actualToolCacheDir, defaultToolCacheDir, 'junction');
-    core.info(`Created link ${defaultToolCacheDir} => ${actualToolCacheDir}`);
 
+    const actualToolCacheCompleteFile = `${actualToolCacheDir}.complete`;
+    const defaultToolCacheCompleteFile = `${defaultToolCacheDir}.complete`;
+    fs.symlinkSync(actualToolCacheCompleteFile, defaultToolCacheCompleteFile, 'file');
     process.env['RUNNER_TOOL_CACHE'] = defaultToolCacheRoot;
     return actualToolCacheDir;
 }
