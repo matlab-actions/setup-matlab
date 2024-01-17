@@ -16,25 +16,66 @@ export interface Release {
     update: string;
 }
 
-export async function makeToolcacheDir(release: Release): Promise<[string, boolean]> {
+export async function makeToolcacheDir(release: Release, platform: string): Promise<[string, boolean]> {
     let toolpath: string = tc.find("MATLAB", release.version);
     let alreadyExists = false;
     if (toolpath) {
         core.info(`Found MATLAB ${release.name} in cache at ${toolpath}.`);
         alreadyExists = true;
     } else {
-        if (process.platform == "win32") {
-            const runnerTemp = process.env["RUNNER_TEMP"] || "";
-            toolpath = path.join(runnerTemp, "MATLAB", release.name);
-            await io.mkdirP(toolpath);
-        }
-        else {
-            fs.writeFileSync(".keep", "");
-            toolpath = await tc.cacheFile(".keep", ".keep", "MATLAB", release.version);
-            io.rmRF(".keep");
-        }
+        toolpath = await windowsToolpath(release, platform) || await defaultToolpath(release, platform);
     }
     return [toolpath, alreadyExists]
+}
+
+async function windowsToolpath(release: Release, platform: string): Promise<string | false> {
+    if (platform !== "win32" ) {
+        return false
+    }
+
+    // only apply optimization for github hosted runners
+    if (process.env['RUNNER_ENVIRONMENT'] !== 'github-hosted' && process.env['AGENT_ISSELFHOSTED'] === '1') {
+        return false;
+    }
+
+    const defaultToolCacheRoot = process.env['RUNNER_TOOL_CACHE'];
+    if (!defaultToolCacheRoot) {
+        return false
+    }
+
+    // make sure runner has expected directory structure
+    if (!fs.existsSync('d:\\') || !fs.existsSync('c:\\')) {
+        return false;
+    }
+
+    const actualToolCacheRoot = defaultToolCacheRoot.replace("C:", "D:").replace("c:", "d:");
+    process.env['RUNNER_TOOL_CACHE'] = actualToolCacheRoot;
+
+    // create install directory and link it to the toolcache directory
+    fs.writeFileSync(".keep", "");
+    let actualToolCacheDir = await tc.cacheFile(".keep", ".keep", "MATLAB", release.version);
+    io.rmRF(".keep");
+    let defaultToolCacheDir = actualToolCacheDir.replace(actualToolCacheRoot, defaultToolCacheRoot);
+    fs.mkdirSync(path.dirname(defaultToolCacheDir), {recursive: true});
+    fs.symlinkSync(actualToolCacheDir, defaultToolCacheDir, 'junction');
+
+    // required for github actions to make the cacheDir persistent
+    const actualToolCacheCompleteFile = `${actualToolCacheDir}.complete`;
+    const defaultToolCacheCompleteFile = `${defaultToolCacheDir}.complete`;
+    fs.symlinkSync(actualToolCacheCompleteFile, defaultToolCacheCompleteFile, 'file');
+
+    process.env['RUNNER_TOOL_CACHE'] = defaultToolCacheRoot;
+    return actualToolCacheDir;
+}
+
+async function defaultToolpath(release: Release, platform: string): Promise<string> {
+    fs.writeFileSync(".keep", "");
+    let toolpath = await tc.cacheFile(".keep", ".keep", "MATLAB", release.version);
+    io.rmRF(".keep");
+    if (platform == "darwin") {
+        toolpath = toolpath + "/MATLAB.app";
+    }
+    return toolpath
 }
 
 export async function setupBatch(platform: string, architecture: string) {

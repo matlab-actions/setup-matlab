@@ -1,4 +1,4 @@
-// Copyright 2022-2023 The MathWorks, Inc.
+// Copyright 2022-2024 The MathWorks, Inc.
 
 import * as exec from "@actions/exec";
 import * as tc from "@actions/tool-cache";
@@ -96,7 +96,7 @@ describe("mpm install", () => {
     let execMock: jest.Mock;
     const mpmPath = "mpm";
     const releaseInfo = {name: "r2022b", version: "9.13.0", update: ""};
-    const mpmRelease = "r2022b"
+    const mpmRelease = "r2022b";
     beforeEach(() => {
         execMock = exec.exec as jest.Mock;
     });

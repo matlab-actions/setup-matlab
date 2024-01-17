@@ -71,11 +71,6 @@ describe("install procedure", () => {
         expect(setOutputMock).toHaveBeenCalledTimes(1);
     });
 
-    it("installs to MATLAB.app on mac", async () => {
-        await expect(install.install("darwin", arch, release, products, useCache)).resolves.toBeUndefined();
-        expect(mpmInstallMock.mock.calls[0][3]).toMatch("MATLAB.app");
-    });
-
     ["darwin", "win32"].forEach((os) => {
         it(`does not run deps script on ${os}`, async () => { 
             await expect(install.install(os, arch, release, products, useCache)).resolves.toBeUndefined();

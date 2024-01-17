@@ -45,10 +45,10 @@ export async function install(mpmPath: string, release: matlab.Release, products
     const mpmRelease = release.name + release.update
     // remove spaces and flatten product list
     let parsedProducts = products.flatMap(p => p.split(" "));
-    // Add MATLAB and PCT by default
+    // Add MATLAB by default
     parsedProducts.push("MATLAB");
-    // Remove duplicates
-    parsedProducts = [...new Set(parsedProducts)];
+
+   parsedProducts = [...new Set(parsedProducts)];
     let mpmArguments: string[] = [
         "install",
         `--release=${mpmRelease}`,    
@@ -61,5 +61,5 @@ export async function install(mpmPath: string, release: matlab.Release, products
     if (exitCode !== 0) {
         return Promise.reject(Error(`Script exited with non-zero code ${exitCode}`));
     }
-    return
+   return
 }
