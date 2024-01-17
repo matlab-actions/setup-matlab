@@ -1,8 +1,6 @@
 // Copyright 2020-2023 The MathWorks, Inc.
 
 import * as core from "@actions/core";
-import * as tc from "@actions/tool-cache";
-import * as fs from "fs";
 import * as matlab from "./matlab";
 import * as mpm from "./mpm";
 import * as script from "./script";
@@ -47,10 +45,6 @@ export async function install(platform: string, architecture: string, release: s
         if (!alreadyExists && !cacheHit) {
             const mpmPath: string = await mpm.setup(platform, architecture);
             await mpm.install(mpmPath, releaseInfo, products, destination);
-        }
-        if (platform == "win32" && !alreadyExists) {
-            let tcDir = tc.find("MATLAB", releaseInfo.version);
-            fs.symlinkSync(tcDir, destination, 'junction');
         }
 
         core.addPath(path.join(destination, "bin"));

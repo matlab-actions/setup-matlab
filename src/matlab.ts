@@ -36,7 +36,7 @@ function windowsToolpath(toolcacheDir: string, platform: string): string | false
         return false
     }
 
-    // this optimization is only for github hosted runners
+    // only apply optimization for github hosted runners
     if (process.env['RUNNER_ENVIRONMENT'] !== 'github-hosted' && process.env['AGENT_ISSELFHOSTED'] === '1') {
         return false;
     }
@@ -48,6 +48,7 @@ function windowsToolpath(toolcacheDir: string, platform: string): string | false
 
     let installDir: string = toolcacheDir.replace("C:", "D:").replace("c:", "d:");
     fs.mkdirSync(path.dirname(installDir), {recursive: true});
+    fs.symlinkSync(installDir, toolcacheDir, 'junction');
     return installDir
 }
 

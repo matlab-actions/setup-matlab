@@ -71,18 +71,18 @@ describe("install procedure", () => {
         expect(setOutputMock).toHaveBeenCalledTimes(1);
     });
 
-    //["darwin", "win32"].forEach((os) => {
-    //    it(`does not run deps script on ${os}`, async () => { 
-    //        await expect(install.install(os, arch, release, products, useCache)).resolves.toBeUndefined();
-    //        expect(downloadAndRunScriptMock).toHaveBeenCalledTimes(0);
-    //        expect(core.group).toHaveBeenCalledTimes(1);
-    //        expect(matlabSetupBatchMock).toHaveBeenCalledTimes(1);
-    //        expect(mpmSetupMock).toHaveBeenCalledTimes(1);
-    //        expect(mpmInstallMock).toHaveBeenCalledTimes(1);
-    //        expect(addPathMock).toHaveBeenCalledTimes(1);
-    //        expect(setOutputMock).toHaveBeenCalledTimes(1);
-    //    });
-    //});
+    ["darwin", "win32"].forEach((os) => {
+        it(`does not run deps script on ${os}`, async () => { 
+            await expect(install.install(os, arch, release, products, useCache)).resolves.toBeUndefined();
+            expect(downloadAndRunScriptMock).toHaveBeenCalledTimes(0);
+            expect(core.group).toHaveBeenCalledTimes(1);
+            expect(matlabSetupBatchMock).toHaveBeenCalledTimes(1);
+            expect(mpmSetupMock).toHaveBeenCalledTimes(1);
+            expect(mpmInstallMock).toHaveBeenCalledTimes(1);
+            expect(addPathMock).toHaveBeenCalledTimes(1);
+            expect(setOutputMock).toHaveBeenCalledTimes(1);
+        });
+    });
 
     it("NoOp on existing install", async () => {
         matlabMakeToolcacheDirMock.mockResolvedValue(["/opt/hostedtoolcache/MATLAB/9.13.0/x64", true]);
