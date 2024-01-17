@@ -51,7 +51,9 @@ async function windowsToolpath(platform: string, release: Release): Promise<stri
     const actualToolCacheRoot = defaultToolCacheRoot.replace("C:", "D:").replace("c:", "d:");
     process.env['RUNNER_TOOL_CACHE'] = actualToolCacheRoot;
 
+    fs.writeFileSync(".keep", "");
     let actualToolCachePath = await tc.cacheFile(".keep", ".keep", "MATLAB", release.version);
+    io.rmRF(".keep");
     let defaultToolCachePath = actualToolCacheRoot.replace(actualToolCacheRoot, defaultToolCacheRoot);
     fs.mkdirSync(path.dirname(defaultToolCachePath));
     fs.symlinkSync(actualToolCachePath, defaultToolCachePath, 'junction');
@@ -62,8 +64,8 @@ async function windowsToolpath(platform: string, release: Release): Promise<stri
 
 async function defaultToolpath(platform: string, release: Release): Promise<string> {
     fs.writeFileSync(".keep", "");
-    io.rmRF(".keep");
     let toolpath = await tc.cacheFile(".keep", ".keep", "MATLAB", release.version);
+    io.rmRF(".keep");
     if (platform == "darwin") {
         toolpath = toolpath + "/MATLAB.app";
     }
