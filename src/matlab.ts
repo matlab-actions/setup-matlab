@@ -23,12 +23,12 @@ export async function makeToolcacheDir(release: Release, platform: string): Prom
         core.info(`Found MATLAB ${release.name} in cache at ${toolpath}.`);
         alreadyExists = true;
     } else {
-        toolpath = await windowsToolpath(platform, release) || await defaultToolpath(platform, release);
+        toolpath = await windowsToolpath(release, platform) || await defaultToolpath(release, platform);
     }
     return [toolpath, alreadyExists]
 }
 
-async function windowsToolpath(platform: string, release: Release): Promise<string | false> {
+async function windowsToolpath(release: Release, platform: string): Promise<string | false> {
     if (platform !== "win32" ) {
         return false
     }
@@ -51,6 +51,7 @@ async function windowsToolpath(platform: string, release: Release): Promise<stri
     const actualToolCacheRoot = defaultToolCacheRoot.replace("C:", "D:").replace("c:", "d:");
     process.env['RUNNER_TOOL_CACHE'] = actualToolCacheRoot;
 
+    // create install directory and link it to the toolcache directory
     fs.writeFileSync(".keep", "");
     let actualToolCacheDir = await tc.cacheFile(".keep", ".keep", "MATLAB", release.version);
     io.rmRF(".keep");
@@ -58,14 +59,16 @@ async function windowsToolpath(platform: string, release: Release): Promise<stri
     fs.mkdirSync(path.dirname(defaultToolCacheDir), {recursive: true});
     fs.symlinkSync(actualToolCacheDir, defaultToolCacheDir, 'junction');
 
+    // required for github actions to make the cacheDir persistent
     const actualToolCacheCompleteFile = `${actualToolCacheDir}.complete`;
     const defaultToolCacheCompleteFile = `${defaultToolCacheDir}.complete`;
     fs.symlinkSync(actualToolCacheCompleteFile, defaultToolCacheCompleteFile, 'file');
+
     process.env['RUNNER_TOOL_CACHE'] = defaultToolCacheRoot;
     return actualToolCacheDir;
 }
 
-async function defaultToolpath(platform: string, release: Release): Promise<string> {
+async function defaultToolpath(release: Release, platform: string): Promise<string> {
     fs.writeFileSync(".keep", "");
     let toolpath = await tc.cacheFile(".keep", ".keep", "MATLAB", release.version);
     io.rmRF(".keep");

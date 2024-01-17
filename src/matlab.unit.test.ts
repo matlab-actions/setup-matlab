@@ -8,6 +8,7 @@ import * as net from 'net';
 import * as path from "path";
 import * as tc from "@actions/tool-cache";
 import * as matlab from "./matlab";
+import fs from "fs";
 
 jest.mock("http");
 jest.mock("net");
@@ -45,11 +46,83 @@ describe("matlab tests", () => {
             expect(infoMock).toHaveBeenCalledTimes(1);
         });
     
-        it("creates cache and returns new path if not in toolcache", async () => {
+        it("creates cache and returns default path for linux", async () => {
             findMock.mockReturnValue("");
             cacheFileMock.mockReturnValue("/opt/hostedtoolcache/matlab/r2022b");
             await expect(matlab.makeToolcacheDir(release, platform)).resolves.toMatchObject(["/opt/hostedtoolcache/matlab/r2022b", false]);
-        })    
+        });
+
+        it("creates cache and returns default path for mac", async () => {
+            findMock.mockReturnValue("");
+            cacheFileMock.mockReturnValue("/opt/hostedtoolcache/matlab/r2022b");
+            await expect(matlab.makeToolcacheDir(release, "darwin")).resolves.toMatchObject(["/opt/hostedtoolcache/matlab/r2022b/MATLAB.app", false]);
+        });
+
+        describe("windows performance workaround", () => {
+            let runnerEnv: string | undefined;
+            let agentIsSelfHosted: string | undefined;
+            let runnerToolcache: string | undefined;
+
+            afterEach(() => {
+                process.env["RUNNER_ENVIRONMENT"] = runnerEnv;
+                process.env["AGENT_ISSELFHOSTED"] = agentIsSelfHosted;
+                process.env["RUNNER_TOOL_CACHE"] = runnerToolcache;
+            });
+
+            beforeEach(() => {
+                runnerEnv = process.env["RUNNER_ENVIRONMENT"];
+                agentIsSelfHosted = process.env["AGENT_ISSELFHOSTED"];
+                runnerToolcache = process.env["RUNNER_TOOL_CACHE"];
+
+                process.env["RUNNER_TOOL_CACHE"] = "C:\\hostedtoolcache\\windows\\matlab\\r2022b";
+                cacheFileMock.mockImplementation(() => process.env["RUNNER_TOOL_CACHE"]);
+                findMock.mockReturnValue("");
+            });
+
+            it("uses workaround if github-hosted", async () => {
+                let expectedToolcacheDir = "D:\\hostedtoolcache\\windows\\matlab\\r2022b";
+
+                // replicate github-hosted environment
+                process.env["AGENT_ISSELFHOSTED"] = "0";
+                process.env["RUNNER_ENVIRONMENT"] = "github-hosted";
+                // mock & no-op fs operations
+                let existsSyncSpy = jest.spyOn(fs, "existsSync").mockReturnValue(true);
+                let mkdirSyncSpy = jest.spyOn(fs, "mkdirSync").mockImplementation(() => "");
+                let symlinkSyncSpy = jest.spyOn(fs, "symlinkSync").mockImplementation(() => {});
+
+                await expect(matlab.makeToolcacheDir(release, "win32")).resolves.toMatchObject([expectedToolcacheDir, false]);
+                expect(existsSyncSpy).toHaveBeenCalledTimes(2);
+                expect(mkdirSyncSpy).toHaveBeenCalledTimes(1);
+                expect(symlinkSyncSpy).toHaveBeenCalledTimes(2);
+            });
+
+            it("uses default toolcache directory if not github hosted", async () => {
+                let expectedToolcacheDir = "C:\\hostedtoolcache\\windows\\matlab\\r2022b";
+                process.env["AGENT_ISSELFHOSTED"] = "1";
+                process.env["RUNNER_ENVIRONMENT"] = "self-hosted";
+                await expect(matlab.makeToolcacheDir(release, "win32")).resolves.toMatchObject([expectedToolcacheDir, false]);
+            });
+
+            it("uses default toolcache directory toolcache directory is not defined", async () => {
+                let expectedToolcacheDir = "C:\\hostedtoolcache\\windows\\matlab\\r2022b";
+                process.env["RUNNER_TOOL_CACHE"] = '';
+                cacheFileMock.mockReturnValue(expectedToolcacheDir);
+                await expect(matlab.makeToolcacheDir(release, "win32")).resolves.toMatchObject([expectedToolcacheDir, false]);
+            });
+
+            it("uses default toolcache directory if d: drive doesn't exist", async () => {
+                jest.spyOn(fs, "existsSync").mockReturnValue(false);
+                let expectedToolcacheDir = "C:\\hostedtoolcache\\windows\\matlab\\r2022b";
+                await expect(matlab.makeToolcacheDir(release, "win32")).resolves.toMatchObject([expectedToolcacheDir, false]);
+            });
+
+            it("uses default toolcache directory if c: drive doesn't exist", async () => {
+                jest.spyOn(fs, "existsSync").mockReturnValueOnce(true).mockReturnValue(false);
+                let expectedToolcacheDir = "C:\\hostedtoolcache\\windows\\matlab\\r2022b";
+                await expect(matlab.makeToolcacheDir(release, "win32")).resolves.toMatchObject([expectedToolcacheDir, false]);
+
+            });
+        });
     });
 
     describe("setupBatch", () => {
@@ -176,5 +249,8 @@ describe("matlab tests", () => {
             })            
             expect(matlab.getReleaseInfo("latest")).rejects.toBeDefined();
         });
+    });
+
+    describe("alalala", () => {
     });
 });
