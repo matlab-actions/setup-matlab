@@ -16,25 +16,48 @@ export interface Release {
     update: string;
 }
 
-export async function makeToolcacheDir(release: Release): Promise<[string, boolean]> {
+export async function makeToolcacheDir(release: Release, platform: string): Promise<[string, boolean]> {
     let toolpath: string = tc.find("MATLAB", release.version);
     let alreadyExists = false;
     if (toolpath) {
         core.info(`Found MATLAB ${release.name} in cache at ${toolpath}.`);
         alreadyExists = true;
     } else {
-        if (process.platform == "win32") {
-            const runnerTemp = process.env["RUNNER_TEMP"] || "";
-            toolpath = path.join(runnerTemp, "MATLAB", release.name);
-            await io.mkdirP(toolpath);
-        }
-        else {
-            fs.writeFileSync(".keep", "");
-            toolpath = await tc.cacheFile(".keep", ".keep", "MATLAB", release.version);
-            io.rmRF(".keep");
-        }
+        fs.writeFileSync(".keep", "");
+        toolpath = await tc.cacheFile(".keep", ".keep", "MATLAB", release.version);
+        io.rmRF(".keep");
     }
+    toolpath = windowsToolpath(toolpath, platform) || macToolpath(toolpath, platform) || toolpath;
     return [toolpath, alreadyExists]
+}
+
+function windowsToolpath(toolcacheDir: string, platform: string): string | false {
+    if (platform !== "win32" ) {
+        return false
+    }
+
+    // this optimization is only for github hosted runners
+    if (process.env['RUNNER_ENVIRONMENT'] !== 'github-hosted' && process.env['AGENT_ISSELFHOSTED'] === '1') {
+        return false;
+    }
+
+    // make sure runner has expected directory structure
+    if (!fs.existsSync('d:\\') || !fs.existsSync('c:\\')) {
+        return false;
+    }
+
+    let installDir: string = toolcacheDir.replace("C:", "D:").replace("c:", "d:");
+    fs.mkdirSync(path.dirname(installDir), {recursive: true});
+    fs.symlinkSync(toolcacheDir, installDir, 'junction');
+    return installDir
+}
+
+function macToolpath(toolcacheDir: string, platform: string): string | false {
+    if (platform !== "darwin" ) {
+        return false
+
+    }
+    return toolcacheDir + "/MATLAB.app";
 }
 
 export async function setupBatch(platform: string, architecture: string) {

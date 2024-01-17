@@ -34,11 +34,8 @@ export async function install(platform: string, architecture: string, release: s
     }
 
     await core.group("Setting up MATLAB", async () => {
-        let [destination, alreadyExists]: [string, boolean] = await matlab.makeToolcacheDir(releaseInfo);
+        let [destination, alreadyExists]: [string, boolean] = await matlab.makeToolcacheDir(releaseInfo, platform);
         let cacheHit = false;
-        if (platform === "darwin") {
-            destination = destination + "/MATLAB.app";
-        }
 
         if (useCache) {
             const supportFilesDir = matlab.getSupportPackagesPath(platform, releaseInfo.name);
