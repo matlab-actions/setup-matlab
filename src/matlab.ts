@@ -23,15 +23,12 @@ export async function makeToolcacheDir(release: Release, platform: string): Prom
         core.info(`Found MATLAB ${release.name} in cache at ${toolpath}.`);
         alreadyExists = true;
     } else {
-        fs.writeFileSync(".keep", "");
-        toolpath = await tc.cacheFile(".keep", ".keep", "MATLAB", release.version);
-        io.rmRF(".keep");
+        toolpath = await windowsToolpath(platform, release) || await defaultToolpath(platform, release);
     }
-    toolpath = windowsToolpath(toolpath, platform) || macToolpath(toolpath, platform) || toolpath;
     return [toolpath, alreadyExists]
 }
 
-function windowsToolpath(toolcacheDir: string, platform: string): string | false {
+async function windowsToolpath(platform: string, release: Release): Promise<string | false> {
     if (platform !== "win32" ) {
         return false
     }
@@ -41,23 +38,36 @@ function windowsToolpath(toolcacheDir: string, platform: string): string | false
         return false;
     }
 
+    const defaultToolCacheRoot = process.env['RUNNER_TOOL_CACHE'];
+    if (!defaultToolCacheRoot) {
+        return false
+    }
+
     // make sure runner has expected directory structure
     if (!fs.existsSync('d:\\') || !fs.existsSync('c:\\')) {
         return false;
     }
 
-    let installDir: string = toolcacheDir.replace("C:", "D:").replace("c:", "d:");
-    fs.mkdirSync(path.dirname(installDir), {recursive: true});
-    fs.symlinkSync(installDir, toolcacheDir, 'junction');
-    return installDir
+    const actualToolCacheRoot = defaultToolCacheRoot.replace("C:", "D:").replace("c:", "d:");
+    process.env['RUNNER_TOOL_CACHE'] = actualToolCacheRoot;
+
+    let actualToolCachePath = await tc.cacheFile(".keep", ".keep", "MATLAB", release.version);
+    let defaultToolCachePath = actualToolCacheRoot.replace(actualToolCacheRoot, defaultToolCacheRoot);
+    fs.mkdirSync(path.dirname(defaultToolCachePath));
+    fs.symlinkSync(actualToolCachePath, defaultToolCachePath, 'junction');
+
+    process.env['RUNNER_TOOL_CACHE'] = defaultToolCacheRoot;
+    return actualToolCachePath;
 }
 
-function macToolpath(toolcacheDir: string, platform: string): string | false {
-    if (platform !== "darwin" ) {
-        return false
-
+async function defaultToolpath(platform: string, release: Release): Promise<string> {
+    fs.writeFileSync(".keep", "");
+    io.rmRF(".keep");
+    let toolpath = await tc.cacheFile(".keep", ".keep", "MATLAB", release.version);
+    if (platform == "darwin") {
+        toolpath = toolpath + "/MATLAB.app";
     }
-    return toolcacheDir + "/MATLAB.app";
+    return toolpath
 }
 
 export async function setupBatch(platform: string, architecture: string) {
