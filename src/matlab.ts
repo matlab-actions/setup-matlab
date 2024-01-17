@@ -48,7 +48,6 @@ function windowsToolpath(toolcacheDir: string, platform: string): string | false
 
     let installDir: string = toolcacheDir.replace("C:", "D:").replace("c:", "d:");
     fs.mkdirSync(path.dirname(installDir), {recursive: true});
-    fs.symlinkSync(toolcacheDir, installDir, 'junction');
     return installDir
 }
 
