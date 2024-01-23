@@ -1,4 +1,4 @@
-// Copyright 2023 The MathWorks, Inc.
+// Copyright 2023-2024 The MathWorks, Inc.
 
 export enum State {
     CachePrimaryKey = 'MATLAB_CACHE_KEY',
