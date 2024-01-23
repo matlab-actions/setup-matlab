@@ -1,4 +1,4 @@
-// Copyright 2022-2023 The MathWorks, Inc.
+// Copyright 2022-2024 The MathWorks, Inc.
 
 import * as exec from "@actions/exec";
 import * as tc from "@actions/tool-cache";
@@ -43,15 +43,17 @@ describe("setup mpm", () => {
     
         it(`works on windows`, async () => {
             const platform = "win32";
+            tcDownloadToolMock.mockResolvedValue(mpmMockPath);
             execMock.mockResolvedValue(0);
-            await expect(mpm.setup(platform, arch)).resolves.toBe(mpmMockPath);
+            await expect(mpm.setup(platform, arch)).resolves.toBe(path.join(mpmMockPath));
             expect(tcDownloadToolMock.mock.calls[0][0]).toContain("win64");
         });
 
         it(`works on mac`, async () => {
             const platform = "darwin";
+            tcDownloadToolMock.mockResolvedValue(mpmMockPath);
             execMock.mockResolvedValue(0);
-            await expect(mpm.setup(platform, arch)).resolves.toBe(mpmMockPath);
+            await expect(mpm.setup(platform, arch)).resolves.toBe(path.join(mpmMockPath));
             expect(tcDownloadToolMock.mock.calls[0][0]).toContain("maci64");
         });
     });
@@ -65,7 +67,7 @@ describe("setup mpm", () => {
         await expect(() => mpm.setup(platform, 'x86')).rejects.toBeDefined();
     });
 
-    it("Errors without RUNNER_TEMP", async () => {
+    it("errors without RUNNER_TEMP", async () => {
         const platform = "linux";
         process.env.RUNNER_TEMP = '';
         tcDownloadToolMock.mockResolvedValue(mpmMockPath);
@@ -94,7 +96,7 @@ describe("mpm install", () => {
     let execMock: jest.Mock;
     const mpmPath = "mpm";
     const releaseInfo = {name: "r2022b", version: "9.13.0", update: ""};
-    const mpmRelease = "r2022b"
+    const mpmRelease = "r2022b";
     beforeEach(() => {
         execMock = exec.exec as jest.Mock;
     });
@@ -109,7 +111,6 @@ describe("mpm install", () => {
             "--products",
             "MATLAB",
             "Compiler",
-            "Parallel_Computing_Toolbox",
         ]
         execMock.mockResolvedValue(0);
 
@@ -127,7 +128,6 @@ describe("mpm install", () => {
             "--products",
             "MATLAB",
             "Compiler",
-            "Parallel_Computing_Toolbox",
         ]
         execMock.mockResolvedValue(0);
 

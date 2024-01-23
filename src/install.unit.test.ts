@@ -1,4 +1,4 @@
-// Copyright 2020-2023 The MathWorks, Inc.
+// Copyright 2020-2024 The MathWorks, Inc.
 
 import * as core from "@actions/core";
 import * as cache from './cache-restore';
@@ -69,11 +69,6 @@ describe("install procedure", () => {
         expect(mpmInstallMock).toHaveBeenCalledTimes(1);
         expect(addPathMock).toHaveBeenCalledTimes(1);
         expect(setOutputMock).toHaveBeenCalledTimes(1);
-    });
-
-    it("installs to MATLAB.app on mac", async () => {
-        await expect(install.install("darwin", arch, release, products, useCache)).resolves.toBeUndefined();
-        expect(mpmInstallMock.mock.calls[0][3]).toMatch("MATLAB.app");
     });
 
     ["darwin", "win32"].forEach((os) => {

@@ -1,4 +1,4 @@
-// Copyright 2023 The MathWorks, Inc.
+// Copyright 2023-2024 The MathWorks, Inc.
 
 import * as cache from "@actions/cache";
 import * as core from "@actions/core";
@@ -33,12 +33,12 @@ describe("cache-restore", () => {
     it("returns true if cache is found", async () => {
         restoreCacheMock.mockReturnValue("matched-cache-key");
         await expect(restoreMATLAB(release, platform, arch, products, location)).resolves.toBe(true);
-        expect(saveStateMock).toHaveBeenCalledTimes(3);
+        expect(saveStateMock).toHaveBeenCalledTimes(4);
     });
 
 
     it("returns false if cache is not found", async () => {
         await expect(restoreMATLAB(release, platform, arch, products, location)).resolves.toBe(false);
-        expect(saveStateMock).toHaveBeenCalledTimes(2);
+        expect(saveStateMock).toHaveBeenCalledTimes(3);
     });
 });

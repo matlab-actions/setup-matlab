@@ -1,4 +1,4 @@
-// Copyright 2022-2023 The MathWorks, Inc.
+// Copyright 2022-2024 The MathWorks, Inc.
 
 import * as exec from "@actions/exec";
 import * as tc from "@actions/tool-cache";
@@ -27,7 +27,6 @@ export async function setup(platform: string, architecture: string): Promise<str
             return Promise.reject(Error(`This action is not supported on ${platform} runners using the ${architecture} architecture.`));
     }
 
-
     let runner_temp = process.env["RUNNER_TEMP"]
     if (!runner_temp) {
         return Promise.reject(Error("Unable to find runner temporary directory."));
@@ -45,11 +44,12 @@ export async function setup(platform: string, architecture: string): Promise<str
 export async function install(mpmPath: string, release: matlab.Release, products: string[], destination: string) {
     const mpmRelease = release.name + release.update
     // remove spaces and flatten product list
-    let parsedProducts = products.flatMap(p => p.split(" "));
-    // Add MATLAB and PCT by default
-    parsedProducts.push("MATLAB", "Parallel_Computing_Toolbox")
-    // Remove duplicates
+    let parsedProducts = products.flatMap(p => p.split(/[ ]+/));
+    // Add MATLAB by default
+    parsedProducts.push("MATLAB");
+    // Remove duplicate products
     parsedProducts = [...new Set(parsedProducts)];
+
     let mpmArguments: string[] = [
         "install",
         `--release=${mpmRelease}`,    

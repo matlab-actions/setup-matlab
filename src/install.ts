@@ -1,12 +1,12 @@
-// Copyright 2020-2023 The MathWorks, Inc.
+// Copyright 2020-2024 The MathWorks, Inc.
 
 import * as core from "@actions/core";
 import * as matlab from "./matlab";
 import * as mpm from "./mpm";
-import properties from "./properties.json";
 import * as script from "./script";
 import * as path from "path";
 import * as cache from './cache-restore';
+import properties from "./properties.json";
 
 /**
  * Set up an instance of MATLAB on the runner.
@@ -34,24 +34,23 @@ export async function install(platform: string, architecture: string, release: s
     }
 
     await core.group("Setting up MATLAB", async () => {
-        let [destination, alreadyExists]: [string, boolean] = await matlab.makeToolcacheDir(releaseInfo);
+        let [destination, alreadyExists]: [string, boolean] = await matlab.makeToolcacheDir(releaseInfo, platform);
         let cacheHit = false;
-        if (platform === "darwin") {
-            destination = destination + "/MATLAB.app";
-        }
 
         if (useCache) {
-            cacheHit = await cache.restoreMATLAB(releaseInfo, platform, architecture, products, destination);
+            const supportFilesDir = matlab.getSupportPackagesPath(platform, releaseInfo.name);
+            cacheHit = await cache.restoreMATLAB(releaseInfo, platform, architecture, products, destination, supportFilesDir);
         }
 
         if (!alreadyExists && !cacheHit) {
             const mpmPath: string = await mpm.setup(platform, architecture);
             await mpm.install(mpmPath, releaseInfo, products, destination);
         }
+
         core.addPath(path.join(destination, "bin"));
         core.setOutput('matlabroot', destination);
 
-        await matlab.setupBatch(platform);
+        await matlab.setupBatch(platform, architecture);
     });
 
     return;

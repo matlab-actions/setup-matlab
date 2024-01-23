@@ -1,4 +1,4 @@
-# Copyright 2020-2023 The MathWorks, Inc.
+# Copyright 2020-2024 The MathWorks, Inc.
 
 name: Setup MATLAB
 description: >-
@@ -13,9 +13,7 @@ inputs:
     description: >-
       Array of products to install
     required: false
-    default: |
-      MATLAB
-      Parallel_Computing_Toolbox
+    default: MATLAB
   cache:
     description: >-
       Option to store MATLAB in the GitHub Actions cache, specified as false or true

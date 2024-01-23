@@ -1,17 +1,19 @@
-// Copyright 2022-2023 The MathWorks, Inc.
+// Copyright 2022-2024 The MathWorks, Inc.
 
 import * as core from "@actions/core";
+import * as exec from "@actions/exec";
 import * as http from "@actions/http-client";
 import * as httpjs from "http";
 import * as net from 'net';
+import * as path from "path";
 import * as tc from "@actions/tool-cache";
 import * as matlab from "./matlab";
-import * as script from "./script";
+import fs from "fs";
 
-jest.mock("./script");
 jest.mock("http");
 jest.mock("net");
 jest.mock("@actions/core");
+jest.mock("@actions/exec");
 jest.mock("@actions/http-client");
 jest.mock("@actions/tool-cache");
 
@@ -25,6 +27,8 @@ describe("matlab tests", () => {
         version: "2022.2.999",
         update: "",
     }
+    const platform = "linux";
+    
     describe("toolcacheLocation", () => {
         let findMock: jest.Mock;
         let cacheFileMock: jest.Mock;
@@ -38,46 +42,150 @@ describe("matlab tests", () => {
 
         it("returns toolpath if in toolcache", async () => {
             findMock.mockReturnValue("/opt/hostedtoolcache/matlab/r2022b");
-            await expect(matlab.makeToolcacheDir(release)).resolves.toMatchObject(["/opt/hostedtoolcache/matlab/r2022b", true]);
+            await expect(matlab.makeToolcacheDir(release, platform)).resolves.toMatchObject(["/opt/hostedtoolcache/matlab/r2022b", true]);
             expect(infoMock).toHaveBeenCalledTimes(1);
         });
     
-        it("creates cache and returns new path if not in toolcache", async () => {
+        it("creates cache and returns default path for linux", async () => {
             findMock.mockReturnValue("");
             cacheFileMock.mockReturnValue("/opt/hostedtoolcache/matlab/r2022b");
-            await expect(matlab.makeToolcacheDir(release)).resolves.toMatchObject(["/opt/hostedtoolcache/matlab/r2022b", false]);
-        })    
+            await expect(matlab.makeToolcacheDir(release, platform)).resolves.toMatchObject(["/opt/hostedtoolcache/matlab/r2022b", false]);
+        });
+
+        it("creates cache and returns default path for mac", async () => {
+            findMock.mockReturnValue("");
+            cacheFileMock.mockReturnValue("/opt/hostedtoolcache/matlab/r2022b");
+            await expect(matlab.makeToolcacheDir(release, "darwin")).resolves.toMatchObject(["/opt/hostedtoolcache/matlab/r2022b/MATLAB.app", false]);
+        });
+
+        describe("windows performance workaround", () => {
+            let runnerEnv: string | undefined;
+            let agentIsSelfHosted: string | undefined;
+            let runnerToolcache: string | undefined;
+
+            afterEach(() => {
+                process.env["RUNNER_ENVIRONMENT"] = runnerEnv;
+                process.env["AGENT_ISSELFHOSTED"] = agentIsSelfHosted;
+                process.env["RUNNER_TOOL_CACHE"] = runnerToolcache;
+            });
+
+            beforeEach(() => {
+                runnerEnv = process.env["RUNNER_ENVIRONMENT"];
+                agentIsSelfHosted = process.env["AGENT_ISSELFHOSTED"];
+                runnerToolcache = process.env["RUNNER_TOOL_CACHE"];
+
+                process.env["RUNNER_TOOL_CACHE"] = "C:\\hostedtoolcache\\windows\\matlab\\r2022b";
+                cacheFileMock.mockImplementation(() => process.env["RUNNER_TOOL_CACHE"]);
+                findMock.mockReturnValue("");
+            });
+
+            it("uses workaround if github-hosted", async () => {
+                let expectedToolcacheDir = "D:\\hostedtoolcache\\windows\\matlab\\r2022b";
+
+                // replicate github-hosted environment
+                process.env["AGENT_ISSELFHOSTED"] = "0";
+                process.env["RUNNER_ENVIRONMENT"] = "github-hosted";
+                // mock & no-op fs operations
+                let existsSyncSpy = jest.spyOn(fs, "existsSync").mockReturnValue(true);
+                let mkdirSyncSpy = jest.spyOn(fs, "mkdirSync").mockImplementation(() => "");
+                let symlinkSyncSpy = jest.spyOn(fs, "symlinkSync").mockImplementation(() => {});
+
+                await expect(matlab.makeToolcacheDir(release, "win32")).resolves.toMatchObject([expectedToolcacheDir, false]);
+                expect(existsSyncSpy).toHaveBeenCalledTimes(2);
+                expect(mkdirSyncSpy).toHaveBeenCalledTimes(1);
+                expect(symlinkSyncSpy).toHaveBeenCalledTimes(2);
+            });
+
+            it("uses default toolcache directory if not github hosted", async () => {
+                let expectedToolcacheDir = "C:\\hostedtoolcache\\windows\\matlab\\r2022b";
+                process.env["AGENT_ISSELFHOSTED"] = "1";
+                process.env["RUNNER_ENVIRONMENT"] = "self-hosted";
+                await expect(matlab.makeToolcacheDir(release, "win32")).resolves.toMatchObject([expectedToolcacheDir, false]);
+            });
+
+            it("uses default toolcache directory toolcache directory is not defined", async () => {
+                let expectedToolcacheDir = "C:\\hostedtoolcache\\windows\\matlab\\r2022b";
+                process.env["RUNNER_TOOL_CACHE"] = '';
+                cacheFileMock.mockReturnValue(expectedToolcacheDir);
+                await expect(matlab.makeToolcacheDir(release, "win32")).resolves.toMatchObject([expectedToolcacheDir, false]);
+            });
+
+            it("uses default toolcache directory if d: drive doesn't exist", async () => {
+                jest.spyOn(fs, "existsSync").mockReturnValue(false);
+                let expectedToolcacheDir = "C:\\hostedtoolcache\\windows\\matlab\\r2022b";
+                await expect(matlab.makeToolcacheDir(release, "win32")).resolves.toMatchObject([expectedToolcacheDir, false]);
+            });
+
+            it("uses default toolcache directory if c: drive doesn't exist", async () => {
+                jest.spyOn(fs, "existsSync").mockReturnValueOnce(true).mockReturnValue(false);
+                let expectedToolcacheDir = "C:\\hostedtoolcache\\windows\\matlab\\r2022b";
+                await expect(matlab.makeToolcacheDir(release, "win32")).resolves.toMatchObject([expectedToolcacheDir, false]);
+
+            });
+        });
     });
 
     describe("setupBatch", () => {
-        let downloadAndRunScriptMock: jest.Mock;
-        let addPathMock: jest.Mock;
-        let tcCacheDirMock: jest.Mock;
-        let tcFindMock: jest.Mock;
-        const platform = "linux";
-
+        let tcDownloadToolMock: jest.Mock;
+        let cacheFileMock: jest.Mock;
+        let execMock: jest.Mock;
+        const arch = "x64";
+        const batchMockPath = path.join("path", "to", "matlab-batch");
+    
         beforeEach(() => {
-            downloadAndRunScriptMock = script.downloadAndRunScript as jest.Mock;
-            addPathMock = core.addPath as jest.Mock;
-            tcCacheDirMock = tc.cacheDir as jest.Mock;
-            tcFindMock = tc.find as jest.Mock;
-        });
+            tcDownloadToolMock = tc.downloadTool as jest.Mock;
+            cacheFileMock = tc.cacheFile as jest.Mock;
+            execMock = exec.exec as jest.Mock;
+            process.env.RUNNER_TEMP = path.join("runner", "workdir", "tmp");
 
-        it("ideally works", async () => {
-            downloadAndRunScriptMock.mockResolvedValue(undefined);
-            await expect(matlab.setupBatch(platform)).resolves.toBeUndefined();
-            expect(downloadAndRunScriptMock).toHaveBeenCalledTimes(1);
-            expect(addPathMock).toHaveBeenCalledTimes(1);
+            tcDownloadToolMock.mockResolvedValue(batchMockPath);
+            cacheFileMock.mockResolvedValue(batchMockPath);
+            execMock.mockResolvedValue(0);
         });
-
+    
+        describe("test on all supported platforms", () => {
+            it(`works on linux`, async () => {
+                const platform = "linux";
+                await expect(matlab.setupBatch(platform, arch)).resolves.toBeUndefined();
+                expect(cacheFileMock).toHaveBeenCalledTimes(1);
+            });
+        
+            it(`works on windows`, async () => {
+                const platform = "win32";
+                await expect(matlab.setupBatch(platform, arch)).resolves.toBeUndefined();
+            });
+    
+            it(`works on mac`, async () => {
+                const platform = "darwin";
+                await expect(matlab.setupBatch(platform, arch)).resolves.toBeUndefined();
+            });
+        });
+    
+        it("errors on unsupported platform", async () => {
+            await expect(() => matlab.setupBatch('sunos', arch)).rejects.toBeDefined();
+        });
+    
+        it("errors on unsupported architecture", async () => {
+            const platform = "linux";
+            await expect(() => matlab.setupBatch(platform, 'x86')).rejects.toBeDefined();
+        });
+    
+        it("works without RUNNER_TEMP", async () => {
+            const platform = "linux";
+            process.env.RUNNER_TEMP = '';
+            await expect(matlab.setupBatch(platform, arch)).resolves.toBeUndefined();
+        });
+    
         it("rejects when the download fails", async () => {
-            tcFindMock.mockReturnValue("");
-            downloadAndRunScriptMock.mockRejectedValueOnce(Error("oof"));
-
-            await expect(matlab.setupBatch(platform)).rejects.toBeDefined();
-            expect(downloadAndRunScriptMock).toHaveBeenCalledTimes(1);
-            expect(addPathMock).toHaveBeenCalledTimes(0);
-            expect(tcCacheDirMock).toHaveBeenCalledTimes(0);
+            const platform = "linux";
+            tcDownloadToolMock.mockRejectedValue(Error("oof"));
+            await expect(matlab.setupBatch(platform, arch)).rejects.toBeDefined();
+        });
+    
+        it("rejects when the chmod fails", async () => {
+            const platform = "linux";
+            execMock.mockResolvedValue(1);
+            await expect(matlab.setupBatch(platform, arch)).rejects.toBeDefined();
         });
     });
 
