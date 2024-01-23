@@ -62,5 +62,5 @@ export async function install(mpmPath: string, release: matlab.Release, products
     if (exitCode !== 0) {
         return Promise.reject(Error(`Script exited with non-zero code ${exitCode}`));
     }
-   return
+    return
 }

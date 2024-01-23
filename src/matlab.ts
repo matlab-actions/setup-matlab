@@ -23,29 +23,31 @@ export async function makeToolcacheDir(release: Release, platform: string): Prom
         core.info(`Found MATLAB ${release.name} in cache at ${toolpath}.`);
         alreadyExists = true;
     } else {
-        toolpath = await windowsToolpath(release, platform) || await defaultToolpath(release, platform);
+        if (platform === "win32") {
+            toolpath = await windowsHostedToolpath(release).catch(async () => {
+                return await defaultToolpath(release, platform);
+            });
+        } else {
+            toolpath = await defaultToolpath(release, platform);
+        }
     }
     return [toolpath, alreadyExists]
 }
 
-async function windowsToolpath(release: Release, platform: string): Promise<string | false> {
-    if (platform !== "win32" ) {
-        return false
-    }
-
+async function windowsHostedToolpath(release: Release): Promise<string> {
     // bail early if not on a github hosted runner
     if (process.env['RUNNER_ENVIRONMENT'] !== 'github-hosted' && process.env['AGENT_ISSELFHOSTED'] === '1') {
-        return false;
+        return Promise.reject();
     }
 
     const defaultToolCacheRoot = process.env['RUNNER_TOOL_CACHE'];
     if (!defaultToolCacheRoot) {
-        return false
+        return Promise.reject();
     }
 
     // make sure runner has expected directory structure
     if (!fs.existsSync('d:\\') || !fs.existsSync('c:\\')) {
-        return false;
+        return Promise.reject();
     }
 
     const actualToolCacheRoot = defaultToolCacheRoot.replace("C:", "D:").replace("c:", "d:");
