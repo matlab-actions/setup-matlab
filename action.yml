@@ -13,8 +13,7 @@ inputs:
     description: >-
       Array of products to install
     required: false
-    default: |
-      MATLAB
+    default: MATLAB
   cache:
     description: >-
       Option to store MATLAB in the GitHub Actions cache, specified as false or true

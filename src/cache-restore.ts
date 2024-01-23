@@ -7,10 +7,10 @@ import { State } from './cache-state';
 import { Release } from './matlab';
 
 export async function restoreMATLAB(release: Release, platform: string, architecture: string, products: string[], matlabPath: string, supportPackagesPath?: string): Promise<boolean> {
-    const installHash = crypto.createHash('sha256').update(products.sort().join('|')).digest('hex')
+    const installHash = crypto.createHash('sha256').update(products.sort().join('|')).digest('hex');
     const keyPrefix = `matlab-cache-${platform}-${architecture}-${release.version}`;
     const primaryKey = `${keyPrefix}-${installHash}`;
-    const cachePaths = [matlabPath]
+    const cachePaths = [matlabPath];
     if (supportPackagesPath) {
         cachePaths.push(supportPackagesPath);
     }

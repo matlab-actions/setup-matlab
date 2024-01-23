@@ -33,7 +33,7 @@ async function windowsToolpath(release: Release, platform: string): Promise<stri
         return false
     }
 
-    // only apply optimization for github hosted runners
+    // bail early if not on a github hosted runner
     if (process.env['RUNNER_ENVIRONMENT'] !== 'github-hosted' && process.env['AGENT_ISSELFHOSTED'] === '1') {
         return false;
     }

@@ -250,7 +250,4 @@ describe("matlab tests", () => {
             expect(matlab.getReleaseInfo("latest")).rejects.toBeDefined();
         });
     });
-
-    describe("alalala", () => {
-    });
 });
