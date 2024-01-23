@@ -44,7 +44,7 @@ export async function setup(platform: string, architecture: string): Promise<str
 export async function install(mpmPath: string, release: matlab.Release, products: string[], destination: string) {
     const mpmRelease = release.name + release.update
     // remove spaces and flatten product list
-    let parsedProducts = products.flatMap(p => p.split(" "));
+    let parsedProducts = products.flatMap(p => p.split(/[ ]+/));
     // Add MATLAB by default
     parsedProducts.push("MATLAB");
     // Remove duplicate products
