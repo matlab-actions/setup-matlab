@@ -1,0 +1,77 @@
+name: Build and Test
+on: [push]
+
+jobs:
+  bat:
+    name: Build and Test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 16
+      - name: Perform npm tasks
+        run: npm run ci
+      - uses: actions/upload-artifact@v3
+        with:
+          name: built-action
+          path: |
+            **/*
+            !node_modules/
+
+  integ:
+    needs: bat
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-latest
+            release: latest 
+            products: Simulink Simulink_Test
+            check-matlab: matlabVer = ver('matlab'); assert(~isempty(matlabVer));
+            check-simulink: simulinkVer = ver('simulink'); assert(~isempty(simulinkVer));
+          - os: ubuntu-20.04
+            release: R2021bU2
+            products: |
+              MATLAB
+              Simulink
+            check-matlab: matlabVer = ver('matlab'); assert(strcmp(matlabVer.Release,'(R2021b)'));
+            check-simulink: simulinkVer = ver('simulink'); assert(strcmp(simulinkVer.Release,'(R2021b)'));
+          - os: windows-latest
+            release: latest
+            products: Simulink
+            check-matlab: matlabVer = ver('matlab'); assert(~isempty(matlabVer));
+            check-simulink: simulinkVer = ver('simulink'); assert(~isempty(simulinkVer));
+          - os: macos-latest
+            release: latest
+            products: Simulink
+            check-matlab: matlabVer = ver('matlab'); assert(~isempty(matlabVer));
+            check-simulink: simulinkVer = ver('simulink'); assert(~isempty(simulinkVer));
+    steps:
+      - uses: actions/download-artifact@v3
+        with:
+          name: built-action
+      - name: Install selected products
+        id: setup_matlab
+        uses: ./
+        with:
+          release: ${{ matrix.release }}
+          products: ${{ matrix.products }}
+      - name: Check matlabroot output is set
+        run:  'if [[ "${{ steps.setup_matlab.outputs.matlabroot }}" != *"MATLAB"* ]]; then exit 1; fi'
+        shell: bash
+      - name: Check MATLAB version
+        uses: matlab-actions/run-command@v2
+        with:
+          command: "${{ matrix.check-matlab }}"
+      - name: Check Simulink version
+        uses: matlab-actions/run-command@v2
+        with:
+          command: "${{ matrix.check-simulink }}"
+      - name: Check NoOp on 2nd install
+        uses: ./
+        with:
+          release: ${{ matrix.release }}
+          products: ${{ matrix.products }}
+  
