@@ -107,7 +107,7 @@ export async function setupBatch(platform: string, architecture: string) {
     core.addPath(cachedPath);
     const exitCode = await exec.exec(`chmod +x ${path.join(cachedPath, 'matlab-batch'+matlabBatchExt)}`);
     if (exitCode !== 0) {
-        return Promise.reject(Error("Unable to set up mpm."));
+        return Promise.reject(Error("Unable to make matlab-batch executable."));
     }
     return
 }
