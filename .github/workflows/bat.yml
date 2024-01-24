@@ -49,7 +49,7 @@ jobs:
             check-matlab: matlabVer = ver('matlab'); assert(~isempty(matlabVer));
             check-simulink: simulinkVer = ver('simulink'); assert(~isempty(simulinkVer));
     steps:
-      - uses: actions/download-artifact@v3
+      - uses: actions/download-artifact@v4
         with:
           name: built-action
       - name: Install selected products
