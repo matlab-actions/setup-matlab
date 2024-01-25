@@ -19,13 +19,13 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Check out repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       - name: Set up MATLAB
-        uses: matlab-actions/setup-matlab@v2-beta
+        uses: matlab-actions/setup-matlab@v2
         with:
           products: Simulink Simulink_Test
       - name: Run build
-        uses: matlab-actions/run-build@v1
+        uses: matlab-actions/run-build@v2
         with:
           tasks: test
 ```
@@ -42,11 +42,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Check out repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       - name: Set up MATLAB
-        uses: matlab-actions/setup-matlab@v2-beta
+        uses: matlab-actions/setup-matlab@v2
       - name: Run tests and generate artifacts
-        uses: matlab-actions/run-tests@v1
+        uses: matlab-actions/run-tests@v2
         with:
           test-results-junit: test-results/results.xml
           code-coverage-cobertura: code-coverage/coverage.xml
@@ -64,11 +64,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Check out repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       - name: Set up MATLAB
-        uses: matlab-actions/setup-matlab@v2-beta
+        uses: matlab-actions/setup-matlab@v2
       - name: Run script
-        uses: matlab-actions/run-command@v1
+        uses: matlab-actions/run-command@v2
         with:
           command: myscript
 ```
@@ -78,8 +78,9 @@ When you define your workflow in the `.github/workflows` directory of your repos
 
 | Input     | Description |
 |-----------|-------------|
-| `release` | (Optional) MATLAB release to set up. You can specify R2020a or a later release. If you do not specify `release`, the action sets up the latest release of MATLAB.<br/>**Example**: `R2022a`
-| `products` | (Optional) Space-separated list of products to install. If a product name contains white-space characters, replace them with underscores. For the full list of available products and their names, see [Products and Services](https://www.mathworks.com/products.html). By default, the task installs MATLAB and Parallel Computing Toolbox.<br/> **Example**: `Simulink`</br>**Example:** `Simulink Deep_Learning_Toolbox`
+| `release` | (Optional) MATLAB release to set up. You can specify R2020b or a later release. If you do not specify `release`, the action sets up the latest release of MATLAB.<br/>**Example**: `R2022a`
+| `products` | (Optional) Space-separated list of products to install. If a product name contains white-space characters, replace them with underscores. For the full list of available products and their names, see [Products and Services](https://www.mathworks.com/products.html). By default, the task installs MATLAB.<br/> **Example**: `Simulink`</br>**Example:** `Simulink Deep_Learning_Toolbox`
+
 ## Notes
 When you use the **Setup MATLAB** action, you execute third-party code that is licensed under separate terms.
 
