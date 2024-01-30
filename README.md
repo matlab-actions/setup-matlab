@@ -74,7 +74,7 @@ jobs:
 ```
 
 ## Set Up MATLAB
-When you define your workflow in the `.github/workflows` directory of your repository, specify the **Setup MATLAB** action as `matlab-actions/setup-matlab@v1`. The action accepts an optional input.
+When you define your workflow in the `.github/workflows` directory of your repository, specify the **Setup MATLAB** action as `matlab-actions/setup-matlab@v2`. The action accepts an optional input.
 
 | Input     | Description |
 |-----------|-------------|
