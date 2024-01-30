@@ -6,7 +6,7 @@ Before you run MATLAB&reg; code and Simulink&reg; models on a [GitHub&reg;-hoste
 Once you set up MATLAB, you can build and test your MATLAB project as part of your workflow. To execute code on the runner, include the [Run MATLAB Build](https://github.com/matlab-actions/run-build/), [Run MATLAB Tests](https://github.com/matlab-actions/run-tests/), or [Run MATLAB Command](https://github.com/matlab-actions/run-command/) action in your workflow.
 
 ### Run MATLAB Build on GitHub-Hosted Runner
-Set up a GitHub-hosted runner to run a specific task and its depended-on tasks that are specified in a file named `buildfile.m` in the root of your repository. To run tasks using the MATLAB build tool, include the [Run MATLAB Build](https://github.com/matlab-actions/run-build/) action in your workflow. This action is supported in MATLAB R2022b and later.
+Use a GitHub-hosted runner to run a specific task and its depended-on tasks that are specified in a file named `buildfile.m` in the root of your repository. To run tasks using the MATLAB build tool, include the [Run MATLAB Build](https://github.com/matlab-actions/run-build/) action in your workflow. This action is supported in MATLAB R2022b and later.
 
 ```yaml
 name: Run MATLAB Build on GitHub-Hosted Runner
@@ -29,7 +29,7 @@ jobs:
 ```
 
 ### Run MATLAB Tests on GitHub-Hosted Runner
-Set up a GitHub-hosted runner to run the tests in your [MATLAB project](https://www.mathworks.com/help/matlab/projects.html) and generate test results in JUnit-style XML format and code coverage results in Cobertura XML format. To run the tests and generate the artifacts, include the [Run MATLAB Tests](https://github.com/matlab-actions/run-tests/) action in your workflow.
+Use a GitHub-hosted runner to run the tests in your [MATLAB project](https://www.mathworks.com/help/matlab/projects.html) and generate test results in JUnit-style XML format and code coverage results in Cobertura XML format. To run the tests and generate the artifacts, include the [Run MATLAB Tests](https://github.com/matlab-actions/run-tests/) action in your workflow.
 
 ```yaml
 name: Run MATLAB Tests on GitHub-Hosted Runner
@@ -51,7 +51,7 @@ jobs:
 ```
 
 ### Run MATLAB Script on GitHub-Hosted Runner
-Set up a GitHub-hosted runner to run the commands in a file named `myscript.m` in the root of your repository. To run the script, include the [Run MATLAB Command](https://github.com/matlab-actions/run-command/) action in your workflow.
+Use a GitHub-hosted runner to run the commands in a file named `myscript.m` in the root of your repository. To run the script, include the [Run MATLAB Command](https://github.com/matlab-actions/run-command/) action in your workflow.
 
 ```yaml
 name: Run MATLAB Script on GitHub-Hosted Runner
