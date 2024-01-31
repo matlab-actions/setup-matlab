@@ -1,6 +1,6 @@
 # Action for Setting Up MATLAB
 
-The [Setup MATLAB](#set-up-matlab) action enables you to run MATLAB&reg; code and Simulink&reg; models with a specific version of MATLAB. When you specify this action as part of your workflow, the action sets up the specified MATLAB release on a Linux&reg;, Windows&reg;, or macOS&reg; virtual machine. If you do not specify a release, the action sets up the latest release of MATLAB.
+The [Setup MATLAB](#set-up-matlab) action enables you to run MATLAB&reg; code and Simulink&reg; models with a specific version of MATLAB. When you specify this action as part of your workflow, the action sets up your preferred MATLAB release (R2021a or later) on a Linux&reg;, Windows&reg;, or macOS&reg; virtual machine. If you do not specify a release, the action sets up the latest release of MATLAB.
 
 ## Usage Examples
 Once you set up MATLAB on a runner, you can build and test your MATLAB project as part of your workflow. To execute code on the runner, include the [Run MATLAB Build](https://github.com/matlab-actions/run-build/), [Run MATLAB Tests](https://github.com/matlab-actions/run-tests/), or [Run MATLAB Command](https://github.com/matlab-actions/run-command/) action in your workflow.
