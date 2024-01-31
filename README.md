@@ -71,6 +71,58 @@ jobs:
           command: myscript
 ```
 
+### Specify MATLAB Version on Self-Hosted Runner
+When you use the **Run MATLAB Build**, **Run MATLAB Tests**, or **Run MATLAB Command** action in your workflow, the self-hosted runner uses the topmost MATLAB version on the system path. The build fails if the runner cannot find any version of MATLAB on the path.
+
+You can prepend your preferred version of MATLAB to the `PATH` environment variable of the runner. For example, prepend MATLAB R2023a to the path and use it to run your script. The step depends on your operating system and MATLAB root folder.
+
+```YAML
+name: Run MATLAB Script on Self-Hosted Runner
+on: [push]
+jobs:
+  my-job:
+    name: Run MATLAB Script
+    runs-on: self-hosted
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v3 
+      - name: Prepend MATLAB to PATH on Windows (PowerShell)
+        if: runner.os == 'Windows'
+        run: echo "C:\Program Files\MATLAB\R2023a\bin" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append     
+      - name: Prepend MATLAB to PATH on Linux
+        if: runner.os == 'Linux'
+        run: echo "/usr/local/MATLAB/R2023a/bin" >> $GITHUB_PATH
+      - name: Prepend MATLAB to PATH on macOS
+        if: runner.os == 'macOS'
+        run: echo "/Applications/MATLAB_R2023a.app/bin" >> $GITHUB_PATH
+      - name: Run script
+        uses: matlab-actions/run-command@v1
+        with:
+          command: myscript
+```
+
+```
+name: Run MATLAB Matrix Build on GitHub-Hosted Runner
+on: [push]
+jobs:
+  my-job:
+    name: Run MATLAB Build
+    strategy:
+      matrix:
+        platform: [ubuntu-latest, windows-latest, macos-latest]
+    runs-on: ${{ matrix.platform }}
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v3
+      - name: Set up MATLAB
+        uses: matlab-actions/setup-matlab@v2
+      - name: Run build
+        uses: matlab-actions/run-build@v2
+        with:
+          tasks: test
+```
+
+
 ## Set Up MATLAB
 When you define your workflow in the `.github/workflows` directory of your repository, specify the **Setup MATLAB** action as `matlab-actions/setup-matlab@v2`. The action accepts optional inputs.
 
