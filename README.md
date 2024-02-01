@@ -77,31 +77,6 @@ When you use the **Run MATLAB Build**, **Run MATLAB Tests**, or **Run MATLAB Com
 You can prepend your preferred version of MATLAB to the `PATH` environment variable of the runner. For example, prepend MATLAB R2023a to the path and use it to run your script. The step depends on your operating system and MATLAB root folder.
 
 ```YAML
-name: Run MATLAB Script on Self-Hosted Runner
-on: [push]
-jobs:
-  my-job:
-    name: Run MATLAB Script
-    runs-on: self-hosted
-    steps:
-      - name: Check out repository
-        uses: actions/checkout@v3 
-      - name: Prepend MATLAB to PATH on Windows (PowerShell)
-        if: runner.os == 'Windows'
-        run: echo "C:\Program Files\MATLAB\R2023a\bin" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append     
-      - name: Prepend MATLAB to PATH on Linux
-        if: runner.os == 'Linux'
-        run: echo "/usr/local/MATLAB/R2023a/bin" >> $GITHUB_PATH
-      - name: Prepend MATLAB to PATH on macOS
-        if: runner.os == 'macOS'
-        run: echo "/Applications/MATLAB_R2023a.app/bin" >> $GITHUB_PATH
-      - name: Run script
-        uses: matlab-actions/run-command@v1
-        with:
-          command: myscript
-```
-
-```
 name: Run MATLAB Matrix Build on GitHub-Hosted Runner
 on: [push]
 jobs:
@@ -113,7 +88,7 @@ jobs:
     runs-on: ${{ matrix.platform }}
     steps:
       - name: Check out repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       - name: Set up MATLAB
         uses: matlab-actions/setup-matlab@v2
       - name: Run build
