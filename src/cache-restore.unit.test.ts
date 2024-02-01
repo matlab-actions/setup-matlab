@@ -20,7 +20,8 @@ describe("cache-restore", () => {
     const release = {
         name: "r2022b",
         version: "9.13.0",
-        update: "latest"
+        update: "latest",
+        isPrerelease: false,
     };
     const products = ["MATLAB", "Parallel_Computing_Toolbox"];
     const location = "/path/to/matlab";

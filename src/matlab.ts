@@ -14,6 +14,7 @@ export interface Release {
     name: string;
     version: string;
     update: string;
+    isPrerelease: boolean;
 }
 
 export async function makeToolcacheDir(release: Release, platform: string): Promise<[string, boolean]> {
@@ -115,11 +116,12 @@ export async function setupBatch(platform: string, architecture: string) {
 export async function getReleaseInfo(release: string): Promise<Release> {
     // Get release name from input parameter
     let name: string;
+    let isPrerelease: boolean = false;
     const trimmedRelease = release.toLowerCase().trim()
-    if (trimmedRelease === "latest") {
+    if (trimmedRelease === "latest" || trimmedRelease === "latest-including-prerelease") {
         try {
             const client: http.HttpClient = new http.HttpClient();
-            const latestResp = await client.get(properties.matlabLatestReleaseUrl);
+            const latestResp = await client.get(`${properties.matlabReleaseInfoUrl}/${trimmedRelease}`);
             name = await latestResp.readBody();    
         }
         catch {
@@ -144,18 +146,24 @@ export async function getReleaseInfo(release: string): Promise<Release> {
         version += `.${update[1]}`;
     } else {
         // Notify user if Update version format is invalid
-        if (trimmedRelease !== name && trimmedRelease !== "latest") {
+        if (trimmedRelease !== name && trimmedRelease !== "latest" && trimmedRelease !== "latest-including-prerelease") {
             const invalidUpdate = trimmedRelease.replace(name, "");
             return Promise.reject(Error(`${invalidUpdate} is not a valid update release name.`));
         }
         update = "";
         version += ".999"
+        if (name.includes("prerelease")) {
+            name = name.replace("prerelease", "")
+            version += "-prerelease";
+            isPrerelease = true;
+        }
     }
 
     return {
         name: name,
         version: version,
         update: update,
+        isPrerelease: isPrerelease,
     }
 }
 
