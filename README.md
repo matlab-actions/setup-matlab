@@ -6,7 +6,7 @@ The [Setup MATLAB](#set-up-matlab) action enables you to run MATLAB&reg; code an
 Once you set up MATLAB on a runner, you can build and test your MATLAB project as part of your workflow. To execute code on the runner, include the [Run MATLAB Build](https://github.com/matlab-actions/run-build/), [Run MATLAB Tests](https://github.com/matlab-actions/run-tests/), or [Run MATLAB Command](https://github.com/matlab-actions/run-command/) action in your workflow.
 
 ### Run MATLAB Build on GitHub-Hosted Runner
-Use a [GitHub&reg;-hosted runner](https://docs.github.com/en/actions/hosting-your-own-runners/managing-self-hosted-runners/about-self-hosted-runners) to run a specific task and its depended-on tasks that are specified in a file named `buildfile.m` in the root of your repository. To run tasks using the MATLAB build tool, include the [Run MATLAB Build](https://github.com/matlab-actions/run-build/) action in your workflow. This action is supported in MATLAB R2022b and later.
+Use a [GitHub&reg;-hosted runner](https://docs.github.com/en/actions/hosting-your-own-runners/managing-self-hosted-runners/about-self-hosted-runners) to run a task and its depended-on tasks that are specified in a file named `buildfile.m` in the root of your repository. In this example, because the `"test"` task runs the tests authored using the MATLAB unit testing framework as well as Simulink Test&trade;, you must set up Simulink and Simulink Test in addition to MATLAB. To run tasks using the MATLAB build tool, include the [Run MATLAB Build](https://github.com/matlab-actions/run-build/) action in your workflow.
 
 ```yaml
 name: Run MATLAB Build on GitHub-Hosted Runner
