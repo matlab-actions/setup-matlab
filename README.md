@@ -6,7 +6,7 @@ The [Setup MATLAB](#set-up-matlab) action enables you to run MATLAB&reg; code an
 Once you set up MATLAB on a runner, you can build and test your MATLAB project as part of your workflow. To execute code on the runner, include the [Run MATLAB Build](https://github.com/matlab-actions/run-build/), [Run MATLAB Tests](https://github.com/matlab-actions/run-tests/), or [Run MATLAB Command](https://github.com/matlab-actions/run-command/) action in your workflow.
 
 ### Run MATLAB Build on GitHub-Hosted Runner
-Use a [GitHub&reg;-hosted runner](https://docs.github.com/en/actions/hosting-your-own-runners/managing-self-hosted-runners/about-self-hosted-runners) to run a task and its depended-on tasks that are specified in a file named `buildfile.m` in the root of your repository. In this example, because the `"test"` task runs the tests authored using the MATLAB unit testing framework as well as Simulink Test&trade;, you must set up Simulink and Simulink Test in addition to MATLAB. To run tasks using the MATLAB build tool, include the [Run MATLAB Build](https://github.com/matlab-actions/run-build/) action in your workflow.
+Use a [GitHub&reg;-hosted runner](https://docs.github.com/en/actions/hosting-your-own-runners/managing-self-hosted-runners/about-self-hosted-runners) to run a task and its depended-on tasks that are specified in a file named `buildfile.m` in the root of your repository. Because the `"test"` task in this example runs the tests authored using the MATLAB unit testing framework as well as Simulink Test&trade;, you must set up Simulink and Simulink Test in addition to MATLAB. To run tasks using the MATLAB build tool, include the [Run MATLAB Build](https://github.com/matlab-actions/run-build/) action in your workflow.
 
 ```yaml
 name: Run MATLAB Build on GitHub-Hosted Runner
@@ -71,21 +71,19 @@ jobs:
           command: myscript
 ```
 
-### Specify MATLAB Version on Self-Hosted Runner
-When you use the **Run MATLAB Build**, **Run MATLAB Tests**, or **Run MATLAB Command** action in your workflow, the self-hosted runner uses the topmost MATLAB version on the system path. The build fails if the runner cannot find any version of MATLAB on the path.
-
-You can prepend your preferred version of MATLAB to the `PATH` environment variable of the runner. For example, prepend MATLAB R2023a to the path and use it to run your script. The step depends on your operating system and MATLAB root folder.
+### Run MATLAB Build on Different Platforms
+The **Setup MATLAB** action supports the Linux, Windows, and macOS platforms. Define a matrix of job configurations to run a build using the MALTAB build tool on all the supported platforms. This workflow runs three jobs, one for each value in the variable `os`. For more information about matrices, see [Using a matrix for your jobs](https://docs.github.com/en/actions/using-jobs/using-a-matrix-for-your-jobs). 
 
 ```YAML
-name: Run MATLAB Matrix Build on GitHub-Hosted Runner
+name: Run MATLAB Build on Different Platforms
 on: [push]
 jobs:
   my-job:
     name: Run MATLAB Build
     strategy:
       matrix:
-        platform: [ubuntu-latest, windows-latest, macos-latest]
-    runs-on: ${{ matrix.platform }}
+        os: [ubuntu-latest, windows-latest, macos-latest]
+    runs-on: ${{ matrix.os }}
     steps:
       - name: Check out repository
         uses: actions/checkout@v4
@@ -96,7 +94,6 @@ jobs:
         with:
           tasks: test
 ```
-
 
 ## Set Up MATLAB
 When you define your workflow in the `.github/workflows` directory of your repository, specify the **Setup MATLAB** action as `matlab-actions/setup-matlab@v2`. The action accepts optional inputs.
