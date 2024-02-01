@@ -31,7 +31,12 @@ jobs:
             products: Simulink Simulink_Test
             check-matlab: matlabVer = ver('matlab'); assert(~isempty(matlabVer));
             check-simulink: simulinkVer = ver('simulink'); assert(~isempty(simulinkVer));
-          - os: ubuntu-20.04
+          - os: ubuntu-latest
+            release: latest-including-prerelease
+            products: MATLAB Simulink
+            check-matlab: matlabVer = ver('matlab'); assert(~isempty(matlabVer));
+            check-simulink: simulinkVer = ver('simulink'); assert(~isempty(simulinkVer));
+           - os: ubuntu-20.04
             release: R2021bU2
             products: |
               MATLAB
