@@ -1,4 +1,4 @@
-// Copyright 2020-2023 The MathWorks, Inc.
+// Copyright 2020-2024 The MathWorks, Inc.
 
 import * as exec from "@actions/exec";
 import * as io from "@actions/io";
@@ -21,7 +21,7 @@ export async function downloadAndRunScript(platform: string, url: string, args?:
     if (exitCode !== 0) {
         return Promise.reject(Error(`Script exited with non-zero code ${exitCode}`));
     }
-    return
+    return;
 }
 
 /**
