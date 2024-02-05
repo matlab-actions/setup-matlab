@@ -1,14 +1,12 @@
-# Action for Setting Up MATLAB on GitHub-Hosted Runner
+# Action for Setting Up MATLAB
 
-Before you run MATLAB&reg; code and Simulink&reg; models on a [GitHub&reg;-hosted](https://docs.github.com/en/free-pro-team@latest/actions/reference/specifications-for-github-hosted-runners) runner, first use the [Setup MATLAB](#set-up-matlab) action. The action sets up the specified MATLAB release on a Linux&reg; or Windows&reg; virtual machine. If you do not specify a release, the action sets up the latest release of MATLAB.
-
-The **Setup MATLAB** action is not supported on [self-hosted](https://docs.github.com/en/free-pro-team@latest/actions/hosting-your-own-runners/about-self-hosted-runners) runners. Public licensing is not available for transformation products, such as MATLAB Coder&trade; and MATLAB Compiler&trade;.
+The [Setup MATLAB](#set-up-matlab) action enables you to run MATLAB&reg; code and Simulink&reg; models with a specific version of MATLAB. When you specify this action as part of your workflow, the action sets up your preferred MATLAB release (R2021a or later) on a Linux&reg;, Windows&reg;, or macOS&reg; runner. If you do not specify a release, the action sets up the latest release of MATLAB. As part of the setup process, the action prepends MATLAB to the system PATH environment variable.
 
 ## Usage Examples
-Once you set up MATLAB, you can build and test your MATLAB project as part of your workflow. To execute code on the runner, include the [Run MATLAB Build](https://github.com/matlab-actions/run-build/), [Run MATLAB Tests](https://github.com/matlab-actions/run-tests/), or [Run MATLAB Command](https://github.com/matlab-actions/run-command/) actions in your workflow.
+Once you set up MATLAB on a runner, you can build and test your MATLAB project as part of your workflow. To execute code on the runner, include the [Run MATLAB Build](https://github.com/matlab-actions/run-build/), [Run MATLAB Tests](https://github.com/matlab-actions/run-tests/), or [Run MATLAB Command](https://github.com/matlab-actions/run-command/) action in your workflow.
 
 ### Run MATLAB Build on GitHub-Hosted Runner
-Set up a GitHub-hosted runner to run a specific task and its depended-on tasks that are specified in a file named `buildfile.m` in the root of your repository. To run tasks using the MATLAB build tool, include the [Run MATLAB Build](https://github.com/matlab-actions/run-build/) action in your workflow. This action is supported in MATLAB R2022b and later.
+Use a [GitHub&reg;-hosted runner](https://docs.github.com/en/actions/using-github-hosted-runners/about-github-hosted-runners/about-github-hosted-runners) to run a task and its depended-on tasks that are specified in a file named `buildfile.m` in the root of your repository. Because the `"test"` task in this example runs the tests authored using the MATLAB unit testing framework as well as Simulink Test&trade;, you must set up Simulink and Simulink Test in addition to MATLAB. To run tasks using the MATLAB build tool, include the [Run MATLAB Build](https://github.com/matlab-actions/run-build/) action in your workflow.
 
 ```yaml
 name: Run MATLAB Build on GitHub-Hosted Runner
@@ -31,7 +29,7 @@ jobs:
 ```
 
 ### Run MATLAB Tests on GitHub-Hosted Runner
-Set up a GitHub-hosted runner to run the tests in your [MATLAB project](https://www.mathworks.com/help/matlab/projects.html) and generate a JUnit test results report and a Cobertura code coverage report. To run the tests and generate the artifacts, include the [Run MATLAB Tests](https://github.com/matlab-actions/run-tests/) action in your workflow.
+Use a GitHub-hosted runner to run the tests in your [MATLAB project](https://www.mathworks.com/help/matlab/projects.html) and generate test results in JUnit-style XML format and code coverage results in Cobertura XML format. To run the tests and generate the artifacts, include the [Run MATLAB Tests](https://github.com/matlab-actions/run-tests/) action in your workflow.
 
 ```yaml
 name: Run MATLAB Tests on GitHub-Hosted Runner
@@ -53,7 +51,7 @@ jobs:
 ```
 
 ### Run MATLAB Script on GitHub-Hosted Runner
-Set up a GitHub-hosted runner to run the commands in a file named `myscript.m` in the root of your repository. To run the script, include the [Run MATLAB Command](https://github.com/matlab-actions/run-command/) action in your workflow.
+Use a GitHub-hosted runner to run the commands in a file named `myscript.m` in the root of your repository. To run the script, include the [Run MATLAB Command](https://github.com/matlab-actions/run-command/) action in your workflow.
 
 ```yaml
 name: Run MATLAB Script on GitHub-Hosted Runner
@@ -73,13 +71,38 @@ jobs:
           command: myscript
 ```
 
+### Run MATLAB Build Across Different Platforms
+The **Setup MATLAB** action supports the Linux, Windows, and macOS platforms. Define a matrix of job configurations to run a build using the MATLAB build tool on all the supported platforms. This workflow runs three jobs, one for each value in the variable `os`. For more information about matrices, see [Using a matrix for your jobs](https://docs.github.com/en/actions/using-jobs/using-a-matrix-for-your-jobs). 
+
+```YAML
+name: Run MATLAB Build on Different Platforms
+on: [push]
+jobs:
+  my-job:
+    name: Run MATLAB Build
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+      - name: Set up MATLAB
+        uses: matlab-actions/setup-matlab@v2
+      - name: Run build
+        uses: matlab-actions/run-build@v2
+        with:
+          tasks: test
+```
+
 ## Set Up MATLAB
-When you define your workflow in the `.github/workflows` directory of your repository, specify the **Setup MATLAB** action as `matlab-actions/setup-matlab@v1`. The action accepts an optional input.
+When you define your workflow in the `.github/workflows` directory of your repository, specify the **Setup MATLAB** action as `matlab-actions/setup-matlab@v2`. The action accepts optional inputs.
 
 | Input     | Description |
 |-----------|-------------|
-| `release` | (Optional) MATLAB release to set up. You can specify R2020b or a later release. If you do not specify `release`, the action sets up the latest release of MATLAB.<br/>**Example**: `R2022a`
-| `products` | (Optional) Space-separated list of products to install. If a product name contains white-space characters, replace them with underscores. For the full list of available products and their names, see [Products and Services](https://www.mathworks.com/products.html). By default, the task installs MATLAB.<br/> **Example**: `Simulink`</br>**Example:** `Simulink Deep_Learning_Toolbox`
+| `release` | <p>(Optional) MATLAB release to set up. You can specify R2021a or a later release. If you do not specify `release`, the action defaults to `latest`, which represents the latest release of MATLAB.<p/><p>**Example**: `release: R2023a`<br/>**Example**: `release: latest`</p>
+| `products` | <p>(Optional) Products to set up in addition to MATLAB, specified as a list of product names separated by spaces. You can specify `products` to set up most MathWorks&reg; products and support packages. For example, `products: Deep_Learning_Toolbox` sets up Deep Learning Toolbox&trade; in addition to MATLAB.</p><p>The action uses [MATLAB Package Manager](https://github.com/mathworks-ref-arch/matlab-dockerfile/blob/main/MPM.md) (`mpm`) for installing products. For a list of supported products and their correctly formatted names, see [Product Installation Options](https://github.com/mathworks-ref-arch/matlab-dockerfile/blob/main/MPM.md#product-installation-options).</p> <p>:information_source: **Note:** If you use this input to set up transformation products, such as MATLAB Coder&trade; and MATLAB Compiler&trade;, the action does not automatically license such products for you.<p/><p>**Example**: `products: Simulink`</br>**Example:** `products: Simulink Deep_Learning_Toolbox`</p>
+| `cache` | <p>(Optional) Option to enable caching with GitHub&reg; Actions, specified as `false` or `true`. By default, the value is `false` and the action does not store MATLAB and the specified products in a GitHub Actions cache for future use. For more information about caching with GitHub Actions, see [Caching dependencies to speed up workflows](https://docs.github.com/en/actions/using-workflows/caching-dependencies-to-speed-up-workflows).<p/><p>**Example**: `cache: true`</p>
 
 ## Notes
 When you use the **Setup MATLAB** action, you execute third-party code that is licensed under separate terms.
