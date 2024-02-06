@@ -62,11 +62,11 @@ jobs:
         run:  'if [[ "${{ steps.setup_matlab.outputs.matlabroot }}" != *"MATLAB"* ]]; then exit 1; fi'
         shell: bash
       - name: Check MATLAB version
-        uses: matlab-actions/run-command@v2-rc0
+        uses: matlab-actions/run-command@v2
         with:
           command: "${{ matrix.check-matlab }}"
       - name: Check Simulink version
-        uses: matlab-actions/run-command@v2-rc0
+        uses: matlab-actions/run-command@v2
         with:
           command: "${{ matrix.check-simulink }}"
       - name: Check NoOp on 2nd install
