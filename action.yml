@@ -1,4 +1,4 @@
-# Copyright 2020 The MathWorks, Inc.
+# Copyright 2020-2024 The MathWorks, Inc.
 
 name: Setup MATLAB
 description: >-
@@ -9,6 +9,22 @@ inputs:
       MATLAB release to set up (R2020a or later)
     required: false
     default: latest
+  products:
+    description: >-
+      Array of products to install
+    required: false
+    default: MATLAB
+  cache:
+    description: >-
+      Option to store MATLAB in the GitHub Actions cache, specified as false or true
+    required: false
+    default: false
+outputs:
+  matlabroot:
+    description: >-
+      A full path to the folder where MATLAB is installed
 runs:
-  using: node16
-  main: dist/index.js
+  using: node20
+  main: dist/setup/index.js
+  post: dist/cache-save/index.js
+  post-if: success()

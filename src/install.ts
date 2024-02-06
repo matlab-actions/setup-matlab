@@ -1,12 +1,12 @@
-// Copyright 2020-2022 The MathWorks, Inc.
+// Copyright 2020-2024 The MathWorks, Inc.
 
 import * as core from "@actions/core";
-import properties from "./properties.json";
+import * as matlab from "./matlab";
+import * as mpm from "./mpm";
 import * as script from "./script";
-import * as ematlab from "./ematlab";
-import * as matlabBatch from "./matlabBatch";
-
-export default install;
+import * as path from "path";
+import * as cache from './cache-restore';
+import properties from "./properties.json";
 
 /**
  * Set up an instance of MATLAB on the runner.
@@ -14,34 +14,44 @@ export default install;
  * First, system dependencies are installed. Then the ephemeral installer script
  * is invoked.
  *
- * @param platform Operating system of the runner (e.g., "win32" or "linux").
- * @param release Release of MATLAB to be set up (e.g., "latest" or "R2020a").
+ * @param platform Operating system of the runner (e.g. "win32" or "linux").
+ * @param architecture Architecture of the runner (e.g. "x64", or "x86").
+ * @param release Release of MATLAB to be set up (e.g. "latest" or "R2020a").
+ * @param products A list of products to install (e.g. ["MATLAB", "Simulink"]).
+ * @param useCache whether to use the cache to restore & save the MATLAB installation
  */
-export async function install(platform: string, release: string, skipActivationFlag: string) {
+export async function install(platform: string, architecture: string, release: string, products: string[], useCache: boolean) {
+    const releaseInfo = await matlab.getReleaseInfo(release);
+    if (releaseInfo.name < "r2020b") {
+        return Promise.reject(Error(`Release '${releaseInfo.name}' is not supported. Use 'R2020b' or a later release.`));
+    }
+
     // Install runtime system dependencies for MATLAB on Linux
     if (platform === "linux") {
         await core.group("Preparing system for MATLAB", () =>
-            script.downloadAndRunScript(platform, properties.matlabDepsUrl, [release])
+            script.downloadAndRunScript(platform, properties.matlabDepsUrl, [releaseInfo.name])
         );
     }
 
-    // Set up MATLAB and matlab-batch
-    await core.group("Setting up MATLAB", () => {
-        const matlabResult = script
-            .downloadAndRunScript(platform, properties.ephemeralInstallerUrl, [
-                "--release",
-                release,
-                skipActivationFlag,
-            ])
-            .then(ematlab.addToPath);
+    await core.group("Setting up MATLAB", async () => {
+        let [destination, alreadyExists]: [string, boolean] = await matlab.makeToolcacheDir(releaseInfo, platform);
+        let cacheHit = false;
 
-        const batchInstallDir = matlabBatch.installDir(platform);
+        if (useCache) {
+            const supportFilesDir = matlab.getSupportPackagesPath(platform, releaseInfo.name);
+            cacheHit = await cache.restoreMATLAB(releaseInfo, platform, architecture, products, destination, supportFilesDir);
+        }
 
-        const batchResult = script
-            .downloadAndRunScript(platform, properties.matlabBatchInstallerUrl, [batchInstallDir])
-            .then(() => core.addPath(batchInstallDir));
+        if (!alreadyExists && !cacheHit) {
+            const mpmPath: string = await mpm.setup(platform, architecture);
+            await mpm.install(mpmPath, releaseInfo, products, destination);
+        }
 
-        return Promise.all([matlabResult, batchResult]);
+        core.addPath(path.join(destination, "bin"));
+        core.setOutput('matlabroot', destination);
+
+        await matlab.setupBatch(platform, architecture);
     });
+
     return;
 }

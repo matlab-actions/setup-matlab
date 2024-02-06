@@ -1,5 +1,6 @@
 {
-    "matlabBatchInstallerUrl": "https://ssd.mathworks.com/supportfiles/ci/matlab-batch/v0/install.sh",
     "matlabDepsUrl": "https://ssd.mathworks.com/supportfiles/ci/matlab-deps/v0/install.sh",
-    "ephemeralInstallerUrl": "https://ssd.mathworks.com/supportfiles/ci/ephemeral-matlab/v0/ci-install.sh"
+    "matlabLatestReleaseUrl": "https://ssd.mathworks.com/supportfiles/ci/matlab-release/v0/latest",
+    "matlabBatchRootUrl": "https://ssd.mathworks.com/supportfiles/ci/matlab-batch/v1/",
+    "mpmRootUrl": "https://www.mathworks.com/mpm/"
 }

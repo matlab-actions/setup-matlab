@@ -1,7 +1,9 @@
-// Copyright 2020 The MathWorks, Inc.
+// Copyright 2020-2024 The MathWorks, Inc.
 
 import * as exec from "@actions/exec";
-import * as toolCache from "@actions/tool-cache";
+import * as io from "@actions/io";
+import * as tc from "@actions/tool-cache";
+import path from "path";
 
 /**
  * Download and run a script on the runner.
@@ -11,14 +13,15 @@ import * as toolCache from "@actions/tool-cache";
  * @param args Arguments to pass to the script.
  */
 export async function downloadAndRunScript(platform: string, url: string, args?: string[]) {
-    const scriptPath = await toolCache.downloadTool(url);
-    const cmd = generateExecCommand(platform, scriptPath);
+    const scriptPath = await tc.downloadTool(url);
+    const cmd = await generateExecCommand(platform, scriptPath);
 
     const exitCode = await exec.exec(cmd, args);
 
     if (exitCode !== 0) {
         return Promise.reject(Error(`Script exited with non-zero code ${exitCode}`));
     }
+    return;
 }
 
 /**
@@ -27,13 +30,26 @@ export async function downloadAndRunScript(platform: string, url: string, args?:
  * @param platform Operating system of the runner (e.g. "win32" or "linux").
  * @param scriptPath Path to the script (on runner's filesystem).
  */
-export function generateExecCommand(platform: string, scriptPath: string): string {
+export async function generateExecCommand(platform: string, scriptPath: string): Promise<string> {
     // Run the install script using bash
     let installCmd = `bash ${scriptPath}`;
 
     if (platform !== "win32") {
-        installCmd = `sudo -E ${installCmd}`;
+        const sudo = await io.which("sudo");
+        if (sudo) {
+            installCmd = `sudo -E ${installCmd}`;
+        }
     }
 
     return installCmd;
+}
+
+export function defaultInstallRoot(platform: string, programName: string): string {
+    let installRoot: string;
+    if (platform === "win32") {
+        installRoot = path.join("C:","Program Files", programName);
+    } else {
+        installRoot = path.join("/","opt", programName);
+    }
+    return installRoot;
 }

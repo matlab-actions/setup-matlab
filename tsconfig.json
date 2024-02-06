@@ -1,8 +1,7 @@
 {
     "compilerOptions": {
-        "target": "ES6",
+        "target": "ES2022",
         "module": "CommonJS",
-        "declaration": true,
         "sourceMap": true,
         "rootDir": "src",
         "outDir": "lib",

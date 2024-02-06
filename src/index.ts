@@ -1,7 +1,6 @@
-// Copyright 2020-2022 The MathWorks, Inc.
+// Copyright 2020-2024 The MathWorks, Inc.
 
 import * as core from "@actions/core";
-import * as ematlab from "./ematlab";
 import * as install from "./install";
 
 /**
@@ -9,9 +8,11 @@ import * as install from "./install";
  */
 export async function run() {
     const platform = process.platform;
+    const architecture = process.arch;
     const release = core.getInput("release");
-    const skipActivationFlag = ematlab.skipActivationFlag(process.env);
-    return install.install(platform, release, skipActivationFlag);
+    const products = core.getMultilineInput("products");
+    const cache = core.getBooleanInput("cache");
+    return install.install(platform, architecture, release, products, cache);
 }
 
 run().catch((e) => {
