@@ -31,14 +31,11 @@ jobs:
             products: Simulink Simulink_Test
             check-matlab: matlabVer = ver('matlab'); assert(~isempty(matlabVer));
             check-simulink: simulinkVer = ver('simulink'); assert(~isempty(simulinkVer));
-<<<<<<< HEAD
           - os: ubuntu-latest
             release: latest-including-prerelease
             products: MATLAB Simulink
             check-matlab: matlabVer = ver('matlab'); assert(~isempty(matlabVer));
             check-simulink: simulinkVer = ver('simulink'); assert(~isempty(simulinkVer));
-=======
->>>>>>> 5a2d0152579af8c271e645354dc08443dfa81914
           - os: ubuntu-20.04
             release: R2021bU2
             products: |
@@ -70,21 +67,12 @@ jobs:
         run:  'if [[ "${{ steps.setup_matlab.outputs.matlabroot }}" != *"MATLAB"* ]]; then exit 1; fi'
         shell: bash
       - name: Check MATLAB version
-<<<<<<< HEAD
-        uses: matlab-actions/run-command@v2-rc0
-        with:
-          command: "${{ matrix.check-matlab }}"
-      - name: Check Simulink version
-        uses: matlab-actions/run-command@v2-rc0
-        with:
-=======
         uses: matlab-actions/run-command@v2
         with:
           command: "${{ matrix.check-matlab }}"
       - name: Check Simulink version
         uses: matlab-actions/run-command@v2
         with:
->>>>>>> 5a2d0152579af8c271e645354dc08443dfa81914
           command: "${{ matrix.check-simulink }}"
       - name: Check NoOp on 2nd install
         uses: ./
