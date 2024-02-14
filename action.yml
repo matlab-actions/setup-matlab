@@ -11,12 +11,12 @@ inputs:
     default: latest
   products:
     description: >-
-      Products to set up in addition to MATLAB, specified as a list of product names separated by spaces.
+      Products to set up in addition to MATLAB, specified as a list of product names separated by spaces
     required: false
     default: ""
   cache:
     description: >-
-      Option to enable caching with GitHub Actions, specified as false or true.
+      Option to enable caching with GitHub Actions, specified as false or true
     required: false
     default: false
 outputs:
