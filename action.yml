@@ -2,7 +2,7 @@
 
 name: Setup MATLAB
 description: >-
-  Set up a specific version of MATLAB and MathWorks products
+  Set up a specific version of MATLAB
 inputs:
   release:
     description: >-
