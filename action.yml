@@ -6,7 +6,7 @@ description: >-
 inputs:
   release:
     description: >-
-      MATLAB release to set up (R2020a or later)
+      MATLAB release to set up (R2021a or later)
     required: false
     default: latest
   products:
