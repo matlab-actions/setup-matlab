@@ -2,21 +2,21 @@
 
 name: Setup MATLAB
 description: >-
-  Set up MATLAB on a Linux-based GitHub-hosted runner
+  Set up a specific version of MATLAB
 inputs:
   release:
     description: >-
-      MATLAB release to set up (R2020a or later)
+      MATLAB release to set up (R2021a or later)
     required: false
     default: latest
   products:
     description: >-
-      Array of products to install
+      Products to set up in addition to MATLAB, specified as a list of product names separated by spaces
     required: false
-    default: MATLAB
+    default: ""
   cache:
     description: >-
-      Option to store MATLAB in the GitHub Actions cache, specified as false or true
+      Option to enable caching with GitHub Actions, specified as false or true
     required: false
     default: false
 outputs:
