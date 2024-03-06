@@ -26,7 +26,7 @@ export async function setup(platform: string, architecture: string): Promise<str
             } else {
                 mpmUrl = properties.mpmRootUrl + "maca64/mpm";
             }
-            await exec.exec(`launchctl limit maxfiles 65536 200000`); // g3185941
+            await exec.exec(`sudo launchctl limit maxfiles 65536 200000`, undefined, {ignoreReturnCode: true}); // g3185941
             break;
         default:
             return Promise.reject(Error(`This action is not supported on ${platform} runners using the ${architecture} architecture.`));
