@@ -56,6 +56,13 @@ describe("setup mpm", () => {
             await expect(mpm.setup(platform, arch)).resolves.toBe(path.join(mpmMockPath));
             expect(tcDownloadToolMock.mock.calls[0][0]).toContain("maci64");
         });
+
+        it(`works on mac with apple silicon`, async () => {
+            const platform = "darwin";
+            execMock.mockResolvedValue(0);
+            await expect(mpm.setup(platform, "arm64")).resolves.toBe(mpmMockPath);
+            expect(tcDownloadToolMock.mock.calls[0][0]).toContain("maca64");
+        });
     });
 
     it("errors on unsupported platform", async () => {

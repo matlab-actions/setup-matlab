@@ -159,6 +159,12 @@ describe("matlab tests", () => {
                 const platform = "darwin";
                 await expect(matlab.setupBatch(platform, arch)).resolves.toBeUndefined();
             });
+
+            it(`works on mac with apple silicon`, async () => {
+                const platform = "darwin";
+                execMock.mockResolvedValue(0);
+                await expect(matlab.setupBatch(platform, "arm64")).resolves.toBeUndefined();
+            });
         });
     
         it("errors on unsupported platform", async () => {
