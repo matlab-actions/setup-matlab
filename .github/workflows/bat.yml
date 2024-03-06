@@ -48,7 +48,7 @@ jobs:
             products: Simulink
             check-matlab: matlabVer = ver('matlab'); assert(~isempty(matlabVer));
             check-simulink: simulinkVer = ver('simulink'); assert(~isempty(simulinkVer));
-          - os: macos-latest-xlarge
+          - os: macos-14
             release: latest
             products: Simulink
             check-matlab: matlabVer = ver('matlab'); assert(~isempty(matlabVer));
