@@ -9,7 +9,7 @@ import properties from "./properties.json";
 export async function setup(platform: string, architecture: string): Promise<string> {
     let mpmUrl: string;
     let ext = "";
-    if (architecture != "x64") {
+    if (architecture != "x64" && !(platform == "darwin" && architecture == "arm64")) {
         return Promise.reject(Error(`This action is not supported on ${platform} runners using the ${architecture} architecture.`));
     }
     switch (platform) {
@@ -21,7 +21,11 @@ export async function setup(platform: string, architecture: string): Promise<str
             mpmUrl = properties.mpmRootUrl + "glnxa64/mpm";
             break;
         case "darwin":
-            mpmUrl = properties.mpmRootUrl + "maci64/mpm";
+            if (architecture == "x64") {
+                mpmUrl = properties.mpmRootUrl + "maci64/mpm";
+            } else {
+                mpmUrl = properties.mpmRootUrl + "maca64/mpm";
+            }
             break;
         default:
             return Promise.reject(Error(`This action is not supported on ${platform} runners using the ${architecture} architecture.`));

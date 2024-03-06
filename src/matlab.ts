@@ -81,7 +81,7 @@ async function defaultToolpath(release: Release, platform: string): Promise<stri
 }
 
 export async function setupBatch(platform: string, architecture: string) {
-    if (architecture != "x64") {
+    if (architecture != "x64" && !(platform == "darwin" && architecture == "arm64")) {
         return Promise.reject(Error(`This action is not supported on ${platform} runners using the ${architecture} architecture.`));
     }
 
@@ -96,7 +96,11 @@ export async function setupBatch(platform: string, architecture: string) {
             matlabBatchUrl = properties.matlabBatchRootUrl + "glnxa64/matlab-batch";
             break;
         case "darwin":
-            matlabBatchUrl = properties.matlabBatchRootUrl + "maci64/matlab-batch";
+            if (architecture == "x64") {
+                matlabBatchUrl = properties.matlabBatchRootUrl + "maci64/matlab-batch";
+            } else {
+                matlabBatchUrl = properties.matlabBatchRootUrl + "maca64/matlab-batch";
+            }
             break;
         default:
             return Promise.reject(Error(`This action is not supported on ${platform} runners.`));
