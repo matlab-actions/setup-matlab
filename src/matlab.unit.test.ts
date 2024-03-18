@@ -307,7 +307,7 @@ describe("matlab tests", () => {
                 await expect(
                     matlab.installSystemDependencies(platform, "arm64", release)
                 ).resolves.toBeUndefined();
-                expect(tcDownloadToolMock).toHaveBeenCalledWith(properties.appleSiliconJdkUrl);
+                expect(tcDownloadToolMock).toHaveBeenCalledWith(properties.appleSiliconJdkUrl, expect.anything());
                 expect(execMock).toHaveBeenCalledWith(`sudo installer -pkg "java.jdk" -target /`);
             });
         });
