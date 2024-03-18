@@ -9,6 +9,7 @@ import * as fs from "fs";
 import { homedir } from "os";
 import * as path from "path";
 import properties from "./properties.json";
+import * as script from "./script";
 
 export interface Release {
     name: string;
@@ -180,3 +181,18 @@ export function getSupportPackagesPath(platform: string, release: string): strin
     return supportPackagesDir;
 }
 
+export async function installSystemDependencies(platform: string, architecture: string, release: string) {
+    if (platform === "linux") {
+        return script.downloadAndRunScript(platform, properties.matlabDepsUrl, [release]);
+    } else if (platform === "darwin" && architecture === "arm64") {
+        return installAppleSiliconJdk();
+    }
+}
+
+async function installAppleSiliconJdk() {
+    const jdk = await tc.downloadTool(properties.appleSiliconJdkUrl);
+    const exitCode = await exec.exec(`sudo installer -pkg "${jdk}" -target /`);
+    if (exitCode !== 0) {
+        return Promise.reject(Error("Unable to install Java runtime."));
+    }
+}
