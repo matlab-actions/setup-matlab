@@ -190,8 +190,9 @@ export async function installSystemDependencies(platform: string, architecture: 
 }
 
 async function installAppleSiliconJdk() {
-    const tempDir = process.env["RUNNER_TEMP"] ?? "";
-    const jdk = await tc.downloadTool(properties.appleSiliconJdkUrl, path.join(tempDir, "jdk.pkg"));
+    const jdkPath = path.join(process.env["RUNNER_TEMP"] ?? "", "jdk.pkg");
+    io.rmRF(jdkPath);
+    const jdk = await tc.downloadTool(properties.appleSiliconJdkUrl, jdkPath);
     const exitCode = await exec.exec(`sudo installer -pkg "${jdk}" -target /`);
     if (exitCode !== 0) {
         return Promise.reject(Error("Unable to install Java runtime."));
