@@ -1,16 +1,14 @@
 // Copyright 2020-2024 The MathWorks, Inc.
 
 import * as core from "@actions/core";
-import * as cache from './cache-restore';
+import * as cache from "./cache-restore";
 import * as install from "./install";
 import * as matlab from "./matlab";
 import * as mpm from "./mpm";
-import * as script from "./script";
 
 jest.mock("@actions/core");
 jest.mock("./matlab");
 jest.mock("./mpm");
-jest.mock("./script");
 jest.mock("./cache-restore");
 
 afterEach(() => {
@@ -18,7 +16,7 @@ afterEach(() => {
 });
 
 describe("install procedure", () => {
-    let downloadAndRunScriptMock: jest.Mock;
+    let matlabInstallSystemDependenciesMock: jest.Mock;
     let matlabGetReleaseInfoMock: jest.Mock;
     let matlabMakeToolcacheDirMock: jest.Mock;
     let matlabSetupBatchMock: jest.Mock;
@@ -42,7 +40,7 @@ describe("install procedure", () => {
     const doInstall = () => install.install(platform, arch, release, products, useCache);
 
     beforeEach(() => {
-        downloadAndRunScriptMock = script.downloadAndRunScript as jest.Mock;
+        matlabInstallSystemDependenciesMock = matlab.installSystemDependencies as jest.Mock;
         matlabGetReleaseInfoMock = matlab.getReleaseInfo as jest.Mock;
         matlabMakeToolcacheDirMock = matlab.makeToolcacheDir as jest.Mock;
         matlabSetupBatchMock = matlab.setupBatch as jest.Mock;
@@ -63,25 +61,12 @@ describe("install procedure", () => {
 
     it("ideally works", async () => {
         await expect(doInstall()).resolves.toBeUndefined();
-        expect(downloadAndRunScriptMock).toHaveBeenCalledTimes(1);
+        expect(matlabInstallSystemDependenciesMock).toHaveBeenCalledTimes(1);
         expect(matlabSetupBatchMock).toHaveBeenCalledTimes(1);
         expect(mpmSetupMock).toHaveBeenCalledTimes(1);
         expect(mpmInstallMock).toHaveBeenCalledTimes(1);
         expect(addPathMock).toHaveBeenCalledTimes(1);
         expect(setOutputMock).toHaveBeenCalledTimes(1);
-    });
-
-    ["darwin", "win32"].forEach((os) => {
-        it(`does not run deps script on ${os}`, async () => { 
-            await expect(install.install(os, arch, release, products, useCache)).resolves.toBeUndefined();
-            expect(downloadAndRunScriptMock).toHaveBeenCalledTimes(0);
-            expect(core.group).toHaveBeenCalledTimes(1);
-            expect(matlabSetupBatchMock).toHaveBeenCalledTimes(1);
-            expect(mpmSetupMock).toHaveBeenCalledTimes(1);
-            expect(mpmInstallMock).toHaveBeenCalledTimes(1);
-            expect(addPathMock).toHaveBeenCalledTimes(1);
-            expect(setOutputMock).toHaveBeenCalledTimes(1);
-        });
     });
 
     it("NoOp on existing install", async () => {
@@ -107,7 +92,7 @@ describe("install procedure", () => {
     });
 
     it("rejects when the setup deps fails", async () => {
-        downloadAndRunScriptMock.mockRejectedValueOnce(Error("oof"));
+        matlabInstallSystemDependenciesMock.mockRejectedValueOnce(Error("oof"));
         await expect(doInstall()).rejects.toBeDefined();
     });
 

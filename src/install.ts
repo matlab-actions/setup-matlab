@@ -3,10 +3,8 @@
 import * as core from "@actions/core";
 import * as matlab from "./matlab";
 import * as mpm from "./mpm";
-import * as script from "./script";
 import * as path from "path";
-import * as cache from './cache-restore';
-import properties from "./properties.json";
+import * as cache from "./cache-restore";
 
 /**
  * Set up an instance of MATLAB on the runner.
@@ -26,12 +24,9 @@ export async function install(platform: string, architecture: string, release: s
         return Promise.reject(Error(`Release '${releaseInfo.name}' is not supported. Use 'R2020b' or a later release.`));
     }
 
-    // Install runtime system dependencies for MATLAB on Linux
-    if (platform === "linux") {
-        await core.group("Preparing system for MATLAB", () =>
-            script.downloadAndRunScript(platform, properties.matlabDepsUrl, [releaseInfo.name])
-        );
-    }
+    await core.group("Preparing system for MATLAB", async () =>
+        matlab.installSystemDependencies(platform, architecture, releaseInfo.name)
+    );
 
     await core.group("Setting up MATLAB", async () => {
         let [destination, alreadyExists]: [string, boolean] = await matlab.makeToolcacheDir(releaseInfo, platform);
