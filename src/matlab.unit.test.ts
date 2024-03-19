@@ -4,11 +4,13 @@ import * as core from "@actions/core";
 import * as exec from "@actions/exec";
 import * as http from "@actions/http-client";
 import * as httpjs from "http";
-import * as net from 'net';
+import * as net from "net";
 import * as path from "path";
 import * as tc from "@actions/tool-cache";
 import * as matlab from "./matlab";
+import * as script from "./script";
 import fs from "fs";
+import properties from "./properties.json";
 
 jest.mock("http");
 jest.mock("net");
@@ -16,6 +18,7 @@ jest.mock("@actions/core");
 jest.mock("@actions/exec");
 jest.mock("@actions/http-client");
 jest.mock("@actions/tool-cache");
+jest.mock("./script");
 
 afterEach(() => {
     jest.resetAllMocks();
@@ -160,6 +163,12 @@ describe("matlab tests", () => {
                 const platform = "darwin";
                 await expect(matlab.setupBatch(platform, arch)).resolves.toBeUndefined();
             });
+
+            it(`works on mac with apple silicon`, async () => {
+                const platform = "darwin";
+                execMock.mockResolvedValue(0);
+                await expect(matlab.setupBatch(platform, "arm64")).resolves.toBeUndefined();
+            });
         });
     
         it("errors on unsupported platform", async () => {
@@ -268,6 +277,76 @@ describe("matlab tests", () => {
                 };
             })            
             expect(matlab.getReleaseInfo("latest")).rejects.toBeDefined();
+        });
+    });
+
+    describe("installSystemDependencies", () => {
+        let downloadAndRunScriptMock: jest.Mock;
+        let tcDownloadToolMock: jest.Mock;
+        let execMock: jest.Mock;
+        const arch = "x64";
+        const release = "R2023b";
+
+        beforeEach(() => {
+            downloadAndRunScriptMock = script.downloadAndRunScript as jest.Mock;
+            tcDownloadToolMock = tc.downloadTool as jest.Mock;
+            execMock = exec.exec as jest.Mock;
+        });
+
+        describe("test on all supported platforms", () => {
+            it(`works on linux`, async () => {
+                const platform = "linux";
+                await expect(
+                    matlab.installSystemDependencies(platform, arch, release)
+                ).resolves.toBeUndefined();
+                expect(downloadAndRunScriptMock).toHaveBeenCalledWith(
+                    platform,
+                    properties.matlabDepsUrl,
+                    [release]
+                );
+            });
+
+            it(`works on windows`, async () => {
+                const platform = "win32";
+                await expect(
+                    matlab.installSystemDependencies(platform, arch, release)
+                ).resolves.toBeUndefined();
+            });
+
+            it(`works on mac`, async () => {
+                const platform = "darwin";
+                await expect(
+                    matlab.installSystemDependencies(platform, arch, release)
+                ).resolves.toBeUndefined();
+            });
+
+            it(`works on mac with apple silicon`, async () => {
+                const platform = "darwin";
+                tcDownloadToolMock.mockResolvedValue("java.jdk");
+                execMock.mockResolvedValue(0);
+                await expect(
+                    matlab.installSystemDependencies(platform, "arm64", release)
+                ).resolves.toBeUndefined();
+                expect(tcDownloadToolMock).toHaveBeenCalledWith(properties.appleSiliconJdkUrl, expect.anything());
+                expect(execMock).toHaveBeenCalledWith(`sudo installer -pkg "java.jdk" -target /`);
+            });
+        });
+
+        it("rejects when the apple silicon JDK download fails", async () => {
+            const platform = "darwin";
+            tcDownloadToolMock.mockRejectedValue(Error("oof"));
+            await expect(
+                matlab.installSystemDependencies(platform, "arm64", release)
+            ).rejects.toBeDefined();
+        });
+
+        it("rejects when the apple silicon JDK fails to install", async () => {
+            const platform = "darwin";
+            tcDownloadToolMock.mockResolvedValue("java.jdk");
+            execMock.mockResolvedValue(1);
+            await expect(
+                matlab.installSystemDependencies(platform, "arm64", release)
+            ).rejects.toBeDefined();
         });
     });
 });

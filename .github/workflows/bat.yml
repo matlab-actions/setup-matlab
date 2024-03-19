@@ -28,31 +28,36 @@ jobs:
         include:
           - os: ubuntu-latest
             release: latest 
-            products: Simulink Simulink_Test
+            products: Symbolic_Math_Toolbox
             check-matlab: matlabVer = ver('matlab'); assert(~isempty(matlabVer));
-            check-simulink: simulinkVer = ver('simulink'); assert(~isempty(simulinkVer));
+            check-toolbox: symbolicVer = ver('symbolic'); assert(~isempty(symbolicVer));
           - os: ubuntu-latest
             release: latest-including-prerelease
             products: MATLAB Simulink
             check-matlab: matlabVer = ver('matlab'); assert(~isempty(matlabVer));
-            check-simulink: simulinkVer = ver('simulink'); assert(~isempty(simulinkVer));
+            check-toolbox: symbolicVer = ver('symbolic'); assert(~isempty(symbolicVer));
           - os: ubuntu-20.04
             release: R2021bU2
             products: |
               MATLAB
-              Simulink
+              Symbolic_Math_Toolbox
             check-matlab: matlabVer = ver('matlab'); assert(strcmp(matlabVer.Release,'(R2021b)'));
-            check-simulink: simulinkVer = ver('simulink'); assert(strcmp(simulinkVer.Release,'(R2021b)'));
+            check-toolbox: symbolicVer = ver('symbolic'); assert(strcmp(symbolicVer.Release,'(R2021b)'));
           - os: windows-latest
             release: latest
-            products: Simulink
+            products: Symbolic_Math_Toolbox
             check-matlab: matlabVer = ver('matlab'); assert(~isempty(matlabVer));
-            check-simulink: simulinkVer = ver('simulink'); assert(~isempty(simulinkVer));
+            check-toolbox: symbolicVer = ver('symbolic'); assert(~isempty(symbolicVer));
           - os: macos-latest
             release: latest
-            products: Simulink
+            products: Symbolic_Math_Toolbox
             check-matlab: matlabVer = ver('matlab'); assert(~isempty(matlabVer));
-            check-simulink: simulinkVer = ver('simulink'); assert(~isempty(simulinkVer));
+            check-toolbox: symbolicVer = ver('symbolic'); assert(~isempty(symbolicVer));
+          - os: macos-14
+            release: latest
+            products: Symbolic_Math_Toolbox
+            check-matlab: matlabVer = ver('matlab'); assert(~isempty(matlabVer));
+            check-toolbox: symbolicVer = ver('symbolic'); assert(~isempty(symbolicVer));
     steps:
       - uses: actions/download-artifact@v4
         with:
@@ -70,10 +75,10 @@ jobs:
         uses: matlab-actions/run-command@v2
         with:
           command: "${{ matrix.check-matlab }}"
-      - name: Check Simulink version
+      - name: Check toolbox version
         uses: matlab-actions/run-command@v2
         with:
-          command: "${{ matrix.check-simulink }}"
+          command: "${{ matrix.check-toolbox }}"
       - name: Check NoOp on 2nd install
         uses: ./
         with:

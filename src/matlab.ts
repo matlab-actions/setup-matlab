@@ -9,6 +9,7 @@ import * as fs from "fs";
 import { homedir } from "os";
 import * as path from "path";
 import properties from "./properties.json";
+import * as script from "./script";
 
 export interface Release {
     name: string;
@@ -82,7 +83,7 @@ async function defaultToolpath(release: Release, platform: string): Promise<stri
 }
 
 export async function setupBatch(platform: string, architecture: string) {
-    if (architecture != "x64") {
+    if (architecture != "x64" && !(platform == "darwin" && architecture == "arm64")) {
         return Promise.reject(Error(`This action is not supported on ${platform} runners using the ${architecture} architecture.`));
     }
 
@@ -97,7 +98,11 @@ export async function setupBatch(platform: string, architecture: string) {
             matlabBatchUrl = properties.matlabBatchRootUrl + "glnxa64/matlab-batch";
             break;
         case "darwin":
-            matlabBatchUrl = properties.matlabBatchRootUrl + "maci64/matlab-batch";
+            if (architecture == "x64") {
+                matlabBatchUrl = properties.matlabBatchRootUrl + "maci64/matlab-batch";
+            } else {
+                matlabBatchUrl = properties.matlabBatchRootUrl + "maca64/matlab-batch";
+            }
             break;
         default:
             return Promise.reject(Error(`This action is not supported on ${platform} runners.`));
@@ -184,3 +189,20 @@ export function getSupportPackagesPath(platform: string, release: string): strin
     return supportPackagesDir;
 }
 
+export async function installSystemDependencies(platform: string, architecture: string, release: string) {
+    if (platform === "linux") {
+        return script.downloadAndRunScript(platform, properties.matlabDepsUrl, [release]);
+    } else if (platform === "darwin" && architecture === "arm64") {
+        return installAppleSiliconJdk();
+    }
+}
+
+async function installAppleSiliconJdk() {
+    const jdkPath = path.join(process.env["RUNNER_TEMP"] ?? "", "jdk.pkg");
+    io.rmRF(jdkPath);
+    const jdk = await tc.downloadTool(properties.appleSiliconJdkUrl, jdkPath);
+    const exitCode = await exec.exec(`sudo installer -pkg "${jdk}" -target /`);
+    if (exitCode !== 0) {
+        return Promise.reject(Error("Unable to install Java runtime."));
+    }
+}
