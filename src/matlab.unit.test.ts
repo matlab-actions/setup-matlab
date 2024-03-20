@@ -29,6 +29,7 @@ describe("matlab tests", () => {
         name: "r2022b",
         version: "2022.2.999",
         update: "",
+        isPrerelease: false,
     }
     const platform = "linux";
     
@@ -208,8 +209,25 @@ describe("matlab tests", () => {
             })            
         });
 
-        it("latest resolves", () => {
+        it("latest-including-prereleases resolves", () => {
             expect(matlab.getReleaseInfo("latest")).resolves.toMatchObject(release);
+        });
+
+        it("prerelease-latest resolves", () => {
+            const prereleaseName = "r2022bprerelease"
+            const prerelease = {
+                name: "r2022b",
+                version: "2022.2.999-prerelease",
+                update: "",
+                isPrerelease: true,
+            }
+            jest.spyOn(http.HttpClient.prototype, 'get').mockImplementation(async () => {
+                return {
+                    message: new httpjs.IncomingMessage(new net.Socket()),
+                    readBody: () => {return Promise.resolve(prereleaseName)}
+                };
+            })            
+            expect(matlab.getReleaseInfo("latest-including-prerelease")).resolves.toMatchObject(prerelease);
         });
 
         it("case insensitive", () => {
@@ -221,6 +239,7 @@ describe("matlab tests", () => {
                 name: "r2022a",
                 update: "",
                 version: "2022.1.999",
+                isPrerelease: false,
             }
             expect(matlab.getReleaseInfo("R2022a")).resolves.toMatchObject(R2022aRelease);
 
@@ -228,6 +247,7 @@ describe("matlab tests", () => {
                 name: "r2022b",
                 update: "",
                 version: "2022.2.999",
+                isPrerelease: false,
             }
             expect(matlab.getReleaseInfo("R2022b")).resolves.toMatchObject(R2022bRelease);
         });
