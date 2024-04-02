@@ -18,20 +18,14 @@ export interface Release {
     isPrerelease: boolean;
 }
 
-export async function makeToolcacheDir(release: Release, platform: string): Promise<[string, boolean]> {
+export async function getToolcacheDir(platform: string, release: Release): Promise<[string, boolean]> {
     let toolpath: string = tc.find("MATLAB", release.version);
     let alreadyExists = false;
     if (toolpath) {
         core.info(`Found MATLAB ${release.name} in cache at ${toolpath}.`);
         alreadyExists = true;
     } else {
-        if (platform === "win32") {
-            toolpath = await windowsHostedToolpath(release).catch(async () => {
-                return await defaultToolpath(release);
-            });
-        } else {
-            toolpath = await defaultToolpath(release);
-        }
+        toolpath = await makeToolcacheDir(platform, release);
     }
     if (platform == "darwin") {
         toolpath = toolpath + "/MATLAB.app";
@@ -39,7 +33,20 @@ export async function makeToolcacheDir(release: Release, platform: string): Prom
     return [toolpath, alreadyExists]
 }
 
-async function windowsHostedToolpath(release: Release): Promise<string> {
+async function makeToolcacheDir(platform: string, release: Release): Promise<string> {
+    let toolcacheDir: string;
+    if (platform === "win32") {
+        toolcacheDir = await makeWindowsHostedToolpath(release)
+            .catch(async () => {
+                return await makeDefaultToolpath(release)
+            });
+    } else {
+        toolcacheDir = await makeDefaultToolpath(release);
+    }
+    return toolcacheDir;
+}
+
+async function makeWindowsHostedToolpath(release: Release): Promise<string> {
     // bail early if not on a github hosted runner
     if (process.env['RUNNER_ENVIRONMENT'] !== 'github-hosted' && process.env['AGENT_ISSELFHOSTED'] === '1') {
         return Promise.reject();
@@ -59,11 +66,16 @@ async function windowsHostedToolpath(release: Release): Promise<string> {
     process.env['RUNNER_TOOL_CACHE'] = actualToolCacheRoot;
 
     // create install directory and link it to the toolcache directory
+    console.log("writing .keep");
     fs.writeFileSync(".keep", "");
+    console.log("creating toolcache dir");
     let actualToolCacheDir = await tc.cacheFile(".keep", ".keep", "MATLAB", release.version);
+    console.log("removing .keep");
     io.rmRF(".keep");
     let defaultToolCacheDir = actualToolCacheDir.replace(actualToolCacheRoot, defaultToolCacheRoot);
+    console.log("make linked");
     fs.mkdirSync(path.dirname(defaultToolCacheDir), {recursive: true});
+    console.log("symlink");
     fs.symlinkSync(actualToolCacheDir, defaultToolCacheDir, 'junction');
 
     // required for github actions to make the cacheDir persistent
@@ -75,7 +87,7 @@ async function windowsHostedToolpath(release: Release): Promise<string> {
     return actualToolCacheDir;
 }
 
-async function defaultToolpath(release: Release): Promise<string> {
+async function makeDefaultToolpath(release: Release): Promise<string> {
     fs.writeFileSync(".keep", "");
     let toolpath = await tc.cacheFile(".keep", ".keep", "MATLAB", release.version);
     io.rmRF(".keep");
