@@ -95,7 +95,7 @@ describe("matlab tests", () => {
                 let symlinkSyncSpy = jest.spyOn(fs, "symlinkSync").mockImplementation(() => {});
 
                 await expect(matlab.getToolcacheDir("win32", release)).resolves.toMatchObject([expectedToolcacheDir, false]);
-                expect(existsSyncSpy).toHaveBeenCalledTimes(10);
+                expect(existsSyncSpy).toHaveBeenCalledTimes(6);
                 expect(mkdirSyncSpy).toHaveBeenCalledTimes(1);
                 expect(symlinkSyncSpy).toHaveBeenCalledTimes(2);
             });
