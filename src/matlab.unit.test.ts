@@ -92,12 +92,12 @@ describe("matlab tests", () => {
                 // mock & no-op fs operations
                 let existsSyncSpy = jest.spyOn(fs, "existsSync").mockReturnValue(true);
                 let mkdirSyncSpy = jest.spyOn(fs, "mkdirSync").mockImplementation(() => "");
-                let symlinkSyncSpy = jest.spyOn(fs, "symlinkSync").mockImplementation(() => {});
+                // let symlinkSyncSpy = jest.spyOn(fs, "symlinkSync").mockImplementation(() => {});
 
                 await expect(matlab.getToolcacheDir("win32", release)).resolves.toMatchObject([expectedToolcacheDir, false]);
                 expect(existsSyncSpy).toHaveBeenCalledTimes(6);
                 expect(mkdirSyncSpy).toHaveBeenCalledTimes(1);
-                expect(symlinkSyncSpy).toHaveBeenCalledTimes(2);
+                // expect(symlinkSyncSpy).toHaveBeenCalledTimes(2);
             });
 
             it("uses default toolcache directory if not github hosted", async () => {

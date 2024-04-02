@@ -76,12 +76,12 @@ async function makeWindowsHostedToolpath(release: Release): Promise<string> {
     console.log("make linked");
     fs.mkdirSync(path.dirname(defaultToolCacheDir), {recursive: true});
     console.log("symlink");
-    fs.symlinkSync(actualToolCacheDir, defaultToolCacheDir, 'junction');
+    // fs.symlinkSync(actualToolCacheDir, defaultToolCacheDir, 'junction');
 
     // required for github actions to make the cacheDir persistent
-    const actualToolCacheCompleteFile = `${actualToolCacheDir}.complete`;
-    const defaultToolCacheCompleteFile = `${defaultToolCacheDir}.complete`;
-    fs.symlinkSync(actualToolCacheCompleteFile, defaultToolCacheCompleteFile, 'file');
+    // const actualToolCacheCompleteFile = `${actualToolCacheDir}.complete`;
+    // const defaultToolCacheCompleteFile = `${defaultToolCacheDir}.complete`;
+    // fs.symlinkSync(actualToolCacheCompleteFile, defaultToolCacheCompleteFile, 'file');
 
     process.env['RUNNER_TOOL_CACHE'] = defaultToolCacheRoot;
     return actualToolCacheDir;
