@@ -27,11 +27,14 @@ export async function makeToolcacheDir(release: Release, platform: string): Prom
     } else {
         if (platform === "win32") {
             toolpath = await windowsHostedToolpath(release).catch(async () => {
-                return await defaultToolpath(release, platform);
+                return await defaultToolpath(release);
             });
         } else {
-            toolpath = await defaultToolpath(release, platform);
+            toolpath = await defaultToolpath(release);
         }
+    }
+    if (platform == "darwin") {
+        toolpath = toolpath + "/MATLAB.app";
     }
     return [toolpath, alreadyExists]
 }
@@ -72,13 +75,10 @@ async function windowsHostedToolpath(release: Release): Promise<string> {
     return actualToolCacheDir;
 }
 
-async function defaultToolpath(release: Release, platform: string): Promise<string> {
+async function defaultToolpath(release: Release): Promise<string> {
     fs.writeFileSync(".keep", "");
     let toolpath = await tc.cacheFile(".keep", ".keep", "MATLAB", release.version);
     io.rmRF(".keep");
-    if (platform == "darwin") {
-        toolpath = toolpath + "/MATLAB.app";
-    }
     return toolpath
 }
 
