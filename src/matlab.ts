@@ -37,7 +37,8 @@ async function makeToolcacheDir(platform: string, release: Release): Promise<str
     let toolcacheDir: string;
     if (platform === "win32") {
         toolcacheDir = await makeWindowsHostedToolpath(release)
-            .catch(async () => {
+            .catch(async (e) => {
+                console.log(e)
                 return await makeDefaultToolpath(release)
             });
     } else {
@@ -76,12 +77,12 @@ async function makeWindowsHostedToolpath(release: Release): Promise<string> {
     console.log("make linked");
     fs.mkdirSync(path.dirname(defaultToolCacheDir), {recursive: true});
     console.log("symlink");
-    // fs.symlinkSync(actualToolCacheDir, defaultToolCacheDir, 'junction');
+    fs.symlinkSync(actualToolCacheDir, defaultToolCacheDir, 'junction');
 
     // required for github actions to make the cacheDir persistent
-    // const actualToolCacheCompleteFile = `${actualToolCacheDir}.complete`;
-    // const defaultToolCacheCompleteFile = `${defaultToolCacheDir}.complete`;
-    // fs.symlinkSync(actualToolCacheCompleteFile, defaultToolCacheCompleteFile, 'file');
+    const actualToolCacheCompleteFile = `${actualToolCacheDir}.complete`;
+    const defaultToolCacheCompleteFile = `${defaultToolCacheDir}.complete`;
+    fs.symlinkSync(actualToolCacheCompleteFile, defaultToolCacheCompleteFile, 'file');
 
     process.env['RUNNER_TOOL_CACHE'] = defaultToolCacheRoot;
     return actualToolCacheDir;
