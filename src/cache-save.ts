@@ -16,6 +16,10 @@ export async function cacheMATLAB() {
         return;
     }
 
-    await cache.saveCache([matlabPath, supportPackagesPath], primaryKey);
-    core.info(`Cache saved with the key: ${primaryKey}`); 
+    try {
+        await cache.saveCache([matlabPath, supportPackagesPath], primaryKey);
+        core.info(`Cache saved with the key: ${primaryKey}`);
+    } catch (e) {
+        core.warning(`Failed to save MATLAB to cache: ${e}`);
+    }
 }

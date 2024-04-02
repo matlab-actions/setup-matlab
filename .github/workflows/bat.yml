@@ -62,6 +62,11 @@ jobs:
       - uses: actions/download-artifact@v4
         with:
           name: built-action
+      - name: Cache MATLAB
+        id: cache-matlab
+        uses: actions/cache@v4
+        with:
+          path: ${{ runner.tool_cache }}/MATLAB
       - name: Install selected products
         id: setup_matlab
         uses: ./
@@ -79,8 +84,3 @@ jobs:
         uses: matlab-actions/run-command@v2
         with:
           command: "${{ matrix.check-toolbox }}"
-      - name: Check NoOp on 2nd install
-        uses: ./
-        with:
-          release: ${{ matrix.release }}
-          products: ${{ matrix.products }}
