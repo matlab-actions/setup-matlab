@@ -40,7 +40,7 @@ jobs:
         uses: actions/cache@v4
         with:
           path: |
-            D:\hostedtoolcache\windows\MATLAB\2023.2.999\x64
+            D:\hostedtoolcache\windows\MATLAB
           key: ${{ matrix.os }}-${{ matrix.release }}
       - name: Install selected products
         id: setup_matlab
