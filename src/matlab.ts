@@ -67,16 +67,11 @@ async function makeWindowsHostedToolpath(release: Release): Promise<string> {
     process.env['RUNNER_TOOL_CACHE'] = actualToolCacheRoot;
 
     // create install directory and link it to the toolcache directory
-    console.log("writing .keep");
     fs.writeFileSync(".keep", "");
-    console.log("creating toolcache dir");
     let actualToolCacheDir = await tc.cacheFile(".keep", ".keep", "MATLAB", release.version);
-    console.log("removing .keep");
     io.rmRF(".keep");
     let defaultToolCacheDir = actualToolCacheDir.replace(actualToolCacheRoot, defaultToolCacheRoot);
-    console.log("make linked");
     fs.mkdirSync(path.dirname(defaultToolCacheDir), {recursive: true});
-    console.log("symlink");
     fs.symlinkSync(actualToolCacheDir, defaultToolCacheDir, 'junction');
 
     // required for github actions to make the cacheDir persistent

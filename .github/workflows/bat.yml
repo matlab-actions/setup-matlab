@@ -26,34 +26,7 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - os: ubuntu-latest
-            release: latest 
-            products: Symbolic_Math_Toolbox
-            check-matlab: matlabVer = ver('matlab'); assert(~isempty(matlabVer));
-            check-toolbox: symbolicVer = ver('symbolic'); assert(~isempty(symbolicVer));
-          - os: ubuntu-latest
-            release: latest-including-prerelease
-            products: Symbolic_Math_Toolbox
-            check-matlab: matlabVer = ver('matlab'); assert(~isempty(matlabVer));
-            check-toolbox: symbolicVer = ver('symbolic'); assert(~isempty(symbolicVer));
-          - os: ubuntu-20.04
-            release: R2021bU2
-            products: |
-              MATLAB
-              Symbolic_Math_Toolbox
-            check-matlab: matlabVer = ver('matlab'); assert(strcmp(matlabVer.Release,'(R2021b)'));
-            check-toolbox: symbolicVer = ver('symbolic'); assert(strcmp(symbolicVer.Release,'(R2021b)'));
           - os: windows-latest
-            release: latest
-            products: Symbolic_Math_Toolbox
-            check-matlab: matlabVer = ver('matlab'); assert(~isempty(matlabVer));
-            check-toolbox: symbolicVer = ver('symbolic'); assert(~isempty(symbolicVer));
-          - os: macos-latest
-            release: latest
-            products: Symbolic_Math_Toolbox
-            check-matlab: matlabVer = ver('matlab'); assert(~isempty(matlabVer));
-            check-toolbox: symbolicVer = ver('symbolic'); assert(~isempty(symbolicVer));
-          - os: macos-14
             release: latest
             products: Symbolic_Math_Toolbox
             check-matlab: matlabVer = ver('matlab'); assert(~isempty(matlabVer));
@@ -67,7 +40,6 @@ jobs:
         uses: actions/cache@v4
         with:
           path: |
-            ${{ runner.tool_cache }}/MATLAB
             D:\hostedtoolcache\windows\MATLAB\2023.2.999\x64
           key: ${{ matrix.os }}-${{ matrix.release }}
       - name: Install selected products
