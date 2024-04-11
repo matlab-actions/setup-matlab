@@ -37,9 +37,7 @@ async function makeToolcacheDir(platform: string, release: Release): Promise<str
     let toolcacheDir: string;
     if (platform === "win32") {
         toolcacheDir = await makeWindowsHostedToolpath(release)
-            .catch(async () => {
-                return await makeDefaultToolpath(release)
-            });
+            .catch(async () => await makeDefaultToolpath(release));
     } else {
         toolcacheDir = await makeDefaultToolpath(release);
     }
