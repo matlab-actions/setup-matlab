@@ -46,20 +46,20 @@ describe("matlab tests", () => {
 
         it("returns toolpath if in toolcache", async () => {
             findMock.mockReturnValue("/opt/hostedtoolcache/matlab/r2022b");
-            await expect(matlab.makeToolcacheDir(release, platform)).resolves.toMatchObject(["/opt/hostedtoolcache/matlab/r2022b", true]);
+            await expect(matlab.getToolcacheDir(platform, release)).resolves.toMatchObject(["/opt/hostedtoolcache/matlab/r2022b", true]);
             expect(infoMock).toHaveBeenCalledTimes(1);
         });
     
         it("creates cache and returns default path for linux", async () => {
             findMock.mockReturnValue("");
             cacheFileMock.mockReturnValue("/opt/hostedtoolcache/matlab/r2022b");
-            await expect(matlab.makeToolcacheDir(release, platform)).resolves.toMatchObject(["/opt/hostedtoolcache/matlab/r2022b", false]);
+            await expect(matlab.getToolcacheDir(platform, release)).resolves.toMatchObject(["/opt/hostedtoolcache/matlab/r2022b", false]);
         });
 
         it("creates cache and returns default path for mac", async () => {
             findMock.mockReturnValue("");
             cacheFileMock.mockReturnValue("/opt/hostedtoolcache/matlab/r2022b");
-            await expect(matlab.makeToolcacheDir(release, "darwin")).resolves.toMatchObject(["/opt/hostedtoolcache/matlab/r2022b/MATLAB.app", false]);
+            await expect(matlab.getToolcacheDir("darwin", release)).resolves.toMatchObject(["/opt/hostedtoolcache/matlab/r2022b/MATLAB.app", false]);
         });
 
         describe("windows performance workaround", () => {
@@ -94,7 +94,7 @@ describe("matlab tests", () => {
                 let mkdirSyncSpy = jest.spyOn(fs, "mkdirSync").mockImplementation(() => "");
                 let symlinkSyncSpy = jest.spyOn(fs, "symlinkSync").mockImplementation(() => {});
 
-                await expect(matlab.makeToolcacheDir(release, "win32")).resolves.toMatchObject([expectedToolcacheDir, false]);
+                await expect(matlab.getToolcacheDir("win32", release)).resolves.toMatchObject([expectedToolcacheDir, false]);
                 expect(existsSyncSpy).toHaveBeenCalledTimes(2);
                 expect(mkdirSyncSpy).toHaveBeenCalledTimes(1);
                 expect(symlinkSyncSpy).toHaveBeenCalledTimes(2);
@@ -104,26 +104,26 @@ describe("matlab tests", () => {
                 let expectedToolcacheDir = "C:\\hostedtoolcache\\windows\\matlab\\r2022b";
                 process.env["AGENT_ISSELFHOSTED"] = "1";
                 process.env["RUNNER_ENVIRONMENT"] = "self-hosted";
-                await expect(matlab.makeToolcacheDir(release, "win32")).resolves.toMatchObject([expectedToolcacheDir, false]);
+                await expect(matlab.getToolcacheDir("win32", release)).resolves.toMatchObject([expectedToolcacheDir, false]);
             });
 
             it("uses default toolcache directory toolcache directory is not defined", async () => {
                 let expectedToolcacheDir = "C:\\hostedtoolcache\\windows\\matlab\\r2022b";
                 process.env["RUNNER_TOOL_CACHE"] = '';
                 cacheFileMock.mockReturnValue(expectedToolcacheDir);
-                await expect(matlab.makeToolcacheDir(release, "win32")).resolves.toMatchObject([expectedToolcacheDir, false]);
+                await expect(matlab.getToolcacheDir("win32", release)).resolves.toMatchObject([expectedToolcacheDir, false]);
             });
 
             it("uses default toolcache directory if d: drive doesn't exist", async () => {
                 jest.spyOn(fs, "existsSync").mockReturnValue(false);
                 let expectedToolcacheDir = "C:\\hostedtoolcache\\windows\\matlab\\r2022b";
-                await expect(matlab.makeToolcacheDir(release, "win32")).resolves.toMatchObject([expectedToolcacheDir, false]);
+                await expect(matlab.getToolcacheDir("win32", release)).resolves.toMatchObject([expectedToolcacheDir, false]);
             });
 
             it("uses default toolcache directory if c: drive doesn't exist", async () => {
                 jest.spyOn(fs, "existsSync").mockReturnValueOnce(true).mockReturnValue(false);
                 let expectedToolcacheDir = "C:\\hostedtoolcache\\windows\\matlab\\r2022b";
-                await expect(matlab.makeToolcacheDir(release, "win32")).resolves.toMatchObject([expectedToolcacheDir, false]);
+                await expect(matlab.getToolcacheDir("win32", release)).resolves.toMatchObject([expectedToolcacheDir, false]);
 
             });
         });

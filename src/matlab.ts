@@ -18,25 +18,33 @@ export interface Release {
     isPrerelease: boolean;
 }
 
-export async function makeToolcacheDir(release: Release, platform: string): Promise<[string, boolean]> {
+export async function getToolcacheDir(platform: string, release: Release): Promise<[string, boolean]> {
     let toolpath: string = tc.find("MATLAB", release.version);
     let alreadyExists = false;
     if (toolpath) {
         core.info(`Found MATLAB ${release.name} in cache at ${toolpath}.`);
         alreadyExists = true;
     } else {
-        if (platform === "win32") {
-            toolpath = await windowsHostedToolpath(release).catch(async () => {
-                return await defaultToolpath(release, platform);
-            });
-        } else {
-            toolpath = await defaultToolpath(release, platform);
-        }
+        toolpath = await makeToolcacheDir(platform, release);
+    }
+    if (platform == "darwin") {
+        toolpath = toolpath + "/MATLAB.app";
     }
     return [toolpath, alreadyExists]
 }
 
-async function windowsHostedToolpath(release: Release): Promise<string> {
+async function makeToolcacheDir(platform: string, release: Release): Promise<string> {
+    let toolcacheDir: string;
+    if (platform === "win32") {
+        toolcacheDir = await makeWindowsHostedToolpath(release)
+            .catch(async () => await makeDefaultToolpath(release));
+    } else {
+        toolcacheDir = await makeDefaultToolpath(release);
+    }
+    return toolcacheDir;
+}
+
+async function makeWindowsHostedToolpath(release: Release): Promise<string> {
     // bail early if not on a github hosted runner
     if (process.env['RUNNER_ENVIRONMENT'] !== 'github-hosted' && process.env['AGENT_ISSELFHOSTED'] === '1') {
         return Promise.reject();
@@ -55,30 +63,36 @@ async function windowsHostedToolpath(release: Release): Promise<string> {
     const actualToolCacheRoot = defaultToolCacheRoot.replace("C:", "D:").replace("c:", "d:");
     process.env['RUNNER_TOOL_CACHE'] = actualToolCacheRoot;
 
-    // create install directory and link it to the toolcache directory
-    fs.writeFileSync(".keep", "");
-    let actualToolCacheDir = await tc.cacheFile(".keep", ".keep", "MATLAB", release.version);
-    io.rmRF(".keep");
-    let defaultToolCacheDir = actualToolCacheDir.replace(actualToolCacheRoot, defaultToolCacheRoot);
-    fs.mkdirSync(path.dirname(defaultToolCacheDir), {recursive: true});
-    fs.symlinkSync(actualToolCacheDir, defaultToolCacheDir, 'junction');
+    try {
+        // create install directory and link it to the toolcache directory
+        fs.writeFileSync(".keep", "");
+        let actualToolCacheDir = await tc.cacheFile(".keep", ".keep", "MATLAB", release.version);
+        await io.rmRF(".keep");
+        let defaultToolCacheDir = actualToolCacheDir.replace(actualToolCacheRoot, defaultToolCacheRoot);
 
-    // required for github actions to make the cacheDir persistent
-    const actualToolCacheCompleteFile = `${actualToolCacheDir}.complete`;
-    const defaultToolCacheCompleteFile = `${defaultToolCacheDir}.complete`;
-    fs.symlinkSync(actualToolCacheCompleteFile, defaultToolCacheCompleteFile, 'file');
+        // remove cruft from incomplete installs
+        await io.rmRF(defaultToolCacheDir);
 
-    process.env['RUNNER_TOOL_CACHE'] = defaultToolCacheRoot;
-    return actualToolCacheDir;
+        // link to actual tool cache directory
+        fs.mkdirSync(path.dirname(defaultToolCacheDir), {recursive: true});
+        fs.symlinkSync(actualToolCacheDir, defaultToolCacheDir, 'junction');
+
+        // .complete file is required for github actions to make the cacheDir persistent
+        const actualToolCacheCompleteFile = `${actualToolCacheDir}.complete`;
+        const defaultToolCacheCompleteFile = `${defaultToolCacheDir}.complete`;
+        await io.rmRF(defaultToolCacheCompleteFile);
+        fs.symlinkSync(actualToolCacheCompleteFile, defaultToolCacheCompleteFile, 'file');
+
+        return actualToolCacheDir;
+    } finally {
+        process.env['RUNNER_TOOL_CACHE'] = defaultToolCacheRoot;
+    }
 }
 
-async function defaultToolpath(release: Release, platform: string): Promise<string> {
+async function makeDefaultToolpath(release: Release): Promise<string> {
     fs.writeFileSync(".keep", "");
     let toolpath = await tc.cacheFile(".keep", ".keep", "MATLAB", release.version);
-    io.rmRF(".keep");
-    if (platform == "darwin") {
-        toolpath = toolpath + "/MATLAB.app";
-    }
+    await io.rmRF(".keep");
     return toolpath
 }
 
@@ -199,7 +213,7 @@ export async function installSystemDependencies(platform: string, architecture: 
 
 async function installAppleSiliconJdk() {
     const jdkPath = path.join(process.env["RUNNER_TEMP"] ?? "", "jdk.pkg");
-    io.rmRF(jdkPath);
+    await io.rmRF(jdkPath);
     const jdk = await tc.downloadTool(properties.appleSiliconJdkUrl, jdkPath);
     const exitCode = await exec.exec(`sudo installer -pkg "${jdk}" -target /`);
     if (exitCode !== 0) {

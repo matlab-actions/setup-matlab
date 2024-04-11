@@ -18,7 +18,7 @@ afterEach(() => {
 describe("install procedure", () => {
     let matlabInstallSystemDependenciesMock: jest.Mock;
     let matlabGetReleaseInfoMock: jest.Mock;
-    let matlabMakeToolcacheDirMock: jest.Mock;
+    let matlabGetToolcacheDirMock: jest.Mock;
     let matlabSetupBatchMock: jest.Mock;
     let mpmSetupMock: jest.Mock;
     let mpmInstallMock: jest.Mock;
@@ -42,7 +42,7 @@ describe("install procedure", () => {
     beforeEach(() => {
         matlabInstallSystemDependenciesMock = matlab.installSystemDependencies as jest.Mock;
         matlabGetReleaseInfoMock = matlab.getReleaseInfo as jest.Mock;
-        matlabMakeToolcacheDirMock = matlab.makeToolcacheDir as jest.Mock;
+        matlabGetToolcacheDirMock = matlab.getToolcacheDir as jest.Mock;
         matlabSetupBatchMock = matlab.setupBatch as jest.Mock;
         mpmSetupMock = mpm.setup as jest.Mock;
         mpmInstallMock = mpm.install as jest.Mock;
@@ -56,7 +56,7 @@ describe("install procedure", () => {
             return func();
         });
         matlabGetReleaseInfoMock.mockResolvedValue(releaseInfo);
-        matlabMakeToolcacheDirMock.mockResolvedValue(["/opt/hostedtoolcache/MATLAB/9.13.0/x64", false]);
+        matlabGetToolcacheDirMock.mockResolvedValue(["/opt/hostedtoolcache/MATLAB/9.13.0/x64", false]);
     });
 
     it("ideally works", async () => {
@@ -70,7 +70,7 @@ describe("install procedure", () => {
     });
 
     it("NoOp on existing install", async () => {
-        matlabMakeToolcacheDirMock.mockResolvedValue(["/opt/hostedtoolcache/MATLAB/9.13.0/x64", true]);
+        matlabGetToolcacheDirMock.mockResolvedValue(["/opt/hostedtoolcache/MATLAB/9.13.0/x64", true]);
         await expect(doInstall()).resolves.toBeUndefined();
         expect(mpmInstallMock).toHaveBeenCalledTimes(0);
         expect(addPathMock).toHaveBeenCalledTimes(1);
