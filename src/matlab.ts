@@ -65,27 +65,36 @@ async function makeWindowsHostedToolpath(release: Release): Promise<string> {
     const actualToolCacheRoot = defaultToolCacheRoot.replace("C:", "D:").replace("c:", "d:");
     process.env['RUNNER_TOOL_CACHE'] = actualToolCacheRoot;
 
-    // create install directory and link it to the toolcache directory
-    fs.writeFileSync(".keep", "");
-    let actualToolCacheDir = await tc.cacheFile(".keep", ".keep", "MATLAB", release.version);
-    io.rmRF(".keep");
-    let defaultToolCacheDir = actualToolCacheDir.replace(actualToolCacheRoot, defaultToolCacheRoot);
-    fs.mkdirSync(path.dirname(defaultToolCacheDir), {recursive: true});
-    fs.symlinkSync(actualToolCacheDir, defaultToolCacheDir, 'junction');
+    try {
+        // create install directory and link it to the toolcache directory
+        fs.writeFileSync(".keep", "");
+        let actualToolCacheDir = await tc.cacheFile(".keep", ".keep", "MATLAB", release.version);
+        await io.rmRF(".keep");
+        let defaultToolCacheDir = actualToolCacheDir.replace(actualToolCacheRoot, defaultToolCacheRoot);
 
-    // required for github actions to make the cacheDir persistent
-    const actualToolCacheCompleteFile = `${actualToolCacheDir}.complete`;
-    const defaultToolCacheCompleteFile = `${defaultToolCacheDir}.complete`;
-    fs.symlinkSync(actualToolCacheCompleteFile, defaultToolCacheCompleteFile, 'file');
+        // remove cruft from incomplete installs
+        await io.rmRF(defaultToolCacheDir);
 
-    process.env['RUNNER_TOOL_CACHE'] = defaultToolCacheRoot;
-    return actualToolCacheDir;
+        // link to actual tool cache directory
+        fs.mkdirSync(path.dirname(defaultToolCacheDir), {recursive: true});
+        fs.symlinkSync(actualToolCacheDir, defaultToolCacheDir, 'junction');
+
+        // .complete file is required for github actions to make the cacheDir persistent
+        const actualToolCacheCompleteFile = `${actualToolCacheDir}.complete`;
+        const defaultToolCacheCompleteFile = `${defaultToolCacheDir}.complete`;
+        await io.rmRF(defaultToolCacheCompleteFile);
+        fs.symlinkSync(actualToolCacheCompleteFile, defaultToolCacheCompleteFile, 'file');
+
+        return actualToolCacheDir;
+    } finally {
+        process.env['RUNNER_TOOL_CACHE'] = defaultToolCacheRoot;
+    }
 }
 
 async function makeDefaultToolpath(release: Release): Promise<string> {
     fs.writeFileSync(".keep", "");
     let toolpath = await tc.cacheFile(".keep", ".keep", "MATLAB", release.version);
-    io.rmRF(".keep");
+    await io.rmRF(".keep");
     return toolpath
 }
 
@@ -206,7 +215,7 @@ export async function installSystemDependencies(platform: string, architecture: 
 
 async function installAppleSiliconJdk() {
     const jdkPath = path.join(process.env["RUNNER_TEMP"] ?? "", "jdk.pkg");
-    io.rmRF(jdkPath);
+    await io.rmRF(jdkPath);
     const jdk = await tc.downloadTool(properties.appleSiliconJdkUrl, jdkPath);
     const exitCode = await exec.exec(`sudo installer -pkg "${jdk}" -target /`);
     if (exitCode !== 0) {
