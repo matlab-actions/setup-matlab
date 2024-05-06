@@ -24,7 +24,7 @@ export async function install(platform: string, architecture: string, release: s
         return Promise.reject(Error(`Release '${releaseInfo.name}' is not supported. Use 'R2020b' or a later release.`));
     }
     if (platform === "darwin" && architecture === "arm64" && releaseInfo.name < "r2023b") {
-        architecture = "x86";
+        architecture = "x64";
     }
 
     await core.group("Preparing system for MATLAB", async () =>
