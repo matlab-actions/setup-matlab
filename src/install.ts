@@ -23,32 +23,34 @@ export async function install(platform: string, architecture: string, release: s
     if (releaseInfo.name < "r2020b") {
         return Promise.reject(Error(`Release '${releaseInfo.name}' is not supported. Use 'R2020b' or a later release.`));
     }
-    if (platform === "darwin" && architecture === "arm64" && releaseInfo.name < "r2023b") {
-        architecture = "x64";
-    }
 
     await core.group("Preparing system for MATLAB", async () =>
         matlab.installSystemDependencies(platform, architecture, releaseInfo.name)
     );
 
     await core.group("Setting up MATLAB", async () => {
+        let matlabArch = architecture;
+        if (platform === "darwin" && architecture === "arm64" && releaseInfo.name < "r2023b") {
+            matlabArch = "x64";
+        }
+
         let [destination, alreadyExists]: [string, boolean] = await matlab.getToolcacheDir(platform, releaseInfo);
         let cacheHit = false;
 
         if (useCache) {
             const supportFilesDir = matlab.getSupportPackagesPath(platform, releaseInfo.name);
-            cacheHit = await cache.restoreMATLAB(releaseInfo, platform, architecture, products, destination, supportFilesDir);
+            cacheHit = await cache.restoreMATLAB(releaseInfo, platform, matlabArch, products, destination, supportFilesDir);
         }
 
         if (!alreadyExists && !cacheHit) {
-            const mpmPath: string = await mpm.setup(platform, architecture);
+            const mpmPath: string = await mpm.setup(platform, matlabArch);
             await mpm.install(mpmPath, releaseInfo, products, destination);
         }
 
         core.addPath(path.join(destination, "bin"));
         core.setOutput('matlabroot', destination);
 
-        await matlab.setupBatch(platform, architecture);
+        await matlab.setupBatch(platform, matlabArch);
     });
 
     return;
