@@ -333,7 +333,6 @@ describe("matlab tests", () => {
 
             it(`works on mac with apple silicon <R2023b`, async () => {
                 const platform = "darwin";
-                tcDownloadToolMock.mockResolvedValue("java.jdk");
                 execMock.mockResolvedValue(0);
                 await expect(
                     matlab.installSystemDependencies(platform, "arm64", "r2023a")

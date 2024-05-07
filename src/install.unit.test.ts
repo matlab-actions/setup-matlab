@@ -136,8 +136,8 @@ describe("install procedure", () => {
             updateNumber: "latest"    
         });
         await expect(install.install("darwin", "arm64", "r2023a", products, true)).resolves.toBeUndefined();
-        expect(matlabInstallSystemDependenciesMock).toHaveBeenCalledWith("darwin","arm64","r2023a");
-        expect(matlabSetupBatchMock).toHaveBeenCalledWith("darwin","x64");
-        expect(mpmSetupMock).toHaveBeenCalledWith("darwin","x64");
+        expect(matlabInstallSystemDependenciesMock).toHaveBeenCalledWith("darwin", "arm64", "r2023a");
+        expect(matlabSetupBatchMock).toHaveBeenCalledWith("darwin", "x64");
+        expect(mpmSetupMock).toHaveBeenCalledWith("darwin", "x64");
     });
 });
