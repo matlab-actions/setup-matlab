@@ -128,4 +128,16 @@ describe("install procedure", () => {
         expect(mpmSetupMock).toHaveBeenCalledTimes(1);
         expect(mpmInstallMock).toHaveBeenCalledTimes(1);
     });
+
+    it("installs Intel version on Apple silicon prior to R2023b", async () => {
+        matlabGetReleaseInfoMock.mockResolvedValue({
+            name: "r2023a",
+            version: "9.14.0",
+            updateNumber: "latest"    
+        });
+        await expect(install.install("darwin", "arm64", "r2023a", products, useCache)).resolves.toBeUndefined();
+        expect(matlabInstallSystemDependenciesMock).toHaveBeenCalledWith("darwin","x64","r2023a");
+        expect(matlabSetupBatchMock).toHaveBeenCalledWith("darwin","x64");
+        expect(mpmSetupMock).toHaveBeenCalledWith("darwin","x64");
+    });
 });

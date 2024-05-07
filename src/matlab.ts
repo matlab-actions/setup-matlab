@@ -207,7 +207,18 @@ export async function installSystemDependencies(platform: string, architecture: 
     if (platform === "linux") {
         return script.downloadAndRunScript(platform, properties.matlabDepsUrl, [release]);
     } else if (platform === "darwin" && architecture === "arm64") {
-        return installAppleSiliconJdk();
+        if (release < "r2023b") {
+            return installAppleSiliconRosetta();
+        } else {
+            return installAppleSiliconJdk();
+        }
+    }
+}
+
+async function installAppleSiliconRosetta() {
+    const exitCode = await exec.exec(`sudo softwareupdate --install-rosetta --agree-to-license`);
+    if (exitCode !== 0) {
+        return Promise.reject(Error("Unable to install Rosetta 2."));
     }
 }
 
