@@ -58,6 +58,11 @@ jobs:
             products: Symbolic_Math_Toolbox
             check-matlab: matlabVer = ver('matlab'); assert(~isempty(matlabVer));
             check-toolbox: symbolicVer = ver('symbolic'); assert(~isempty(symbolicVer));
+          - os: macos-14
+            release: R2023a
+            products: Symbolic_Math_Toolbox
+            check-matlab: matlabVer = ver('matlab'); assert(strcmp(matlabVer.Release,'(R2023a)'));
+            check-toolbox: symbolicVer = ver('symbolic'); assert(strcmp(symbolicVer.Release,'(R2023a)'));
     steps:
       - uses: actions/download-artifact@v4
         with:

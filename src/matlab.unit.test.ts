@@ -285,7 +285,7 @@ describe("matlab tests", () => {
         let tcDownloadToolMock: jest.Mock;
         let execMock: jest.Mock;
         const arch = "x64";
-        const release = "R2023b";
+        const release = "r2023b";
 
         beforeEach(() => {
             downloadAndRunScriptMock = script.downloadAndRunScript as jest.Mock;
@@ -329,6 +329,15 @@ describe("matlab tests", () => {
                 ).resolves.toBeUndefined();
                 expect(tcDownloadToolMock).toHaveBeenCalledWith(properties.appleSiliconJdkUrl, expect.anything());
                 expect(execMock).toHaveBeenCalledWith(`sudo installer -pkg "java.jdk" -target /`);
+            });
+
+            it(`works on mac with apple silicon <R2023b`, async () => {
+                const platform = "darwin";
+                execMock.mockResolvedValue(0);
+                await expect(
+                    matlab.installSystemDependencies(platform, "arm64", "r2023a")
+                ).resolves.toBeUndefined();
+                expect(execMock).toHaveBeenCalledWith(`sudo softwareupdate --install-rosetta --agree-to-license`);
             });
         });
 
