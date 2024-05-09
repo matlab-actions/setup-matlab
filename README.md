@@ -28,11 +28,11 @@ jobs:
 Run your MATLAB and Simulink tests in parallel (requires Parallel Computing Toolbox&trade;) using the latest release of the required products on a GitHub-hosted runner. To set up the latest release of MATLAB, Simulink, Simulink Test, and Parallel Computing Toolbox on the runner, specify the **Setup MATLAB** action with its `products` input in your workflow. To run the tests in parallel, specify the [Run MATLAB Tests](https://github.com/matlab-actions/run-tests/) action with its `use-parallel` input specified as `true`.
 
 ```YAML
-name: Run MATLAB and Simulink Tests in Parallel
+name: Run MATLAB and Simulink Tests
 on: [push]
 jobs:
   my-job:
-    name: Run MATLAB and Simulink Tests
+    name: Run Tests in Parallel
     runs-on: ubuntu-latest
     steps:
       - name: Check out repository
@@ -130,7 +130,7 @@ When you define your workflow in the `.github/workflows` directory of your repos
 |-----------|-------------|
 | `release` | <p>(Optional) MATLAB release to set up. You can specify R2021a or a later release. By default, the value of `release` is `latest`, which corresponds to the latest release of MATLAB.</p><p>**Example**: `release: R2023b`<br/>**Example**: `release: latest`</p>
 | `products` | <p>(Optional) Products to set up in addition to MATLAB, specified as a list of product names separated by spaces. You can specify `products` to set up most MathWorks products and support packages. For example, `products: Deep_Learning_Toolbox` sets up Deep Learning Toolbox&trade; in addition to MATLAB.</p><p>The action uses [MATLAB Package Manager](https://github.com/mathworks-ref-arch/matlab-dockerfile/blob/main/MPM.md) (`mpm`) to set up products. For a list of supported products and their formatted names, see [Product Installation Options](https://github.com/mathworks-ref-arch/matlab-dockerfile/blob/main/MPM.md#product-installation-options).</p><p>For an example of how to use the `products` input, see [Run MATLAB and Simulink Tests](#run-matlab-and-simulink-tests).</p><p>**Example**: `products: Simulink`<br/>**Example:** `products: Simulink Deep_Learning_Toolbox`</p>
-| `cache` | <p>(Optional) Option to enable caching with GitHub&reg; Actions, specified as `false` or `true`. By default, the value is `false` and the action does not store MATLAB and the specified products in a GitHub Actions cache for future use. For more information about caching with GitHub Actions, see [Caching dependencies to speed up workflows](https://docs.github.com/en/actions/using-workflows/caching-dependencies-to-speed-up-workflows).</p><p>**Example**: `cache: true`</p>
+| `cache` | <p>(Optional) Option to enable caching with GitHub Actions, specified as `false` or `true`. By default, the value is `false` and the action does not store MATLAB and the specified products in a GitHub Actions cache for future use. For more information about caching with GitHub Actions, see [Caching dependencies to speed up workflows](https://docs.github.com/en/actions/using-workflows/caching-dependencies-to-speed-up-workflows).</p><p>**Example**: `cache: true`</p>
 
 #### Licensing
 Product licensing for your workflow depends on your project visibility as well as the type of products to set up:
