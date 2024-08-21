@@ -26,6 +26,9 @@ describe("install procedure", () => {
     let setOutputMock: jest.Mock;
     let restoreMATLABMock: jest.Mock;
 
+    const runnerEnv = "github-hosted";
+    const agentIsSelfHosted = "0";
+
     const platform = "linux";
     const arch = "x64";
     const release = "latest";
@@ -57,6 +60,9 @@ describe("install procedure", () => {
         });
         matlabGetReleaseInfoMock.mockResolvedValue(releaseInfo);
         matlabGetToolcacheDirMock.mockResolvedValue(["/opt/hostedtoolcache/MATLAB/9.13.0/x64", false]);
+
+        process.env["RUNNER_ENVIRONMENT"] = runnerEnv;
+        process.env["AGENT_ISSELFHOSTED"] = agentIsSelfHosted;
     });
 
     it("ideally works", async () => {
@@ -89,6 +95,17 @@ describe("install procedure", () => {
     it("rejects for invalid MATLAB version", async () => {
         matlabGetReleaseInfoMock.mockRejectedValue(Error("oof"));
         await expect(doInstall()).rejects.toBeDefined();
+    });
+
+    it("sets up dependencies for github-hosted runners", async () => {
+        await doInstall();
+        expect(matlabInstallSystemDependenciesMock).toHaveBeenCalled();
+    });
+
+    it("does not set up dependencies for self-hosted runners", async () => {
+        process.env["RUNNER_ENVIRONMENT"] = "self-hosted";
+        await doInstall();
+        expect(matlabInstallSystemDependenciesMock).not.toHaveBeenCalled();
     });
 
     it("rejects when the setup deps fails", async () => {
