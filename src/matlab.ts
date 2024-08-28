@@ -125,9 +125,11 @@ export async function setupBatch(platform: string, architecture: string) {
     let matlabBatch: string = await tc.downloadTool(matlabBatchUrl);
     let cachedPath = await tc.cacheFile(matlabBatch, `matlab-batch${matlabBatchExt}`, "matlab-batch", "v1");
     core.addPath(cachedPath);
-    const exitCode = await exec.exec(`chmod +x ${path.join(cachedPath, 'matlab-batch'+matlabBatchExt)}`);
-    if (exitCode !== 0) {
-        return Promise.reject(Error("Unable to make matlab-batch executable."));
+    if (platform !== "win32") {
+        const exitCode = await exec.exec(`chmod +x ${path.join(cachedPath, 'matlab-batch'+matlabBatchExt)}`);
+        if (exitCode !== 0) {
+            return Promise.reject(Error("Unable to make matlab-batch executable."));
+        }
     }
     return
 }

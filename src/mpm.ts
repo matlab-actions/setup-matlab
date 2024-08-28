@@ -26,7 +26,6 @@ export async function setup(platform: string, architecture: string): Promise<str
             } else {
                 mpmUrl = properties.mpmRootUrl + "maca64/mpm";
             }
-            await exec.exec(`sudo launchctl limit maxfiles 65536 200000`, undefined, {ignoreReturnCode: true}); // g3185941
             break;
         default:
             return Promise.reject(Error(`This action is not supported on ${platform} runners using the ${architecture} architecture.`));
@@ -39,9 +38,11 @@ export async function setup(platform: string, architecture: string): Promise<str
     let mpmDest = path.join(runner_temp, `mpm${ext}`);
     let mpm: string = await tc.downloadTool(mpmUrl, mpmDest);
 
-    const exitCode = await exec.exec(`chmod +x "${mpm}"`);
-    if (exitCode !== 0) {
-        return Promise.reject(Error("Unable to set up mpm."));
+    if (platform !== "win32") {
+        const exitCode = await exec.exec(`chmod +x "${mpm}"`);
+        if (exitCode !== 0) {
+            return Promise.reject(Error("Unable to set up mpm."));
+        }
     }
     return mpm
 }
