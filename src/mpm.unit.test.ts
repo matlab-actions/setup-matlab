@@ -2,6 +2,7 @@
 
 import * as exec from "@actions/exec";
 import * as tc from "@actions/tool-cache";
+import * as io from "@actions/io";
 import * as path from "path";
 import * as mpm from "./mpm";
 import * as script from "./script";
@@ -9,6 +10,7 @@ import * as script from "./script";
 jest.mock("@actions/core");
 jest.mock("@actions/exec");
 jest.mock("@actions/tool-cache");
+jest.mock("@actions/io");
 jest.mock("./script");
 
 afterEach(() => {
@@ -101,11 +103,13 @@ describe("setup mpm", () => {
 
 describe("mpm install", () => {
     let execMock: jest.Mock;
+    let rmRFMock: jest.Mock;
     const mpmPath = "mpm";
     const releaseInfo = {name: "r2022b", version: "9.13.0", update: "", isPrerelease: false};
     const mpmRelease = "r2022b";
     beforeEach(() => {
         execMock = exec.exec as jest.Mock;
+        rmRFMock = io.rmRF as jest.Mock;
     });
 
     it("works with multiline products list", async () => {
@@ -161,10 +165,19 @@ describe("mpm install", () => {
         expect(execMock.mock.calls[0][1]).toMatchObject(expectedMpmArgs);
     });
 
-    it("rejects on failed install", async () => {
+    it("rejects and cleans on mpm rejection", async () => {
+        const destination = "/opt/matlab";
+        const products = ["MATLAB", "Compiler"];
+        execMock.mockRejectedValue(1);
+        await expect(mpm.install(mpmPath, releaseInfo, products, destination)).rejects.toBeDefined();
+        expect(rmRFMock).toHaveBeenCalledWith(destination);
+    });
+
+    it("rejects and cleans on failed install", async () => {
         const destination = "/opt/matlab";
         const products = ["MATLAB", "Compiler"];
         execMock.mockResolvedValue(1);
         await expect(mpm.install(mpmPath, releaseInfo, products, destination)).rejects.toBeDefined();
+        expect(rmRFMock).toHaveBeenCalledWith(destination);
     });
 });
