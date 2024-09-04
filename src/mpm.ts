@@ -3,6 +3,7 @@
 import * as exec from "@actions/exec";
 import * as tc from "@actions/tool-cache";
 import {rmRF} from "@actions/io";
+import {info} from "@actions/core";
 import * as path from "path";
 import * as matlab from "./matlab";
 import properties from "./properties.json";
@@ -67,9 +68,12 @@ export async function install(mpmPath: string, release: matlab.Release, products
     }
     mpmArguments = mpmArguments.concat("--products", ...parsedProducts);
 
+    info('Calling mpm');
     const exitCode = await exec.exec(mpmPath, mpmArguments);
+    info(`Exit code: ${exitCode}`);
     if (exitCode !== 0) {
         // Fully remove failed MATLAB installation for self-hosted runners
+        info(`Removing dest ${destination}`);
         await rmRF(destination);
 
         return Promise.reject(Error(`Script exited with non-zero code ${exitCode}`));
