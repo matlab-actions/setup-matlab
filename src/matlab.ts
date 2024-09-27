@@ -139,7 +139,7 @@ export async function getReleaseInfo(release: string): Promise<Release> {
     const trimmedRelease = release.toLowerCase().trim()
     if (trimmedRelease === "latest" || trimmedRelease === "latest-including-prerelease") {
         try {
-            const client: http.HttpClient = new http.HttpClient();
+            const client: http.HttpClient = new http.HttpClient(undefined, [], { allowRetries: true, maxRetries: 3 });
             const latestResp = await client.get(`${properties.matlabReleaseInfoUrl}${trimmedRelease}`);
             name = await latestResp.readBody();    
         }
