@@ -89,3 +89,12 @@ jobs:
         with:
           release: ${{ matrix.release }}
           products: ${{ matrix.products }}
+      - name: Call setup MATLAB again with different release # should not error as in issue 130
+        uses: ./
+        with:
+          release: R2023b
+      - name: Check MATLAB version
+        uses: matlab-actions/run-command@v2
+        with:
+          command: matlabVer = ver('matlab'); assert(strcmp(matlabVer.Release,'(R2023b)'));
+  
