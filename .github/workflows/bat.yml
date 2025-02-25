@@ -48,6 +48,7 @@ jobs:
             products: Symbolic_Math_Toolbox
             check-matlab: matlabVer = ver('matlab'); assert(~isempty(matlabVer));
             check-toolbox: symbolicVer = ver('symbolic'); assert(~isempty(symbolicVer));
+          # Added pauses in the check commands on macos until g3258674 is fixed
           - os: macos-latest
             release: latest
             products: Symbolic_Math_Toolbox
