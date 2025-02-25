@@ -36,7 +36,7 @@ jobs:
             products: Symbolic_Math_Toolbox
             check-matlab: matlabVer = ver('matlab'); assert(~isempty(matlabVer));
             check-toolbox: symbolicVer = ver('symbolic'); assert(~isempty(symbolicVer));
-          - os: ubuntu-20.04
+          - os: ubuntu-22.04
             release: R2021bU2
             products: |
               MATLAB
