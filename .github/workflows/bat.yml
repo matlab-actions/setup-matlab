@@ -52,13 +52,13 @@ jobs:
           - os: macos-latest
             release: latest
             products: Symbolic_Math_Toolbox
-            check-matlab: pause(10); matlabVer = ver('matlab'); assert(~isempty(matlabVer));
-            check-toolbox: pause(10); symbolicVer = ver('symbolic'); assert(~isempty(symbolicVer));
+            check-matlab: matlabVer = ver('matlab'); assert(~isempty(matlabVer));
+            check-toolbox: symbolicVer = ver('symbolic'); assert(~isempty(symbolicVer));
           - os: macos-14
             release: latest
             products: Symbolic_Math_Toolbox
-            check-matlab: pause(10); matlabVer = ver('matlab'); assert(~isempty(matlabVer));
-            check-toolbox: pause(10); symbolicVer = ver('symbolic'); assert(~isempty(symbolicVer));
+            check-matlab: matlabVer = ver('matlab'); assert(~isempty(matlabVer));
+            check-toolbox: symbolicVer = ver('symbolic'); assert(~isempty(symbolicVer));
           - os: macos-14
             release: R2023a
             products: Symbolic_Math_Toolbox
