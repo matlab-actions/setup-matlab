@@ -74,14 +74,17 @@ jobs:
 ```
 
 ### Use MATLAB Batch Licensing Token
-On a GitHub-hosted runner, you need a [MATLAB batch licensing token](https://github.com/mathworks-ref-arch/matlab-dockerfile/blob/main/alternates/non-interactive/MATLAB-BATCH.md#matlab-batch-licensing-token) if your project is private or if your workflow includes transformation products, such as MATLAB Coder&trade; and MATLAB Compiler&trade;. Batch licensing tokens are strings that enable MATLAB to start in noninteractive environments. You can request a token by submitting the [MATLAB Batch Licensing Pilot](https://www.mathworks.com/support/batch-tokens.html) form. 
+When you set up your workflow using the **Install MATLAB** action, you need a [MATLAB batch licensing token](https://github.com/mathworks-ref-arch/matlab-dockerfile/blob/main/alternates/non-interactive/MATLAB-BATCH.md#matlab-batch-licensing-token) if your project is private or if your workflow includes transformation products, such as MATLAB Coder&trade; and MATLAB Compiler&trade;. Batch licensing tokens are strings that enable MATLAB to start in noninteractive environments. You can request a token by submitting the [MATLAB Batch Licensing Pilot](https://www.mathworks.com/support/batch-tokens.html) form. 
 
 To use a MATLAB batch licensing token:
 
 1. Set the token as a secret. For more information about secrets, see [Using secrets in GitHub Actions](https://docs.github.com/en/actions/security-guides/using-secrets-in-github-actions).
 2. Map the secret to an environment variable named `MLM_LICENSE_TOKEN` in your workflow. 
 
-For example, use the latest release of MATLAB on a GitHub-hosted runner to run the tests in your private project. To set up the latest release of MATLAB on the runner, specify the **Setup MATLAB** action in your workflow. To run the tests, specify the [Run MATLAB Tests](https://github.com/matlab-actions/run-tests/) action. In this example, `MyToken` is the name of the secret that holds the batch licensing token.
+For example, define a workflow that uses the latest release of MATLAB on a self-hosted UNIX&reg; runner to run the tests in your private project:
+- To include the dependencies required to run MATLAB on the self-hosted runner, use a container built from the [MATLAB Dependencies Container Image on Docker&reg; Hub](https://hub.docker.com/r/mathworks/matlab-deps). (You do not need to run your workflow in this container if you are using a GitHub-hosted runner.)
+- To install the latest release of MATLAB on the runner, specify the **Setup MATLAB** action in your workflow.
+- To run the tests, specify the the [Run MATLAB Tests](https://github.com/matlab-actions/run-tests/) action. License MATLAB to run the tests by mapping a secret to the `MLM_LICENSE_TOKEN` environment variable in your workflow. In this example, `MyToken` is the name of the secret that holds the batch licensing token.
 
 ```YAML
 name: Use MATLAB Batch Licensing Token
@@ -91,7 +94,8 @@ env:
 jobs:
   my-job:
     name: Run MATLAB Tests in Private Project
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
+    container: mathworks/matlab-deps:latest
     steps:
       - name: Check out repository
         uses: actions/checkout@v4
