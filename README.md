@@ -139,7 +139,7 @@ When you define your workflow in the `.github/workflows` directory of your repos
 | `cache` | <p>(Optional) Option to enable caching with GitHub Actions, specified as `false` or `true`. By default, the value is `false` and the action does not store MATLAB and the specified products in a GitHub Actions cache for future use. For more information about caching with GitHub Actions, see [Caching dependencies to speed up workflows](https://docs.github.com/en/actions/using-workflows/caching-dependencies-to-speed-up-workflows).</p><p>**Example**: `cache: true`</p>
 
 #### Required Software on Self-Hosted Runners
-Before using the **Setup MATLAB** action to set up MATLAB and other MathWorks products on a self-hosted UNIX&reg; runner, verify that the required software is installed on your runner.
+Before using the **Setup MATLAB** action to set up MATLAB and other MathWorks products on a self-hosted UNIX runner, verify that the required software is installed on your runner.
 
 ##### Linux
 If you are using a Linux runner, verify that the following software is installed on your runner:
