@@ -2,6 +2,8 @@
 
 The [Setup MATLAB](#set-up-matlab) action enables you to set up MATLAB&reg; and other MathWorks&reg; products on a [GitHub&reg;-hosted](https://docs.github.com/en/actions/using-github-hosted-runners/about-github-hosted-runners/about-github-hosted-runners) (Linux&reg;, Windows&reg;, or macOS) runner or [self-hosted](https://docs.github.com/en/actions/hosting-your-own-runners/managing-self-hosted-runners/about-self-hosted-runners) (Linux or macOS) runner. When you specify this action as part of your workflow, the action sets up your preferred MATLAB release (R2021a or later) on the runner. If you do not specify a release, the action sets up the latest release of MATLAB. As part of the setup process, the action prepends MATLAB to the `PATH` system environment variable.
 
+>**Note:** The **Setup MATLAB** action automatically includes the dependencies required to run MATLAB and other MathWorks products only for GitHub-hosted runners. If you are using a self-hosted runner, you are responsible for making the required dependencies available on your runner. For details, see [Required Software on Self-Hosted Runners](#required-software-on-self-hosted-runners).
+
 ## Examples
 Once you set up MATLAB on a runner, you can build and test your MATLAB project as part of your workflow. To execute code on the runner, include the [Run MATLAB Build](https://github.com/matlab-actions/run-build/), [Run MATLAB Tests](https://github.com/matlab-actions/run-tests/), or [Run MATLAB Command](https://github.com/matlab-actions/run-command/) action in your workflow.
 
