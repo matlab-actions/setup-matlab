@@ -149,7 +149,7 @@ If you are using a Linux runner, verify that the following software is installed
 ##### macOS
 If you are using a macOS runner with an Apple silicon processor, verify that Java&reg; Runtime Environment (JRE&trade;) is installed on your runner. For information about this requirement and to get a compatible JRE version, see [MATLAB on Apple Silicon Macs](https://www.mathworks.com/support/requirements/apple-silicon.html).
 
->**Tip:** One convenient way to include the required dependencies on a self-hosted runner is to specify the [MATLAB Dependencies Container Image on Docker&reg; Hub](https://hub.docker.com/r/mathworks/matlab-deps) in your workflow. For an example, see [Use MATLAB Batch Licensing Token](#use-matlab-batch-licensing-token).
+>**Tip:** One convenient way to include the required dependencies on a self-hosted runner is to specify the [MATLAB Dependencies Container Image on Docker&reg; Hub](https://hub.docker.com/r/mathworks/matlab-deps) in your workflow.
 
 #### Licensing
 Product licensing for your workflow depends on your project visibility as well as the type of products to set up:
