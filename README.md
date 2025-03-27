@@ -1,8 +1,8 @@
 # Action for Setting Up MATLAB
 
-The [Setup MATLAB](#set-up-matlab) action enables you to set up MATLAB&reg; and other MathWorks&reg; products on a [GitHub&reg;-hosted](https://docs.github.com/en/actions/using-github-hosted-runners/about-github-hosted-runners/about-github-hosted-runners) (Linux&reg;, Windows&reg;, or macOS) runner or [self-hosted](https://docs.github.com/en/actions/hosting-your-own-runners/managing-self-hosted-runners/about-self-hosted-runners) (Linux or macOS) runner. When you specify this action as part of your workflow, the action sets up your preferred MATLAB release (R2021a or later) on the runner. If you do not specify a release, the action sets up the latest release of MATLAB. As part of the setup process, the action prepends MATLAB to the `PATH` system environment variable.
+The [Setup MATLAB](#set-up-matlab) action enables you to set up MATLAB&reg; and other MathWorks&reg; products on a [GitHub&reg;-hosted](https://docs.github.com/en/actions/using-github-hosted-runners/about-github-hosted-runners/about-github-hosted-runners) (Linux&reg;, Windows&reg;, or macOS) runner or [self-hosted](https://docs.github.com/en/actions/hosting-your-own-runners/managing-self-hosted-runners/about-self-hosted-runners) UNIX&reg; (Linux or macOS) runner. When you specify this action as part of your workflow, the action sets up your preferred MATLAB release (R2021a or later) on the runner. If you do not specify a release, the action sets up the latest release of MATLAB. As part of the setup process, the action prepends MATLAB to the `PATH` system environment variable.
 
->**Note:** The **Setup MATLAB** action automatically includes the dependencies required to run MATLAB and other MathWorks products only for GitHub-hosted runners. If you are using a self-hosted runner, you are responsible for making the required dependencies available on your runner. For details, see [Required Software on Self-Hosted Runners](#required-software-on-self-hosted-runners).
+>**Note:** For GitHub-hosted runners, the **Setup MATLAB** action automatically includes the dependencies required to run MATLAB and other MathWorks products. However, if you are using a self-hosted runner, you must ensure that the required dependencies are available on your runner. For details, see [Required Software on Self-Hosted Runners](#required-software-on-self-hosted-runners).
 
 ## Examples
 Once you set up MATLAB on a runner, you can build and test your MATLAB project as part of your workflow. To execute code on the runner, include the [Run MATLAB Build](https://github.com/matlab-actions/run-build/), [Run MATLAB Tests](https://github.com/matlab-actions/run-tests/), or [Run MATLAB Command](https://github.com/matlab-actions/run-command/) action in your workflow.
@@ -27,7 +27,7 @@ jobs:
 ```
 
 ### Run Tests in Parallel
-Run your MATLAB and Simulink tests in parallel (requires Parallel Computing Toolbox&trade;) using the latest release of the required products on a GitHub-hosted runner. To set up the latest release of MATLAB, Simulink, Simulink Test, and Parallel Computing Toolbox on the runner, specify the **Setup MATLAB** action with its `products` input in your workflow. To run the tests in parallel, specify the [Run MATLAB Tests](https://github.com/matlab-actions/run-tests/) action with its `use-parallel` input specified as `true`.
+Run your MATLAB and Simulink&reg; tests in parallel (requires Parallel Computing Toolbox&trade;) using the latest release of the required products on a GitHub-hosted runner. To set up the latest release of MATLAB, Simulink, Simulink Test, and Parallel Computing Toolbox on the runner, specify the **Setup MATLAB** action with its `products` input in your workflow. To run the tests in parallel, specify the [Run MATLAB Tests](https://github.com/matlab-actions/run-tests/) action with its `use-parallel` input specified as `true`.
 
 ```YAML
 name: Run Tests in Parallel
@@ -81,9 +81,9 @@ To use a MATLAB batch licensing token:
 1. Set the token as a secret. For more information about secrets, see [Using secrets in GitHub Actions](https://docs.github.com/en/actions/security-guides/using-secrets-in-github-actions).
 2. Map the secret to an environment variable named `MLM_LICENSE_TOKEN` in your workflow. 
 
-For example, define a workflow that runs the tests in your private project by using the latest release of MATLAB on a self-hosted UNIX&reg; runner:
-- To set up the latest release of MATLAB on the self-hosted runner, specify the **Setup MATLAB** action in your workflow. (The runner must include all the dependencies required to run MATLAB.)
-- To run the tests, specify the the [Run MATLAB Tests](https://github.com/matlab-actions/run-tests/) action. License MATLAB to run the tests by mapping a secret to the `MLM_LICENSE_TOKEN` environment variable in your workflow. In this example, `MyToken` is the name of the secret that holds the batch licensing token.
+For example, define a workflow that runs the tests in your private project by using the latest release of MATLAB on a self-hosted UNIX runner:
+- To set up the latest release of MATLAB on the self-hosted UNIX runner, specify the **Setup MATLAB** action in your workflow. (The runner must include all the dependencies required to run MATLAB.)
+- To run the tests, specify the [Run MATLAB Tests](https://github.com/matlab-actions/run-tests/) action. License MATLAB to run the tests by mapping a secret to the `MLM_LICENSE_TOKEN` environment variable in your workflow. In this example, `MyToken` is the name of the secret that holds the batch licensing token.
 
 ```YAML
 name: Use MATLAB Batch Licensing Token
@@ -142,12 +142,12 @@ Before using the **Setup MATLAB** action to set up MATLAB and other MathWorks pr
 ##### Linux
 If you are using a Linux runner, verify that the following software is installed on your runner:
 - Third-party packages required to run the `mpm` command — To view the list of `mpm` dependencies, refer to the Linux section of [Get MATLAB Package Manager](https://www.mathworks.com/help/install/ug/get-mpm-os-command-line.html).
-- All MATLAB dependencies — To view the list of MATLAB dependencies, go to the [MATLAB Dependencies](https://github.com/mathworks-ref-arch/container-images/tree/main/matlab-deps) repository on GitHub. Then, open the `<release>/<system>/base-dependencies.txt` file for your MATLAB version and your runner's operating system.
+- All MATLAB dependencies — To view the list of MATLAB dependencies, go to the [MATLAB Dependencies](https://github.com/mathworks-ref-arch/container-images/tree/main/matlab-deps) repository on GitHub. Then, open the `<release>/<system>/base-dependencies.txt` file for your MATLAB release and your runner's operating system.
 
 ##### macOS
 If you are using a macOS runner with an Apple silicon processor, verify that Java&reg; Runtime Environment (JRE&trade;) is installed on your runner. For information about this requirement and to get a compatible JRE version, see [MATLAB on Apple Silicon Macs](https://www.mathworks.com/support/requirements/apple-silicon.html).
 
->**Tip:** One convenient way to include the required dependencies on a self-hosted runner is to specify the [MATLAB Dependencies Container Image on Docker&reg; Hub](https://hub.docker.com/r/mathworks/matlab-deps) in your workflow.
+>**Tip:** One convenient way to include the required dependencies on a self-hosted runner is to specify the [MATLAB Dependencies container image on Docker&reg; Hub](https://hub.docker.com/r/mathworks/matlab-deps) in your workflow.
 
 #### Licensing
 Product licensing for your workflow depends on your project visibility as well as the type of products to set up:
