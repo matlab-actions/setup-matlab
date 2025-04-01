@@ -56,7 +56,11 @@ export async function install(platform: string, architecture: string, release: s
         await matlab.setupBatch(platform, matlabArch);
         
         if(platform === "win32") {
-            core.addPath(path.join(destination, "runtime", matlabArch));
+            if(matlabArch === "x86") {
+                core.addPath(path.join(destination, "runtime", "win32"));
+            } else {
+                core.addPath(path.join(destination, "runtime", "win64"));
+            }
         }
     });
 
