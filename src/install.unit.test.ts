@@ -157,4 +157,12 @@ describe("install procedure", () => {
         expect(matlabSetupBatchMock).toHaveBeenCalledWith("darwin", "x64");
         expect(mpmSetupMock).toHaveBeenCalledWith("darwin", "x64");
     });
+
+    it("adds runtime path for Windows platform", async () => {
+        await expect(install.install("win32", arch, release, products, useCache)).resolves.toBeUndefined();
+        expect(addPathMock).toHaveBeenCalledTimes(2);
+        expect(addPathMock).toHaveBeenCalledWith(expect.stringContaining("bin"));
+        expect(addPathMock).toHaveBeenCalledWith(expect.stringContaining("runtime"));
+    });
+
 });
