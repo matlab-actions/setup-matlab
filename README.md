@@ -150,7 +150,7 @@ If you are using a macOS runner with an Apple silicon processor, verify that Jav
 >**Tip:** One convenient way to include the required dependencies on a self-hosted runner is to specify the [MATLAB Dependencies container image on Docker&reg; Hub](https://hub.docker.com/r/mathworks/matlab-deps) in your workflow.
 
 #### Licensing
-Product licensing for your workflow depends on your project visibility as well as the types of products the workflow uses:
+Product licensing for your workflow depends on your project visibility as well as the types of products used by a [Run MATLAB Build](https://github.com/matlab-actions/run-build/), [Run MATLAB Tests](https://github.com/matlab-actions/run-tests/), or [Run MATLAB Command](https://github.com/matlab-actions/run-command/) action in your workflow:
 
 - Public project — The action automatically licenses all products for you, except for transformation products, such as MATLAB Coder and MATLAB Compiler.
 - Private project — The action does not automatically license any products for you. 
