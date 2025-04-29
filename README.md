@@ -74,7 +74,7 @@ jobs:
 ```
 
 ### Use MATLAB Batch Licensing Token
-When you define a workflow using the **Setup MATLAB** action, you need a [MATLAB batch licensing token](https://github.com/mathworks-ref-arch/matlab-dockerfile/blob/main/alternates/non-interactive/MATLAB-BATCH.md#matlab-batch-licensing-token) if your project is private or if your workflow includes transformation products, such as MATLAB Coder&trade; and MATLAB Compiler&trade;. Batch licensing tokens are strings that enable MATLAB to start in noninteractive environments. You can request a token by submitting the [MATLAB Batch Licensing Pilot](https://www.mathworks.com/support/batch-tokens.html) form. 
+When you define a workflow using the **Setup MATLAB** action, you need a [MATLAB batch licensing token](https://github.com/mathworks-ref-arch/matlab-dockerfile/blob/main/alternates/non-interactive/MATLAB-BATCH.md#matlab-batch-licensing-token) if your project is private or if your workflow uses transformation products, such as MATLAB Coder&trade; and MATLAB Compiler&trade;. Batch licensing tokens are strings that enable MATLAB to start in noninteractive environments. You can request a token by submitting the [MATLAB Batch Licensing Pilot](https://www.mathworks.com/support/batch-tokens.html) form. 
 
 To use a MATLAB batch licensing token:
 
@@ -150,11 +150,13 @@ If you are using a macOS runner with an Apple silicon processor, verify that Jav
 >**Tip:** One convenient way to include the required dependencies on a self-hosted runner is to specify the [MATLAB Dependencies container image on Docker&reg; Hub](https://hub.docker.com/r/mathworks/matlab-deps) in your workflow.
 
 #### Licensing
-Product licensing for your workflow depends on your project visibility as well as the type of products to set up:
+Product licensing for your workflow depends on your project visibility as well as the types of products the workflow uses:
 
-- Public project — If your workflow does not include transformation products, such as MATLAB Coder and MATLAB Compiler, then the action automatically licenses any products that you set up. If your workflow includes transformation products, you can request a [MATLAB batch licensing token](https://github.com/mathworks-ref-arch/matlab-dockerfile/blob/main/alternates/non-interactive/MATLAB-BATCH.md#matlab-batch-licensing-token) by submitting the [MATLAB Batch Licensing Pilot](https://www.mathworks.com/support/batch-tokens.html) form.
-- Private project — The action does not automatically license any products for you. You can request a batch licensing token by submitting the [MATLAB Batch Licensing Pilot](https://www.mathworks.com/support/batch-tokens.html) form.
-  
+- Public project — The action automatically licenses all products for you, except for transformation products, such as MATLAB Coder and MATLAB Compiler.
+- Private project — The action does not automatically license any products for you. 
+
+To license products that are not automatically licensed, you can request a [MATLAB batch licensing token](https://github.com/mathworks-ref-arch/matlab-dockerfile/blob/main/alternates/non-interactive/MATLAB-BATCH.md#matlab-batch-licensing-token) by submitting the [MATLAB Batch Licensing Pilot](https://www.mathworks.com/support/batch-tokens.html) form. Batch licensing tokens are strings that enable MATLAB to start in noninteractive environments.
+
 To use a MATLAB batch licensing token, first set it as a [secret](https://docs.github.com/en/actions/security-guides/using-secrets-in-github-actions). Then, map the secret to an environment variable named `MLM_LICENSE_TOKEN` in your workflow. For an example, see [Use MATLAB Batch Licensing Token](#use-matlab-batch-licensing-token). 
 
 ## Notes
