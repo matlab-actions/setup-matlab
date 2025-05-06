@@ -150,10 +150,10 @@ If you are using a macOS runner with an Apple silicon processor, verify that Jav
 >**Tip:** One convenient way to include the required dependencies on a self-hosted runner is to specify the [MATLAB Dependencies container image on Docker&reg; Hub](https://hub.docker.com/r/mathworks/matlab-deps) in your workflow.
 
 #### Licensing
-Product licensing for your workflow depends on your project visibility as well as the types of products used by a [Run MATLAB Build](https://github.com/matlab-actions/run-build/), [Run MATLAB Tests](https://github.com/matlab-actions/run-tests/), or [Run MATLAB Command](https://github.com/matlab-actions/run-command/) action in your workflow:
+Product licensing for your workflow depends on your project visibility:
 
-- Public project — The action automatically licenses all products for you, except for transformation products, such as MATLAB Coder and MATLAB Compiler.
-- Private project — The action does not automatically license any products for you. 
+- Public project — The [Run MATLAB Build](https://github.com/matlab-actions/run-build/), [Run MATLAB Tests](https://github.com/matlab-actions/run-tests/), and [Run MATLAB Command](https://github.com/matlab-actions/run-command/) actions automatically license all products for you, except for transformation products, such as MATLAB Coder and MATLAB Compiler.
+- Private project — The actions do not automatically license any products for you. 
 
 To license products that are not automatically licensed, you can request a [MATLAB batch licensing token](https://github.com/mathworks-ref-arch/matlab-dockerfile/blob/main/alternates/non-interactive/MATLAB-BATCH.md#matlab-batch-licensing-token) by submitting the [MATLAB Batch Licensing Pilot](https://www.mathworks.com/support/batch-tokens.html) form. Batch licensing tokens are strings that enable MATLAB to start in noninteractive environments.
 
