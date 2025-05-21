@@ -1,10 +1,11 @@
-// Copyright 2020-2024 The MathWorks, Inc.
+// Copyright 2020-2025 The MathWorks, Inc.
 
 import * as core from "@actions/core";
 import * as cache from "./cache-restore";
 import * as install from "./install";
 import * as matlab from "./matlab";
 import * as mpm from "./mpm";
+import { State } from './install-state';
 
 jest.mock("@actions/core");
 jest.mock("./matlab");
@@ -22,6 +23,7 @@ describe("install procedure", () => {
     let matlabSetupBatchMock: jest.Mock;
     let mpmSetupMock: jest.Mock;
     let mpmInstallMock: jest.Mock;
+    let saveStateMock: jest.Mock;
     let addPathMock: jest.Mock;
     let setOutputMock: jest.Mock;
     let restoreMATLABMock: jest.Mock;
@@ -49,6 +51,7 @@ describe("install procedure", () => {
         matlabSetupBatchMock = matlab.setupBatch as jest.Mock;
         mpmSetupMock = mpm.setup as jest.Mock;
         mpmInstallMock = mpm.install as jest.Mock;
+        saveStateMock = core.saveState as jest.Mock;
         addPathMock = core.addPath as jest.Mock;
         setOutputMock = core.setOutput as jest.Mock;
         restoreMATLABMock = cache.restoreMATLAB as jest.Mock;
@@ -71,6 +74,7 @@ describe("install procedure", () => {
         expect(matlabSetupBatchMock).toHaveBeenCalledTimes(1);
         expect(mpmSetupMock).toHaveBeenCalledTimes(1);
         expect(mpmInstallMock).toHaveBeenCalledTimes(1);
+        expect(saveStateMock).toHaveBeenCalledWith(State.InstallSuccessful, true);
         expect(addPathMock).toHaveBeenCalledTimes(1);
         expect(setOutputMock).toHaveBeenCalledTimes(1);
     });
@@ -79,6 +83,7 @@ describe("install procedure", () => {
         matlabGetToolcacheDirMock.mockResolvedValue(["/opt/hostedtoolcache/MATLAB/9.13.0/x64", true]);
         await expect(doInstall()).resolves.toBeUndefined();
         expect(mpmInstallMock).toHaveBeenCalledTimes(0);
+        expect(saveStateMock).toHaveBeenCalledTimes(0);
         expect(addPathMock).toHaveBeenCalledTimes(1);
         expect(setOutputMock).toHaveBeenCalledTimes(1);
     });
@@ -116,6 +121,7 @@ describe("install procedure", () => {
     it("rejects when the mpm install fails", async () => {
         mpmInstallMock.mockRejectedValue(Error("oof"));
         await expect(doInstall()).rejects.toBeDefined();
+        expect(saveStateMock).toHaveBeenCalledTimes(0);
     });
 
     it("rejects when the matlab-batch install fails", async () => {

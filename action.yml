@@ -1,4 +1,4 @@
-# Copyright 2020-2024 The MathWorks, Inc.
+# Copyright 2020-2025 The MathWorks, Inc.
 
 name: Setup MATLAB
 description: >-
@@ -27,4 +27,4 @@ runs:
   using: node20
   main: dist/setup/index.js
   post: dist/cache-save/index.js
-  post-if: success()
+  post-if: always()

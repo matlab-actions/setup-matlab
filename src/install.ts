@@ -1,10 +1,11 @@
-// Copyright 2020-2024 The MathWorks, Inc.
+// Copyright 2020-2025 The MathWorks, Inc.
 
 import * as core from "@actions/core";
 import * as matlab from "./matlab";
 import * as mpm from "./mpm";
 import * as path from "path";
 import * as cache from "./cache-restore";
+import { State } from './install-state';
 
 /**
  * Set up an instance of MATLAB on the runner.
@@ -48,6 +49,7 @@ export async function install(platform: string, architecture: string, release: s
         if (!alreadyExists && !cacheHit) {
             const mpmPath: string = await mpm.setup(platform, matlabArch);
             await mpm.install(mpmPath, releaseInfo, products, destination);
+            core.saveState(State.InstallSuccessful, 'true');
         }
 
         core.addPath(path.join(destination, "bin"));
