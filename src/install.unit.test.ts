@@ -74,7 +74,7 @@ describe("install procedure", () => {
         expect(matlabSetupBatchMock).toHaveBeenCalledTimes(1);
         expect(mpmSetupMock).toHaveBeenCalledTimes(1);
         expect(mpmInstallMock).toHaveBeenCalledTimes(1);
-        expect(saveStateMock).toHaveBeenCalledWith(State.InstallSuccessful, true);
+        expect(saveStateMock).toHaveBeenCalledWith(State.InstallSuccessful, 'true');
         expect(addPathMock).toHaveBeenCalledTimes(1);
         expect(setOutputMock).toHaveBeenCalledTimes(1);
     });
