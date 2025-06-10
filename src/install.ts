@@ -1,6 +1,7 @@
 // Copyright 2020-2025 The MathWorks, Inc.
 
 import * as core from "@actions/core";
+import * as crypto from "crypto";
 import * as matlab from "./matlab";
 import * as mpm from "./mpm";
 import * as path from "path";
@@ -56,7 +57,7 @@ export async function install(platform: string, architecture: string, release: s
         core.setOutput('matlabroot', destination);
 
         await matlab.setupBatch(platform, matlabArch);
-        
+
         if (platform === "win32") {
             if (matlabArch === "x86") {
                 core.addPath(path.join(destination, "runtime", "win32"));
@@ -67,4 +68,41 @@ export async function install(platform: string, architecture: string, release: s
     });
 
     return;
+}
+
+// Limitations
+//
+// * No system dependencies are installed
+// * Does not cache
+export async function installFromSource(platform: string, architecture: string, source: string, products: string[]) {
+    // Create release key
+    const name = path.basename(source);
+    const releaseKey = 'source-' + crypto.createHash('sha256').update(source).digest('hex');
+    const releaseInfo = {
+        name: name,
+        version: releaseKey,
+        update: "",
+        isPrerelease: false
+    };
+
+    const [destination, alreadyExists]: [string, boolean] = await matlab.getToolcacheDir(platform, releaseInfo);
+
+    if (!alreadyExists) {
+        const mpmPath: string = await mpm.setup(platform, architecture);
+        await mpm.installFromSource(mpmPath, source, products, destination);
+        core.saveState(State.InstallSuccessful, 'true');
+    }
+
+    core.addPath(path.join(destination, "bin"));
+    core.setOutput('matlabroot', destination);
+
+    await matlab.setupBatch(platform, architecture);
+
+    if (platform === "win32") {
+        if (architecture === "x86") {
+            core.addPath(path.join(destination, "runtime", "win32"));
+        } else {
+            core.addPath(path.join(destination, "runtime", "win64"));
+        }
+    }
 }

@@ -9,6 +9,11 @@ inputs:
       MATLAB release to set up (R2021a or later)
     required: false
     default: latest
+  source:
+    description: >-
+      Path to mounted ISO image or directory set up with `mpm download`
+    required: false
+    default: ""
   products:
     description: >-
       Products to set up in addition to MATLAB, specified as a list of product names separated by spaces

@@ -23,6 +23,7 @@ describe("install procedure", () => {
     let matlabSetupBatchMock: jest.Mock;
     let mpmSetupMock: jest.Mock;
     let mpmInstallMock: jest.Mock;
+    let mpmInstallSourceMock: jest.Mock;
     let saveStateMock: jest.Mock;
     let addPathMock: jest.Mock;
     let setOutputMock: jest.Mock;
@@ -51,6 +52,7 @@ describe("install procedure", () => {
         matlabSetupBatchMock = matlab.setupBatch as jest.Mock;
         mpmSetupMock = mpm.setup as jest.Mock;
         mpmInstallMock = mpm.install as jest.Mock;
+        mpmInstallSourceMock = mpm.installFromSource as jest.Mock;
         saveStateMock = core.saveState as jest.Mock;
         addPathMock = core.addPath as jest.Mock;
         setOutputMock = core.setOutput as jest.Mock;
@@ -92,7 +94,7 @@ describe("install procedure", () => {
         matlabGetReleaseInfoMock.mockResolvedValue({
             name: "r2020a",
             version: "9.8.0",
-            updateNumber: "latest"    
+            updateNumber: "latest"
         });
         await expect(install.install(platform, arch, "r2020a", products, useCache)).rejects.toBeDefined();
     });
@@ -124,9 +126,20 @@ describe("install procedure", () => {
         expect(saveStateMock).toHaveBeenCalledTimes(0);
     });
 
+    it("rejects when mpm installing from source fails", async () => {
+        mpmInstallSourceMock.mockRejectedValue(Error("oof"));
+        await expect(install.installFromSource("linux", "x64", "bad/path", ["MATLAB"])).rejects.toBeDefined();
+        expect(saveStateMock).toHaveBeenCalledTimes(0);
+    });
+
     it("rejects when the matlab-batch install fails", async () => {
         matlabSetupBatchMock.mockRejectedValueOnce(Error("oof"));
         await expect(doInstall()).rejects.toBeDefined();
+    });
+
+    it("installing from source rejects when the matlab-batch install fails", async () => {
+        matlabSetupBatchMock.mockRejectedValueOnce(Error("oof"));
+        await expect(install.installFromSource("linux", "x64", "/path", ["MATLAB"])).rejects.toBeDefined();
     });
 
     it("Does not restore cache if useCache is false", async () => {
@@ -156,7 +169,7 @@ describe("install procedure", () => {
         matlabGetReleaseInfoMock.mockResolvedValue({
             name: "r2023a",
             version: "9.14.0",
-            updateNumber: "latest"    
+            updateNumber: "latest"
         });
         await expect(install.install("darwin", "arm64", "r2023a", products, true)).resolves.toBeUndefined();
         expect(matlabInstallSystemDependenciesMock).toHaveBeenCalledWith("darwin", "arm64", "r2023a");
@@ -166,6 +179,36 @@ describe("install procedure", () => {
 
     it("adds runtime path for Windows platform", async () => {
         await expect(install.install("win32", arch, release, products, useCache)).resolves.toBeUndefined();
+        expect(addPathMock).toHaveBeenCalledTimes(2);
+        expect(addPathMock).toHaveBeenCalledWith(expect.stringContaining("bin"));
+        expect(addPathMock).toHaveBeenCalledWith(expect.stringContaining("runtime"));
+    });
+
+    it("installs from source", async () => {
+        await expect(install.installFromSource("linux", "x64", "/dummy/path", ["MATLAB", "Parallel_Computing_Toolbox"]))
+            .resolves
+            .toBeUndefined();
+        expect(matlabInstallSystemDependenciesMock).toHaveBeenCalledTimes(0);
+        expect(matlabSetupBatchMock).toHaveBeenCalledTimes(1);
+        expect(mpmSetupMock).toHaveBeenCalledTimes(1);
+        expect(mpmInstallMock).toHaveBeenCalledTimes(0);
+        expect(mpmInstallSourceMock).toHaveBeenCalledTimes(1);
+        expect(saveStateMock).toHaveBeenCalledWith(State.InstallSuccessful, 'true');
+        expect(addPathMock).toHaveBeenCalledTimes(1);
+        expect(setOutputMock).toHaveBeenCalledTimes(1);
+    });
+
+    it("NoOp on existing install from source", async () => {
+        matlabGetToolcacheDirMock.mockResolvedValue(["/opt/hostedtoolcache/MATLAB/9.13.0/x64", true]);
+        await expect(install.installFromSource("linux", "x64", "/my/path", ["MATLAB"])).resolves.toBeUndefined();
+        expect(mpmInstallMock).toHaveBeenCalledTimes(0);
+        expect(saveStateMock).toHaveBeenCalledTimes(0);
+        expect(addPathMock).toHaveBeenCalledTimes(1);
+        expect(setOutputMock).toHaveBeenCalledTimes(1);
+    });
+
+    it("adds runtime path for Windows platform when installing from source", async () => {
+        await expect(install.installFromSource("win32", arch, "/dummy/path", products)).resolves.toBeUndefined();
         expect(addPathMock).toHaveBeenCalledTimes(2);
         expect(addPathMock).toHaveBeenCalledWith(expect.stringContaining("bin"));
         expect(addPathMock).toHaveBeenCalledWith(expect.stringContaining("runtime"));
