@@ -180,4 +180,38 @@ describe("mpm install", () => {
         await expect(mpm.install(mpmPath, releaseInfo, products, destination)).rejects.toBeDefined();
         expect(rmRFMock).toHaveBeenCalledWith(destination);
     });
+
+    it("ideally works when installing from source", async () => {
+        const destination ="/opt/matlab";
+        const source = "/path/to/source";
+        const products = ["MATLAB", "Compiler"];
+        const expectedMpmArgs = [
+            "install",
+            `--source=${source}`,
+            `--destination=${destination}`,
+            "--products",
+            "MATLAB",
+            "Compiler",
+        ]
+        execMock.mockResolvedValue(0);
+
+        await expect(mpm.installFromSource(mpmPath, source, products, destination)).resolves.toBeUndefined();
+        expect(execMock.mock.calls[0][1]).toMatchObject(expectedMpmArgs);
+    });
+
+    it("rejects and cleans on mpm rejection when installing from source", async () => {
+        const destination = "/opt/matlab";
+        const products = ["MATLAB", "Compiler"];
+        execMock.mockRejectedValue(1);
+        await expect(mpm.installFromSource(mpmPath, "/path", products, destination)).rejects.toBeDefined();
+        expect(rmRFMock).toHaveBeenCalledWith(destination);
+    });
+
+    it("rejects and cleans on failed install when installing from source", async () => {
+        const destination = "/opt/matlab";
+        const products = ["MATLAB", "Compiler"];
+        execMock.mockResolvedValue(1);
+        await expect(mpm.installFromSource(mpmPath, "/path", products, destination)).rejects.toBeDefined();
+        expect(rmRFMock).toHaveBeenCalledWith(destination);
+    });
 });

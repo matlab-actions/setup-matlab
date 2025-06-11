@@ -10,8 +10,13 @@ export async function run() {
     const platform = process.platform;
     const architecture = process.arch;
     const release = core.getInput("release");
+    const source = core.getInput("source");
     const products = core.getMultilineInput("products");
     const cache = core.getBooleanInput("cache");
+
+    if (source !== "") {
+        return install.installFromSource(platform, architecture, source, products);
+    }
     return install.install(platform, architecture, release, products, cache);
 }
 

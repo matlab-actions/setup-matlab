@@ -72,10 +72,37 @@ export async function install(mpmPath: string, release: matlab.Release, products
         "install",
         `--release=${mpmRelease}`,    
         `--destination=${destination}`,
-    ]
+    ];
     if (release.isPrerelease) {
         mpmArguments = mpmArguments.concat(["--release-status=Prerelease"]);
     }
+    mpmArguments = mpmArguments.concat("--products", ...parsedProducts);
+
+    const exitCode = await exec.exec(mpmPath, mpmArguments).catch(async e => {
+        // Fully remove failed MATLAB installation for self-hosted runners
+        await rmRF(destination);
+        throw e;
+    });
+    if (exitCode !== 0) {
+        await rmRF(destination);
+        return Promise.reject(Error(`Script exited with non-zero code ${exitCode}`));
+    }
+    return
+}
+
+export async function installFromSource(mpmPath: string, source: string, products: string[], destination: string) {
+    // remove spaces and flatten product list
+    let parsedProducts = products.flatMap(p => p.split(/[ ]+/));
+    // Add MATLAB by default
+    parsedProducts.push("MATLAB");
+    // Remove duplicate products
+    parsedProducts = [...new Set(parsedProducts)];
+
+    let mpmArguments: string[] = [
+        "install",
+        `--source=${source}`,    
+        `--destination=${destination}`,
+    ];
     mpmArguments = mpmArguments.concat("--products", ...parsedProducts);
 
     const exitCode = await exec.exec(mpmPath, mpmArguments).catch(async e => {
