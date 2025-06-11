@@ -76,11 +76,10 @@ export async function install(platform: string, architecture: string, release: s
 // * Does not cache
 export async function installFromSource(platform: string, architecture: string, source: string, products: string[]) {
     // Create release key
-    const name = path.basename(source);
     const releaseKey = 'source-' + crypto.createHash('sha256').update(source).digest('hex');
     const releaseInfo = {
-        name: name,
-        version: releaseKey,
+        name: releaseKey,
+        version: "1.0.0",
         update: "",
         isPrerelease: false
     };
