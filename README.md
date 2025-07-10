@@ -161,7 +161,7 @@ To use a MATLAB batch licensing token, first set it as a [secret](https://docs.g
 
 ## Notes
 - The **Setup MATLAB** action automatically includes the [MATLAB batch licensing executable](https://github.com/mathworks-ref-arch/matlab-dockerfile/blob/main/alternates/non-interactive/MATLAB-BATCH.md) (`matlab-batch`). To use a MATLAB batch licensing token in a workflow that does not use this action, you must first download the executable and add it to the system path.
-- Public project and MATLAB batch licensing do not support external language interfaces, including MATLAB Engine APIs for Python&reg;, Java, .NET, COM, C, C++, and Fortran&reg;. To use external language interfaces in your workflow, use a self-hosted runner including a version of MATLAB licensed without a batch token.
+- Public project and MATLAB batch licensing do not support external language interfaces, including MATLAB Engine APIs for Python&reg;, Java, .NET, COM, C, C++, and Fortran. To use external language interfaces in your workflow, use a self-hosted runner that has a version of MATLAB licensed without a batch token.
 - When you use the **Setup MATLAB** action, you execute third-party code that is licensed under separate terms.
 
 ## See Also
