@@ -30,7 +30,7 @@
         "@typescript-eslint/eslint-plugin": "^8.40.0",
         "@typescript-eslint/parser": "^8.40.0",
         "@vercel/ncc": "^0.38.3",
-        "eslint": "^9.33.0",
+        "eslint": "^8.57.1",
         "jest": "^30.0.5",
         "jest-circus": "^30.0.5",
         "prettier": "3.6.2",
