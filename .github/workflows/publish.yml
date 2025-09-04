@@ -1,8 +1,9 @@
 name: Publish
-
 on:
   release:
-    types: [published, edited]
+    types: published
+permissions:
+  contents: write
 
 jobs:
   build:
@@ -11,15 +12,12 @@ jobs:
     outputs:
       tag: ${{ steps.update-package-version.outputs.version }}
     steps:
-      # Configure runner with the right stuff
-      - uses: actions/checkout@v3
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
+      - uses: actions/checkout@v5
       - name: Configure git
         run: |
           git config user.name 'Release Action'
           git config user.email '<>'
-      - uses: actions/setup-node@v3
+      - uses: actions/setup-node@v5
         with:
           node-version: 20
 
@@ -31,7 +29,6 @@ jobs:
         run: |
           git tag -d "${{ github.event.release.tag_name }}"
           VERSION=$(npm version "${{ github.event.release.tag_name }}" --no-git-tag-version)
-          echo "::set-output name=version::$VERSION"
           git add package.json package-lock.json
           git commit -m "[skip ci] Bump $VERSION"
           git push origin HEAD:main
@@ -47,15 +44,15 @@ jobs:
         id: release_info
         run: |
           # Check for semantic versioning
-          echo "Preparing release for version $longVersion"
           longVersion="${{github.event.release.tag_name}}"
+          echo "Preparing release for version $longVersion"
           [[ $longVersion == v[0-9]*.[0-9]*.[0-9]* ]]  || (echo "must follow semantic versioning" && exit 1)
           majorVersion=$(echo ${longVersion%.*.*})
           minorVersion=$(echo ${longVersion%.*})
 
-          # Add the built artifacts. Using --force because dist should be in
+          # Add the built artifacts. Using --force because dist/lib should be in
           # .gitignore
-          git add --force dist
+          git add --force dist lib
 
           # Make the commit
           MESSAGE="Build for $(git rev-parse --short HEAD)"
