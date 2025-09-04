@@ -50,9 +50,9 @@ jobs:
           majorVersion=$(echo ${longVersion%.*.*})
           minorVersion=$(echo ${longVersion%.*})
 
-          # Add the built artifacts. Using --force because dist/lib should be in
+          # Add the built artifacts. Using --force because dist should be in
           # .gitignore
-          git add --force dist lib
+          git add --force dist
 
           # Make the commit
           MESSAGE="Build for $(git rev-parse --short HEAD)"
