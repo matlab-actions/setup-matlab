@@ -1,13 +1,15 @@
 name: Build and Test
 on: [push]
+permissions:
+  contents: read
 
 jobs:
   bat:
     name: Build and Test
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
         with:
           node-version: 20
       - name: Perform npm tasks
@@ -65,7 +67,7 @@ jobs:
             check-matlab: matlabVer = ver('matlab'); assert(strcmp(matlabVer.Release,'(R2023a)'));
             check-toolbox: symbolicVer = ver('symbolic'); assert(strcmp(symbolicVer.Release,'(R2023a)'));
     steps:
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v5
         with:
           name: built-action
       - name: Install selected products
