@@ -44,52 +44,52 @@ async function makeToolcacheDir(platform: string, release: Release): Promise<str
     return toolcacheDir;
 }
 
-async function makeWindowsHostedToolpath(release: Release): Promise<string> {
-    core.info("Attempting to create toolcache directory on D: drive for Windows github-hosted runner.");
-    // bail early if not on a github hosted runner
-    if (process.env['RUNNER_ENVIRONMENT'] !== 'github-hosted' && process.env['AGENT_ISSELFHOSTED'] === '1') {
-        core.info("Not a github-hosted runner.");
-        return Promise.reject();
-    }
+// async function makeWindowsHostedToolpath(release: Release): Promise<string> {
+//     core.info("Attempting to create toolcache directory on D: drive for Windows github-hosted runner.");
+//     // bail early if not on a github hosted runner
+//     if (process.env['RUNNER_ENVIRONMENT'] !== 'github-hosted' && process.env['AGENT_ISSELFHOSTED'] === '1') {
+//         core.info("Not a github-hosted runner.");
+//         return Promise.reject();
+//     }
 
-    const defaultToolCacheRoot = process.env['RUNNER_TOOL_CACHE'];
-    if (!defaultToolCacheRoot) {
-        return Promise.reject();
-    }
+//     const defaultToolCacheRoot = process.env['RUNNER_TOOL_CACHE'];
+//     if (!defaultToolCacheRoot) {
+//         return Promise.reject();
+//     }
 
-    // make sure runner has expected directory structure
-    if (!fs.existsSync('d:\\') || !fs.existsSync('c:\\')) {
-        return Promise.reject();
-    }
+//     // make sure runner has expected directory structure
+//     if (!fs.existsSync('d:\\') || !fs.existsSync('c:\\')) {
+//         return Promise.reject();
+//     }
 
-    const actualToolCacheRoot = defaultToolCacheRoot.replace("C:", "D:").replace("c:", "d:");
-    process.env['RUNNER_TOOL_CACHE'] = actualToolCacheRoot;
+//     const actualToolCacheRoot = defaultToolCacheRoot.replace("C:", "D:").replace("c:", "d:");
+//     process.env['RUNNER_TOOL_CACHE'] = actualToolCacheRoot;
 
-    try {
-        // create install directory and link it to the toolcache directory
-        fs.writeFileSync(".keep", "");
-        let actualToolCacheDir = await tc.cacheFile(".keep", ".keep", "MATLAB", release.version);
-        await io.rmRF(".keep");
-        let defaultToolCacheDir = actualToolCacheDir.replace(actualToolCacheRoot, defaultToolCacheRoot);
+//     try {
+//         // create install directory and link it to the toolcache directory
+//         fs.writeFileSync(".keep", "");
+//         let actualToolCacheDir = await tc.cacheFile(".keep", ".keep", "MATLAB", release.version);
+//         await io.rmRF(".keep");
+//         let defaultToolCacheDir = actualToolCacheDir.replace(actualToolCacheRoot, defaultToolCacheRoot);
 
-        // remove cruft from incomplete installs
-        await io.rmRF(defaultToolCacheDir);
+//         // remove cruft from incomplete installs
+//         await io.rmRF(defaultToolCacheDir);
 
-        // link to actual tool cache directory
-        fs.mkdirSync(path.dirname(defaultToolCacheDir), {recursive: true});
-        fs.symlinkSync(actualToolCacheDir, defaultToolCacheDir, 'junction');
+//         // link to actual tool cache directory
+//         fs.mkdirSync(path.dirname(defaultToolCacheDir), {recursive: true});
+//         fs.symlinkSync(actualToolCacheDir, defaultToolCacheDir, 'junction');
 
-        // .complete file is required for github actions to make the cacheDir persistent
-        const actualToolCacheCompleteFile = `${actualToolCacheDir}.complete`;
-        const defaultToolCacheCompleteFile = `${defaultToolCacheDir}.complete`;
-        await io.rmRF(defaultToolCacheCompleteFile);
-        fs.symlinkSync(actualToolCacheCompleteFile, defaultToolCacheCompleteFile, 'file');
+//         // .complete file is required for github actions to make the cacheDir persistent
+//         const actualToolCacheCompleteFile = `${actualToolCacheDir}.complete`;
+//         const defaultToolCacheCompleteFile = `${defaultToolCacheDir}.complete`;
+//         await io.rmRF(defaultToolCacheCompleteFile);
+//         fs.symlinkSync(actualToolCacheCompleteFile, defaultToolCacheCompleteFile, 'file');
 
-        return actualToolCacheDir;
-    } finally {
-        process.env['RUNNER_TOOL_CACHE'] = defaultToolCacheRoot;
-    }
-}
+//         return actualToolCacheDir;
+//     } finally {
+//         process.env['RUNNER_TOOL_CACHE'] = defaultToolCacheRoot;
+//     }
+// }
 
 async function makeDefaultToolpath(release: Release): Promise<string> {
     core.info("Creating toolcache directory in default location.");
