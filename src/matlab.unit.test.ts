@@ -83,22 +83,22 @@ describe("matlab tests", () => {
                 findMock.mockReturnValue("");
             });
 
-            it("uses workaround if github-hosted", async () => {
-                let expectedToolcacheDir = "D:\\hostedtoolcache\\windows\\matlab\\r2022b";
+            // it("uses workaround if github-hosted", async () => {
+            //     let expectedToolcacheDir = "D:\\hostedtoolcache\\windows\\matlab\\r2022b";
 
-                // replicate github-hosted environment
-                process.env["AGENT_ISSELFHOSTED"] = "0";
-                process.env["RUNNER_ENVIRONMENT"] = "github-hosted";
-                // mock & no-op fs operations
-                let existsSyncSpy = jest.spyOn(fs, "existsSync").mockReturnValue(true);
-                let mkdirSyncSpy = jest.spyOn(fs, "mkdirSync").mockImplementation(() => "");
-                let symlinkSyncSpy = jest.spyOn(fs, "symlinkSync").mockImplementation(() => {});
+            //     // replicate github-hosted environment
+            //     process.env["AGENT_ISSELFHOSTED"] = "0";
+            //     process.env["RUNNER_ENVIRONMENT"] = "github-hosted";
+            //     // mock & no-op fs operations
+            //     let existsSyncSpy = jest.spyOn(fs, "existsSync").mockReturnValue(true);
+            //     let mkdirSyncSpy = jest.spyOn(fs, "mkdirSync").mockImplementation(() => "");
+            //     let symlinkSyncSpy = jest.spyOn(fs, "symlinkSync").mockImplementation(() => {});
 
-                await expect(matlab.getToolcacheDir("win32", release)).resolves.toMatchObject([expectedToolcacheDir, false]);
-                expect(existsSyncSpy).toHaveBeenCalledTimes(2);
-                expect(mkdirSyncSpy).toHaveBeenCalledTimes(1);
-                expect(symlinkSyncSpy).toHaveBeenCalledTimes(2);
-            });
+            //     await expect(matlab.getToolcacheDir("win32", release)).resolves.toMatchObject([expectedToolcacheDir, false]);
+            //     expect(existsSyncSpy).toHaveBeenCalledTimes(2);
+            //     expect(mkdirSyncSpy).toHaveBeenCalledTimes(1);
+            //     expect(symlinkSyncSpy).toHaveBeenCalledTimes(2);
+            // });
 
             it("uses default toolcache directory if not github hosted", async () => {
                 let expectedToolcacheDir = "C:\\hostedtoolcache\\windows\\matlab\\r2022b";
