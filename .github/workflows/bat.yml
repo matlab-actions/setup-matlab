@@ -78,6 +78,7 @@ jobs:
           products: ${{ matrix.products }}
         env:
           AGENT_ISSELFHOSTED: 1
+          RUNNER_ENVIRONMENT: self-hosted
       - name: Check matlabroot output is set
         run:  'if [[ "${{ steps.setup_matlab.outputs.matlabroot }}" != *"MATLAB"* ]]; then exit 1; fi'
         shell: bash
