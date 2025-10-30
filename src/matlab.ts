@@ -35,12 +35,12 @@ export async function getToolcacheDir(platform: string, release: Release): Promi
 
 async function makeToolcacheDir(platform: string, release: Release): Promise<string> {
     let toolcacheDir: string;
-    if (platform === "win32") {
-        toolcacheDir = await makeWindowsHostedToolpath(release)
-            .catch(async () => await makeDefaultToolpath(release));
-    } else {
+    // if (platform === "win32") {
+    //     toolcacheDir = await makeWindowsHostedToolpath(release)
+    //         .catch(async () => await makeDefaultToolpath(release));
+    // } else {
         toolcacheDir = await makeDefaultToolpath(release);
-    }
+    // }
     return toolcacheDir;
 }
 
