@@ -45,8 +45,10 @@ async function makeToolcacheDir(platform: string, release: Release): Promise<str
 }
 
 async function makeWindowsHostedToolpath(release: Release): Promise<string> {
+    core.info("Attempting to create toolcache directory on D: drive for Windows github-hosted runner.");
     // bail early if not on a github hosted runner
     if (process.env['RUNNER_ENVIRONMENT'] !== 'github-hosted' && process.env['AGENT_ISSELFHOSTED'] === '1') {
+        core.info("Not a github-hosted runner.");
         return Promise.reject();
     }
 
@@ -90,6 +92,7 @@ async function makeWindowsHostedToolpath(release: Release): Promise<string> {
 }
 
 async function makeDefaultToolpath(release: Release): Promise<string> {
+    core.info("Creating toolcache directory in default location.");
     fs.writeFileSync(".keep", "");
     let toolpath = await tc.cacheFile(".keep", ".keep", "MATLAB", release.version);
     await io.rmRF(".keep");
