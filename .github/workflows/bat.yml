@@ -87,11 +87,15 @@ jobs:
         uses: matlab-actions/run-command@v2
         with:
           command: "${{ matrix.check-toolbox }}"
-      - name: Check NoOp on 2nd install
+      - name: Install additional product
         uses: ./
         with:
           release: ${{ matrix.release }}
-          products: ${{ matrix.products }}
+          products: Image_Processing_Toolbox
+      - name: Check additional product was installed
+        uses: matlab-actions/run-command@v2
+        with:
+          command: assert(any(strcmp({ver().Name},'Image Processing Toolbox')));
       - name: Call setup MATLAB again with different release # should not error as in issue 130
         uses: ./
         with:
