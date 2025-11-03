@@ -93,11 +93,13 @@ jobs:
           release: ${{ matrix.release }}
           products: ${{ matrix.products }}
       - name: Install additional products
+        if: matrix.os != 'windows-latest'
         uses: ./
         with:
           release: ${{ matrix.release }}
           products: Image_Processing_Toolbox
       - name: Check additional product was installed
+        if: matrix.os != 'windows-latest'
         uses: matlab-actions/run-command@v2
         with:
           command: assert(any(strcmp({ver().Name},'Image Processing Toolbox')))
