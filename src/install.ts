@@ -38,7 +38,7 @@ export async function install(platform: string, architecture: string, release: s
             matlabArch = "x64";
         }
 
-        let [destination, alreadyExists]: [string, boolean] = await matlab.getToolcacheDir(platform, releaseInfo);
+        let [destination]: [string, boolean] = await matlab.getToolcacheDir(platform, releaseInfo);
         let cacheHit = false;
 
         if (useCache) {
@@ -46,7 +46,7 @@ export async function install(platform: string, architecture: string, release: s
             cacheHit = await cache.restoreMATLAB(releaseInfo, platform, matlabArch, products, destination, supportFilesDir);
         }
 
-        if (!alreadyExists && !cacheHit) {
+        if (!cacheHit) {
             const mpmPath: string = await mpm.setup(platform, matlabArch);
             await mpm.install(mpmPath, releaseInfo, products, destination);
             core.saveState(State.InstallSuccessful, 'true');

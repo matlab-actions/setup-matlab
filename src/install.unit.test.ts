@@ -79,11 +79,11 @@ describe("install procedure", () => {
         expect(setOutputMock).toHaveBeenCalledTimes(1);
     });
 
-    it("NoOp on existing install", async () => {
+    it("re-calls MPM install even if MATLAB already exists in toolcache", async () => {
         matlabGetToolcacheDirMock.mockResolvedValue(["/opt/hostedtoolcache/MATLAB/9.13.0/x64", true]);
         await expect(doInstall()).resolves.toBeUndefined();
-        expect(mpmInstallMock).toHaveBeenCalledTimes(0);
-        expect(saveStateMock).toHaveBeenCalledTimes(0);
+        expect(mpmInstallMock).toHaveBeenCalledTimes(1);
+        expect(saveStateMock).toHaveBeenCalledTimes(1);
         expect(addPathMock).toHaveBeenCalledTimes(1);
         expect(setOutputMock).toHaveBeenCalledTimes(1);
     });
