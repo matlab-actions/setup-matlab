@@ -180,4 +180,20 @@ describe("mpm install", () => {
         await expect(mpm.install(mpmPath, releaseInfo, products, destination)).rejects.toBeDefined();
         expect(rmRFMock).toHaveBeenCalledWith(destination);
     });
+
+    it("does not reject when mpm exits non-zero but reports already installed", async () => {
+        const destination = "/opt/matlab";
+        const products = ["MATLAB", "Compiler"];
+
+        // Simulate mpm writing the "already installed" message to stdout and returning non-zero
+        execMock.mockImplementation((cmd: string, args: string[], options?: exec.ExecOptions) => {
+            if (options && options.listeners && typeof options.listeners.stdout === 'function') {
+                options.listeners.stdout(Buffer.from("All specified products are already installed."));
+            }
+            return Promise.resolve(1);
+        });
+
+        await expect(mpm.install(mpmPath, releaseInfo, products, destination)).resolves.toBeUndefined();
+        expect(rmRFMock).not.toHaveBeenCalled();
+    });
 });

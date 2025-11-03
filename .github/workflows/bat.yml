@@ -92,6 +92,15 @@ jobs:
         with:
           release: ${{ matrix.release }}
           products: ${{ matrix.products }}
+      - name: Install additional products
+        uses: ./
+        with:
+          release: ${{ matrix.release }}
+          products: Image_Processing_Toolbox
+      - name: Check additional product was installed
+        uses: matlab-actions/run-command@v2
+        with:
+          command: assert(any(strcmp({ver().Name},'Image Processing Toolbox')))
       - name: Call setup MATLAB again with different release # should not error as in issue 130
         uses: ./
         with:
