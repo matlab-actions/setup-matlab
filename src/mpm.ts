@@ -93,6 +93,7 @@ export async function install(mpmPath: string, release: matlab.Release, products
             },
         },
         ignoreReturnCode: true,
+        silent: true,
     };
 
     const exitCode = await exec.exec(mpmPath, mpmArguments, options).catch(async e => {
