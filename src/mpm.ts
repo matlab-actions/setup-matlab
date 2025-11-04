@@ -78,14 +78,33 @@ export async function install(mpmPath: string, release: matlab.Release, products
     }
     mpmArguments = mpmArguments.concat("--products", ...parsedProducts);
 
-    const exitCode = await exec.exec(mpmPath, mpmArguments).catch(async e => {
-        // Fully remove failed MATLAB installation for self-hosted runners
+    let output = "";
+    const options = {
+        listeners: {
+            stdout: (data: Buffer) => {
+                const text = data.toString();
+                output += text;
+                process.stdout.write(text);
+            },
+            stderr: (data: Buffer) => {
+                const text = data.toString();
+                output += text;
+                process.stderr.write(text);
+            },
+        },
+        ignoreReturnCode: true,
+        silent: true,
+    };
+
+    const exitCode = await exec.exec(mpmPath, mpmArguments, options).catch(async e => {
         await rmRF(destination);
         throw e;
     });
-    if (exitCode !== 0) {
+
+    if (exitCode !== 0 && !output.toLowerCase().includes("already installed")) {
         await rmRF(destination);
         return Promise.reject(Error(`Script exited with non-zero code ${exitCode}`));
     }
-    return
+
+    return;
 }
