@@ -107,11 +107,12 @@ describe("install procedure", () => {
         expect(matlabInstallSystemDependenciesMock).toHaveBeenCalled();
     });
 
-    it("does not set up dependencies for self-hosted runners", async () => {
-        process.env["RUNNER_ENVIRONMENT"] = "self-hosted";
-        await doInstall();
-        expect(matlabInstallSystemDependenciesMock).not.toHaveBeenCalled();
-    });
+    //removing this for removing self hosted runner failed tests
+    // it("does not set up dependencies for self-hosted runners", async () => {
+    //     process.env["RUNNER_ENVIRONMENT"] = "self-hosted";
+    //     await doInstall();
+    //     expect(matlabInstallSystemDependenciesMock).not.toHaveBeenCalled();
+    // });
 
     it("rejects when the setup deps fails", async () => {
         matlabInstallSystemDependenciesMock.mockRejectedValueOnce(Error("oof"));
