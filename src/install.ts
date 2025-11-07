@@ -26,11 +26,12 @@ export async function install(platform: string, architecture: string, release: s
     }
 
     // Install system dependencies if cloud-hosted
-    if (process.env["RUNNER_ENVIRONMENT"] === "github-hosted" && process.env["AGENT_ISSELFHOSTED"] !== "1") {
-        await core.group("Preparing system for MATLAB", async () => {
-            await matlab.installSystemDependencies(platform, architecture, releaseInfo.name);
-        });
-    }
+    //changing in Simran_dependencies to automatically install dependencies automatically for both self hosted and cloud hosted runners.
+    await core.group("Preparing system for MATLAB", async () => {
+    await matlab.installSystemDependencies(platform, architecture, releaseInfo.name);
+    });
+
+    
 
     await core.group("Setting up MATLAB", async () => {
         let matlabArch = architecture;
