@@ -6,7 +6,7 @@
 lib
 
 # Leave out dist; it should be forcibly added on release
-dist
+# dist
 
 ## https://raw.githubusercontent.com/github/gitignore/master/Node.gitignore
 # Logs
