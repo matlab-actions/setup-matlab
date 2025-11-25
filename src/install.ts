@@ -25,12 +25,17 @@ export async function install(platform: string, architecture: string, release: s
         return Promise.reject(Error(`Release '${releaseInfo.name}' is not supported. Use 'R2020b' or a later release.`));
     }
 
-    // Install system dependencies if cloud-hosted
-    //changing in Simran_dependencies to automatically install dependencies automatically for both self hosted and cloud hosted runners.
-    await core.group("Preparing system for MATLAB", async () => {
-    await matlab.installSystemDependencies(platform, architecture, releaseInfo.name);
-    });
+    // // Install system dependencies if cloud-hosted
+    // //changing in Simran_dependencies to automatically install dependencies automatically for both self hosted and cloud hosted runners.
+    // await core.group("Preparing system for MATLAB", async () => {
+    // await matlab.installSystemDependencies(platform, architecture, releaseInfo.name);
+    // });
 
+     if (process.env["RUNNER_ENVIRONMENT"] === "github-hosted" && process.env["AGENT_ISSELFHOSTED"] !== "1") {
+        await core.group("Preparing system for MATLAB", async () => {
+            await matlab.installSystemDependencies(platform, architecture, releaseInfo.name);
+        });
+    }
     
 
     await core.group("Setting up MATLAB", async () => {
