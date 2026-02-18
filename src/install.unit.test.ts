@@ -42,7 +42,18 @@ describe("install procedure", () => {
     const products = ["MATLAB", "Parallel_Computing_Toolbox"];
     const useCache = false;
 
-    const doInstall = () => install.install(platform, arch, release, products, useCache);
+    const doInstall = () => install.install(platform, arch, release, products, useCache, installSysDeps);
+    
+    // assert messages
+    const logSpy = jest.spyOn(console, "log").mockImplementation(() => {});
+    await doInstall(true);
+    expect(logSpy).toHaveBeenCalledWith("installSysDep (resolved): true");
+    expect(logSpy).toHaveBeenCalledWith("installs sys deps");
+
+    
+    await doInstall(false);
+    expect(logSpy).toHaveBeenCalledWith("installSysDep (resolved): false");
+    expect(logSpy).toHaveBeenCalledWith("not installing sys deps");
 
     beforeEach(() => {
         matlabInstallSystemDependenciesMock = matlab.installSystemDependencies as jest.Mock;
