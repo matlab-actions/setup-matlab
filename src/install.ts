@@ -10,7 +10,7 @@ import { State } from './install-state';
 /**
  * Set up an instance of MATLAB on the runner.
  *
- * First, system dependencies are installed. Then the ephemeral installer script
+ * First, system dependencies are installed (if enabled). Then the ephemeral installer script
  * is invoked.
  *
  * @param platform Operating system of the runner (e.g. "win32" or "linux").
@@ -18,18 +18,34 @@ import { State } from './install-state';
  * @param release Release of MATLAB to be set up (e.g. "latest" or "R2020a").
  * @param products A list of products to install (e.g. ["MATLAB", "Simulink"]).
  * @param useCache whether to use the cache to restore & save the MATLAB installation
+ * @param installSysDeps resolved boolean (from "auto" | "true" | "false"):
+ *                       true  -> install system dependencies
+ *                       false -> skip system dependencies
  */
-export async function install(platform: string, architecture: string, release: string, products: string[], useCache: boolean) {
+export async function install(
+    platform: string,
+    architecture: string,
+    release: string,
+    products: string[],
+    useCache: boolean,
+    installSysDeps: boolean
+) {
     const releaseInfo = await matlab.getReleaseInfo(release);
     if (releaseInfo.name < "r2020b") {
         return Promise.reject(Error(`Release '${releaseInfo.name}' is not supported. Use 'R2020b' or a later release.`));
     }
 
-    // Install system dependencies if cloud-hosted
-    if (process.env["RUNNER_ENVIRONMENT"] === "github-hosted" && process.env["AGENT_ISSELFHOSTED"] !== "1") {
+    // -------------------------------
+    // PRE-INSTALL DECISION & LOGGING 
+    // -------------------------------
+    console.log(`installSysDep (resolved): ${installSysDeps}`);
+    if (installSysDeps) {
+        console.log("installs sys deps");
         await core.group("Preparing system for MATLAB", async () => {
             await matlab.installSystemDependencies(platform, architecture, releaseInfo.name);
         });
+    } else {
+        console.log("not installing sys deps");
     }
 
     await core.group("Setting up MATLAB", async () => {
