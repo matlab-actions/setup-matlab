@@ -45,7 +45,6 @@ export async function run() {
     const release = core.getInput("release");
     const products = core.getMultilineInput("products");
     const cache = core.getBooleanInput("cache");
-    const installSysDeps = resolveInstallSysDep();
     const installDepsInput = core.getInput("install-system-dependencies") || 'auto';
     const installSystemDependencies = resolveInstallDependencies(installDepsInput);
     
