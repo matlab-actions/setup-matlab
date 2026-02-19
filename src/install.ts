@@ -22,32 +22,20 @@ import { State } from './install-state';
  *                       true  -> install system dependencies
  *                       false -> skip system dependencies
  */
-export async function install(
-    platform: string,
-    architecture: string,
-    release: string,
-    products: string[],
-    useCache: boolean,
-    installSysDeps: boolean
-) {
+export async function install(platform: string, architecture: string, release: string, products: string[], useCache: boolean, installSystemDependencies: boolean) {
     const releaseInfo = await matlab.getReleaseInfo(release);
     if (releaseInfo.name < "r2020b") {
         return Promise.reject(Error(`Release '${releaseInfo.name}' is not supported. Use 'R2020b' or a later release.`));
     }
 
-    // -------------------------------
-    // PRE-INSTALL DECISION & LOGGING 
-    // -------------------------------
-    console.log(`installSysDep (resolved): ${installSysDeps}`);
-    if (installSysDeps) {
-        console.log("installs sys deps");
+    // install system dependencies based on the resolved flag in index.ts
+    if (installSystemDependencies) {
         await core.group("Preparing system for MATLAB", async () => {
             await matlab.installSystemDependencies(platform, architecture, releaseInfo.name);
         });
-    } else {
-        console.log("not installing sys deps");
     }
 
+    
     await core.group("Setting up MATLAB", async () => {
         let matlabArch = architecture;
         if (platform === "darwin" && architecture === "arm64" && releaseInfo.name < "r2023b") {
