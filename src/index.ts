@@ -3,24 +3,37 @@
 import * as core from "@actions/core";
 import * as install from "./install";
 
-/**
- * Resolve installSysDep tri-state ("true" | "false" | "auto") to a boolean.
- * - "auto": true on GitHub-hosted, false on self-hosted.
- */
-function resolveInstallSysDep(): boolean {
-  const raw = (core.getInput("installSysDep") || "").trim().toLowerCase();
-  const labels = (process.env.RUNNER_LABELS || "").toLowerCase(); // contains "self-hosted" on self-hosted
-
-  if (raw === "true") return true;
-  if (raw === "false") return false;
-
-  if (raw === "auto" || raw === "") {
-    // GitHub-hosted runners do NOT include "self-hosted" label.
-    return !labels.includes("self-hosted");
-  }
-
-  core.setFailed(`installSysDep must be "true", "false", or "auto" (got: ${raw})`);
-  throw new Error("Invalid installSysDep value");
+//function resolving whether to install dependencies based on the input and runner type
+function resolveInstallDependencies(input: string): boolean {
+    if (input.toLowerCase() === 'true') {
+        core.info(`install-system-dependencies explicitly set to true`);
+        return true;
+    }
+    if (input.toLowerCase() === 'false') {
+        core.info(`install-system-dependencies explicitly set to false`);
+        return false;
+    }
+    
+    // when expliciatlly not set to true or false then detecting based on the runner type
+    if (input.toLowerCase() === 'auto' || input === '') {
+        //using the same detection method for github hosted runner as in install.ts
+        const runnerEnvironment = process.env["RUNNER_ENVIRONMENT"];
+        const agentIsSelfHosted = process.env["AGENT_ISSELFHOSTED"];
+        
+        const isGitHubHosted = runnerEnvironment === "github-hosted" && agentIsSelfHosted !== "1";
+      
+        // shouldInstall will return true for self-hosted and false for gitub-hosted
+        const shouldInstall = !isGitHubHosted;
+        
+        core.info(`Auto-detected runner type: ${isGitHubHosted ? 'GitHub-hosted' : 'self-hosted'}`);
+        core.info(`System dependencies will ${shouldInstall ? 'be' : 'not be'} installed (auto mode)`);
+        
+        return shouldInstall;
+    }
+    
+    // default set to false for invalid input type
+    core.warning(`Invalid value for install-system-dependencies: ${input}. Defaulting to false.`);
+    return false;
 }
 
 /**
@@ -33,7 +46,10 @@ export async function run() {
     const products = core.getMultilineInput("products");
     const cache = core.getBooleanInput("cache");
     const installSysDeps = resolveInstallSysDep();
-    return install.install(platform, architecture, release, products, cache, installSysDeps);
+    const installDepsInput = core.getInput("install-system-dependencies") || 'auto';
+    const installSystemDependencies = resolveInstallDependencies(installDepsInput);
+    
+    return install.install(platform, architecture, release, products, cache, installSystemDependencies);
 }
 
 run().catch((e) => {
