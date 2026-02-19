@@ -19,14 +19,11 @@ inputs:
       Option to enable caching with GitHub Actions, specified as false or true
     required: false
     default: false
-  installSysDep:
+  install-system-dependencies:
     description: >-
-      Option to install system dependencies required by MATLAB/products.
-      Accepts "true" | "false" | "auto".
-      "auto" resolves to true on GitHub-hosted and false on self-hosted.
+      Install system dependencies required for MATLAB. Defaults to "true" for self-hosted runners and "false" for GitHub-hosted runners. Set to "true" or "false" to override.
     required: false
-    default: "auto"
-
+    default: auto
 outputs:
   matlabroot:
     description: >-
