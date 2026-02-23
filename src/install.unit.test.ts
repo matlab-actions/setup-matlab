@@ -41,7 +41,7 @@ describe("install procedure", () => {
     };
     const products = ["MATLAB", "Parallel_Computing_Toolbox"];
     const useCache = false;
-    const installSystemDependencies = auto;
+    const installSystemDependencies = "auto";
     
     //updated doInstall to take the new sixth parameter
     const doInstall = () => install.install(platform, arch, release, products, useCache, installSystemDependencies);
