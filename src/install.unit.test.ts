@@ -41,10 +41,10 @@ describe("install procedure", () => {
     };
     const products = ["MATLAB", "Parallel_Computing_Toolbox"];
     const useCache = false;
-
+    const installSystemDependencies = auto;
+    
     //updated doInstall to take the new sixth parameter
-    const doInstall = (installSystemDependencies: boolean = false) => 
-        install.install(platform, arch, release, products, useCache, installSystemDependencies);
+    const doInstall = () => install.install(platform, arch, release, products, useCache, installSystemDependencies);
 
 
     beforeEach(() => {
@@ -72,7 +72,7 @@ describe("install procedure", () => {
     });
 
     it("ideally works", async () => {
-        await expect(doInstall(true)).resolves.toBeUndefined();
+        await expect(doInstall()).resolves.toBeUndefined();
         expect(matlabInstallSystemDependenciesMock).toHaveBeenCalledTimes(1);
         expect(matlabSetupBatchMock).toHaveBeenCalledTimes(1);
         expect(mpmSetupMock).toHaveBeenCalledTimes(1);
@@ -84,7 +84,7 @@ describe("install procedure", () => {
 
     it("re-calls MPM install even if MATLAB already exists in toolcache", async () => {
         matlabGetToolcacheDirMock.mockResolvedValue(["/opt/hostedtoolcache/MATLAB/9.13.0/x64", true]);
-        await expect(doInstall(false)).resolves.toBeUndefined();
+        await expect(doInstall()).resolves.toBeUndefined();
         expect(mpmInstallMock).toHaveBeenCalledTimes(1);
         expect(saveStateMock).toHaveBeenCalledTimes(1);
         expect(addPathMock).toHaveBeenCalledTimes(1);
@@ -97,43 +97,58 @@ describe("install procedure", () => {
             version: "9.8.0",
             updateNumber: "latest"    
         });
-        await expect(install.install(platform, arch, "r2020a", products, useCache, false)).rejects.toBeDefined();
+        await expect(install.install(platform, arch, "r2020a", products, useCache, installSystemDependencies)).rejects.toBeDefined();
     });
 
     it("rejects for invalid MATLAB version", async () => {
         matlabGetReleaseInfoMock.mockRejectedValue(Error("oof"));
-        await expect(doInstall(false)).rejects.toBeDefined();
+        await expect(doInstall()).rejects.toBeDefined();
     });
 
-    it("sets up dependencies for github-hosted runners", async () => {
-        await doInstall(true);
+    //auto = true by default for github hosted runners
+    it("sets up dependencies for github-hosted runners when installSystemDependencies is auto ", async () => {
+        await doInstall();
         expect(matlabInstallSystemDependenciesMock).toHaveBeenCalled();
     });
 
-    it("does not set up dependencies for self-hosted runners", async () => {
+    //auto = false by default for self-hosted runners
+    it("does not set up dependencies for self-hosted runners when installSystemDependencies is auto", async () => {
         process.env["RUNNER_ENVIRONMENT"] = "self-hosted";
-        await doInstall(false);
+        await doInstall();
         expect(matlabInstallSystemDependenciesMock).not.toHaveBeenCalled();
     });
 
+    //install for self hosted if installSystemDependencies = true
+    it("does set up dependencies for self-hosted runners when installSystemDependencies is true", async () => {
+        process.env["RUNNER_ENVIRONMENT"] = "self-hosted";
+        await expect(install.install(platform, arch, release, products, useCache, true)).resolves.toBeUndefined();
+        expect(matlabInstallSystemDependenciesMock).toHaveBeenCalled();
+    });
+
+    //install for github hosted if installSystemDependencies = false
+    it("does not set up dependencies for github-hosted runners when installSystemDependencies is false", async () => {
+    await expect(install.install(platform, arch, release, products, useCache, false)).resolves.toBeUndefined();
+    expect(matlabInstallSystemDependenciesMock).not.toHaveBeenCalled();
+});
+
     it("rejects when the setup deps fails", async () => {
         matlabInstallSystemDependenciesMock.mockRejectedValueOnce(Error("oof"));
-        await expect(doInstall(true)).rejects.toBeDefined();
+        await expect(doInstall()).rejects.toBeDefined();
     });
 
     it("rejects when the mpm install fails", async () => {
         mpmInstallMock.mockRejectedValue(Error("oof"));
-        await expect(doInstall(false)).rejects.toBeDefined();
+        await expect(doInstall()).rejects.toBeDefined();
         expect(saveStateMock).toHaveBeenCalledTimes(0);
     });
 
     it("rejects when the matlab-batch install fails", async () => {
         matlabSetupBatchMock.mockRejectedValueOnce(Error("oof"));
-        await expect(doInstall(false)).rejects.toBeDefined();
+        await expect(doInstall()).rejects.toBeDefined();
     });
 
     it("Does not restore cache if useCache is false", async () => {
-        await expect(doInstall(false)).resolves.toBeUndefined();
+        await expect(doInstall()).resolves.toBeUndefined();
         expect(restoreMATLABMock).toHaveBeenCalledTimes(0);
         expect(mpmSetupMock).toHaveBeenCalledTimes(1);
         expect(mpmInstallMock).toHaveBeenCalledTimes(1);
