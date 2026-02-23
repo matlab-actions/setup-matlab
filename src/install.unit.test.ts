@@ -41,7 +41,7 @@ describe("install procedure", () => {
     };
     const products = ["MATLAB", "Parallel_Computing_Toolbox"];
     const useCache = false;
-    const installSystemDependencies = "auto";
+    const installSystemDependencies = true;
     
     //updated doInstall to take the new sixth parameter
     const doInstall = () => install.install(platform, arch, release, products, useCache, installSystemDependencies);
@@ -105,27 +105,26 @@ describe("install procedure", () => {
         await expect(doInstall()).rejects.toBeDefined();
     });
 
-    //auto = true by default for github hosted runners
-    it("sets up dependencies for github-hosted runners when installSystemDependencies is auto ", async () => {
+    it("sets up dependencies for github-hosted runners ", async () => {
         await doInstall();
         expect(matlabInstallSystemDependenciesMock).toHaveBeenCalled();
     });
 
-    //auto = false by default for self-hosted runners
-    it("does not set up dependencies for self-hosted runners when installSystemDependencies is auto", async () => {
+    //for installSystemDependencies = false
+    it("does not set up dependencies for self-hosted runners", async () => {
         process.env["RUNNER_ENVIRONMENT"] = "self-hosted";
-        await doInstall();
+        await expect(install.install(platform, arch, release, products, useCache, false)).resolves.toBeUndefined();
         expect(matlabInstallSystemDependenciesMock).not.toHaveBeenCalled();
     });
 
     //install for self hosted if installSystemDependencies = true
-    it("does set up dependencies for self-hosted runners when installSystemDependencies is true", async () => {
+    it("sets up dependencies for self-hosted runners when installSystemDependencies is true", async () => {
         process.env["RUNNER_ENVIRONMENT"] = "self-hosted";
         await expect(install.install(platform, arch, release, products, useCache, true)).resolves.toBeUndefined();
         expect(matlabInstallSystemDependenciesMock).toHaveBeenCalled();
     });
 
-    //install for github hosted if installSystemDependencies = false
+    //does not install for github hosted if installSystemDependencies = false
     it("does not set up dependencies for github-hosted runners when installSystemDependencies is false", async () => {
     await expect(install.install(platform, arch, release, products, useCache, false)).resolves.toBeUndefined();
     expect(matlabInstallSystemDependenciesMock).not.toHaveBeenCalled();
