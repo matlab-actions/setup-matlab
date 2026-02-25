@@ -119,7 +119,7 @@ describe("resolveInstallDependencies function", () => {
 
   //considering removing these
     // edge cases like where RUNNER_ENVIRONMENT is not set
-    it("returns false for 'auto' when RUNNER_ENVIRONMENT is not set", () => 
+    it("returns false for 'auto' when RUNNER_ENVIRONMENT is not set", () => {
         const result = index.resolveInstallDependencies('auto');
         // Should return false because isGitHubHosted will be false
         expect(result).toBe(false);
