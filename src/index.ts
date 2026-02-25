@@ -4,7 +4,7 @@ import * as core from "@actions/core";
 import * as install from "./install";
 
 //function resolving whether to install dependencies based on the input and runner type
-function resolveInstallDependencies(input: string): boolean {
+export function resolveInstallDependencies(input: string): boolean {
     if (input.toLowerCase() === 'true') {
         core.info(`install-system-dependencies explicitly set to true`);
         return true;
