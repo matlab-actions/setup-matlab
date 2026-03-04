@@ -1,6 +1,6 @@
 // Copyright 2025 The MathWorks, Inc.
 
-import * as core from '@actions/core';
+import * as core from "@actions/core";
 import { cacheMATLAB } from "./cache-save";
 import { run } from "./post";
 
@@ -24,14 +24,14 @@ describe("post", () => {
 
     it("caches MATLAB when cache true and install successful", async () => {
         getBooleanInputMock.mockReturnValueOnce(true);
-        getStateMock.mockReturnValueOnce('true');
+        getStateMock.mockReturnValueOnce("true");
         await expect(run()).resolves.toBeUndefined();
         expect(cacheMATLABMock).toHaveBeenCalledTimes(1);
     });
 
     it("does not cache MATLAB when cache false", async () => {
         getBooleanInputMock.mockReturnValueOnce(false);
-        getStateMock.mockReturnValueOnce('true');
+        getStateMock.mockReturnValueOnce("true");
         await expect(run()).resolves.toBeUndefined();
         expect(cacheMATLABMock).toHaveBeenCalledTimes(0);
     });

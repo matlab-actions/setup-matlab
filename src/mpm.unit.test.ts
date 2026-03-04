@@ -42,7 +42,7 @@ describe("setup mpm", () => {
             await expect(mpm.setup(platform, arch)).resolves.toBe(mpmMockPath);
             expect(tcDownloadToolMock.mock.calls[0][0]).toContain("glnxa64");
         });
-    
+
         it(`works on windows`, async () => {
             const platform = "win32";
             tcDownloadToolMock.mockResolvedValue(mpmMockPath);
@@ -68,17 +68,17 @@ describe("setup mpm", () => {
     });
 
     it("errors on unsupported platform", async () => {
-        await expect(() => mpm.setup('sunos', arch)).rejects.toBeDefined();
+        await expect(() => mpm.setup("sunos", arch)).rejects.toBeDefined();
     });
 
     it("errors on unsupported architecture", async () => {
         const platform = "linux";
-        await expect(() => mpm.setup(platform, 'x86')).rejects.toBeDefined();
+        await expect(() => mpm.setup(platform, "x86")).rejects.toBeDefined();
     });
 
     it("errors without RUNNER_TEMP", async () => {
         const platform = "linux";
-        process.env.RUNNER_TEMP = '';
+        process.env.RUNNER_TEMP = "";
         tcDownloadToolMock.mockResolvedValue(mpmMockPath);
         defaultInstallRootMock.mockReturnValue(path.join("path", "to", "install", "root"));
         execMock.mockResolvedValue(0);
@@ -98,14 +98,13 @@ describe("setup mpm", () => {
         execMock.mockResolvedValue(1);
         await expect(mpm.setup(platform, arch)).rejects.toBeDefined();
     });
-
 });
 
 describe("mpm install", () => {
     let execMock: jest.Mock;
     let rmRFMock: jest.Mock;
     const mpmPath = "mpm";
-    const releaseInfo = {name: "r2022b", version: "9.13.0", update: "", isPrerelease: false};
+    const releaseInfo = { name: "r2022b", version: "9.13.0", update: "", isPrerelease: false };
     const mpmRelease = "r2022b";
     beforeEach(() => {
         execMock = exec.exec as jest.Mock;
@@ -113,7 +112,7 @@ describe("mpm install", () => {
     });
 
     it("works with multiline products list", async () => {
-        const destination ="/opt/matlab";
+        const destination = "/opt/matlab";
         const products = ["MATLAB", "Compiler"];
         const expectedMpmArgs = [
             "install",
@@ -122,10 +121,12 @@ describe("mpm install", () => {
             "--products",
             "MATLAB",
             "Compiler",
-        ]
+        ];
         execMock.mockResolvedValue(0);
 
-        await expect(mpm.install(mpmPath, releaseInfo, products, destination)).resolves.toBeUndefined();
+        await expect(
+            mpm.install(mpmPath, releaseInfo, products, destination),
+        ).resolves.toBeUndefined();
         expect(execMock.mock.calls[0][1]).toMatchObject(expectedMpmArgs);
     });
 
@@ -139,16 +140,23 @@ describe("mpm install", () => {
             "--products",
             "MATLAB",
             "Compiler",
-        ]
+        ];
         execMock.mockResolvedValue(0);
 
-        await expect(mpm.install(mpmPath, releaseInfo, products, destination)).resolves.toBeUndefined();
+        await expect(
+            mpm.install(mpmPath, releaseInfo, products, destination),
+        ).resolves.toBeUndefined();
         expect(execMock.mock.calls[0][1]).toMatchObject(expectedMpmArgs);
     });
 
     it("works with prerelease", async () => {
-        const prereleaseInfo = {name: "r2022b", version: "2022.2.999", update: "", isPrerelease: true};
-        const destination ="/opt/matlab";
+        const prereleaseInfo = {
+            name: "r2022b",
+            version: "2022.2.999",
+            update: "",
+            isPrerelease: true,
+        };
+        const destination = "/opt/matlab";
         const products = ["MATLAB", "Compiler"];
         const expectedMpmArgs = [
             "install",
@@ -158,10 +166,12 @@ describe("mpm install", () => {
             "--products",
             "MATLAB",
             "Compiler",
-        ]
+        ];
         execMock.mockResolvedValue(0);
 
-        await expect(mpm.install(mpmPath, prereleaseInfo, products, destination)).resolves.toBeUndefined();
+        await expect(
+            mpm.install(mpmPath, prereleaseInfo, products, destination),
+        ).resolves.toBeUndefined();
         expect(execMock.mock.calls[0][1]).toMatchObject(expectedMpmArgs);
     });
 
@@ -169,7 +179,9 @@ describe("mpm install", () => {
         const destination = "/opt/matlab";
         const products = ["MATLAB", "Compiler"];
         execMock.mockRejectedValue(1);
-        await expect(mpm.install(mpmPath, releaseInfo, products, destination)).rejects.toBeDefined();
+        await expect(
+            mpm.install(mpmPath, releaseInfo, products, destination),
+        ).rejects.toBeDefined();
         expect(rmRFMock).toHaveBeenCalledWith(destination);
     });
 
@@ -177,7 +189,9 @@ describe("mpm install", () => {
         const destination = "/opt/matlab";
         const products = ["MATLAB", "Compiler"];
         execMock.mockResolvedValue(1);
-        await expect(mpm.install(mpmPath, releaseInfo, products, destination)).rejects.toBeDefined();
+        await expect(
+            mpm.install(mpmPath, releaseInfo, products, destination),
+        ).rejects.toBeDefined();
         expect(rmRFMock).toHaveBeenCalledWith(destination);
     });
 
@@ -187,13 +201,17 @@ describe("mpm install", () => {
 
         // Simulate mpm writing the "already installed" message to stdout and returning non-zero
         execMock.mockImplementation((cmd: string, args: string[], options?: exec.ExecOptions) => {
-            if (options && options.listeners && typeof options.listeners.stdout === 'function') {
-                options.listeners.stdout(Buffer.from("All specified products are already installed."));
+            if (options && options.listeners && typeof options.listeners.stdout === "function") {
+                options.listeners.stdout(
+                    Buffer.from("All specified products are already installed."),
+                );
             }
             return Promise.resolve(1);
         });
 
-        await expect(mpm.install(mpmPath, releaseInfo, products, destination)).resolves.toBeUndefined();
+        await expect(
+            mpm.install(mpmPath, releaseInfo, products, destination),
+        ).resolves.toBeUndefined();
         expect(rmRFMock).not.toHaveBeenCalled();
     });
 });

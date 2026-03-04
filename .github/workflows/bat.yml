@@ -29,7 +29,7 @@ jobs:
       matrix:
         include:
           - os: ubuntu-latest
-            release: latest 
+            release: latest
             products: Symbolic_Math_Toolbox
             check-matlab: matlabVer = ver('matlab'); assert(~isempty(matlabVer));
             check-toolbox: symbolicVer = ver('symbolic'); assert(~isempty(symbolicVer));
@@ -77,7 +77,7 @@ jobs:
           release: ${{ matrix.release }}
           products: ${{ matrix.products }}
       - name: Check matlabroot output is set
-        run:  'if [[ "${{ steps.setup_matlab.outputs.matlabroot }}" != *"MATLAB"* ]]; then exit 1; fi'
+        run: 'if [[ "${{ steps.setup_matlab.outputs.matlabroot }}" != *"MATLAB"* ]]; then exit 1; fi'
         shell: bash
       - name: Check MATLAB version
         uses: matlab-actions/run-command@v2
@@ -111,4 +111,3 @@ jobs:
         uses: matlab-actions/run-command@v2
         with:
           command: matlabVer = ver('matlab'); assert(strcmp(matlabVer.Release,'(R2023b)'));
-  

@@ -2,9 +2,9 @@
 
 import * as exec from "@actions/exec";
 import * as tc from "@actions/tool-cache";
-import {rmRF} from "@actions/io";
+import { rmRF } from "@actions/io";
 import * as path from "path";
-import * as fs from 'fs';
+import * as fs from "fs";
 import * as matlab from "./matlab";
 import properties from "./properties.json";
 
@@ -12,7 +12,11 @@ export async function setup(platform: string, architecture: string): Promise<str
     let mpmUrl: string;
     let ext = "";
     if (architecture != "x64" && !(platform == "darwin" && architecture == "arm64")) {
-        return Promise.reject(Error(`This action is not supported on ${platform} runners using the ${architecture} architecture.`));
+        return Promise.reject(
+            Error(
+                `This action is not supported on ${platform} runners using the ${architecture} architecture.`,
+            ),
+        );
     }
     switch (platform) {
         case "win32":
@@ -30,10 +34,14 @@ export async function setup(platform: string, architecture: string): Promise<str
             }
             break;
         default:
-            return Promise.reject(Error(`This action is not supported on ${platform} runners using the ${architecture} architecture.`));
+            return Promise.reject(
+                Error(
+                    `This action is not supported on ${platform} runners using the ${architecture} architecture.`,
+                ),
+            );
     }
 
-    let runner_temp = process.env["RUNNER_TEMP"]
+    let runner_temp = process.env["RUNNER_TEMP"];
     if (!runner_temp) {
         return Promise.reject(Error("Unable to find runner temporary directory."));
     }
@@ -56,13 +64,18 @@ export async function setup(platform: string, architecture: string): Promise<str
             return Promise.reject(Error("Unable to set up mpm."));
         }
     }
-    return mpm
+    return mpm;
 }
 
-export async function install(mpmPath: string, release: matlab.Release, products: string[], destination: string) {
-    const mpmRelease = release.name + release.update
+export async function install(
+    mpmPath: string,
+    release: matlab.Release,
+    products: string[],
+    destination: string,
+) {
+    const mpmRelease = release.name + release.update;
     // remove spaces and flatten product list
-    let parsedProducts = products.flatMap(p => p.split(/[ ]+/));
+    let parsedProducts = products.flatMap((p) => p.split(/[ ]+/));
     // Add MATLAB by default
     parsedProducts.push("MATLAB");
     // Remove duplicate products
@@ -70,9 +83,9 @@ export async function install(mpmPath: string, release: matlab.Release, products
 
     let mpmArguments: string[] = [
         "install",
-        `--release=${mpmRelease}`,    
+        `--release=${mpmRelease}`,
         `--destination=${destination}`,
-    ]
+    ];
     if (release.isPrerelease) {
         mpmArguments = mpmArguments.concat(["--release-status=Prerelease"]);
     }
@@ -96,7 +109,7 @@ export async function install(mpmPath: string, release: matlab.Release, products
         silent: true,
     };
 
-    const exitCode = await exec.exec(mpmPath, mpmArguments, options).catch(async e => {
+    const exitCode = await exec.exec(mpmPath, mpmArguments, options).catch(async (e) => {
         await rmRF(destination);
         throw e;
     });
