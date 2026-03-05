@@ -21,7 +21,7 @@ inputs:
     default: false
   install-system-dependencies:
     description: >-
-      Install system dependencies required for MATLAB. Defaults to "true" for self-hosted runners and "false" for GitHub-hosted runners. Set to "true" or "false" to override.
+      Option to enable system dependencies installation required for MATLAB, specified as false or true
     required: false
     default: auto
 outputs:
