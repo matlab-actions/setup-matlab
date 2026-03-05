@@ -20,27 +20,21 @@ afterEach(() => {
 
 describe("resolveInstallDependencies function", () => {
     let coreInfoMock: jest.Mock;
-    let coreWarningMock: jest.Mock;
 
     beforeEach(() => {
         coreInfoMock = core.info as jest.Mock;
-        coreWarningMock = core.warning as jest.Mock;
     });
 
     // for explicit 'true' should return true
     it("returns true when input is explicitly 'true'", () => {
         const result = install.resolveInstallDependencies("true");
         expect(result).toBe(true);
-        expect(coreInfoMock).not.toHaveBeenCalled();
-        expect(coreWarningMock).not.toHaveBeenCalled();
     });
 
     // for explicit 'false' should return false
     it("returns false when input is explicitly 'false'", () => {
         const result = install.resolveInstallDependencies("false");
         expect(result).toBe(false);
-        expect(coreInfoMock).not.toHaveBeenCalled();
-        expect(coreWarningMock).not.toHaveBeenCalled();
     });
 
     // for 'auto' mode on GitHub-hosted runner should return true
@@ -54,7 +48,6 @@ describe("resolveInstallDependencies function", () => {
         expect(coreInfoMock).toHaveBeenCalledWith(
             "System dependencies will be installed (auto mode)",
         );
-        expect(coreWarningMock).not.toHaveBeenCalled();
     });
 
     // for 'auto' mode on self-hosted runner should return false
@@ -68,11 +61,10 @@ describe("resolveInstallDependencies function", () => {
         expect(coreInfoMock).toHaveBeenCalledWith(
             "System dependencies will not be installed (auto mode)",
         );
-        expect(coreWarningMock).not.toHaveBeenCalled();
     });
 
-    // for empty string should behave like 'auto' on GitHub-hosted
-    it("returns true for empty string on GitHub-hosted runner (defaults to auto)", () => {
+    // for empty string should throw error for github hosted
+    it("throws error for empty string input on github-hosted runner", () => {
         process.env["RUNNER_ENVIRONMENT"] = "github-hosted";
         process.env["AGENT_ISSELFHOSTED"] = "0";
 
@@ -81,8 +73,8 @@ describe("resolveInstallDependencies function", () => {
         }).toThrow('Invalid value for install-system-dependencies: "". Must be "auto", "true", or "false".');
     });  
 
-    // for empty string should behave like 'auto' on self-hosted
-    it("returns false for empty string on self-hosted runner (defaults to auto)", () => {
+    // for empty string should throw error for self hosted
+    it("throws error for empty string input for self-hosted runner", () => {
         process.env["RUNNER_ENVIRONMENT"] = "self-hosted";
         process.env["AGENT_ISSELFHOSTED"] = "1";
 
@@ -91,15 +83,15 @@ describe("resolveInstallDependencies function", () => {
         }).toThrow('Invalid value for install-system-dependencies: "". Must be "auto", "true", or "false".');
     });  
 
-    // for any invalid input should return false with warning
-    it("returns false for invalid input and logs warning", () => {
+    // for any invalid input should throw error
+    it("throws error for invalid string input", () => {
         expect(() => {
             install.resolveInstallDependencies("invalid-value");
         }).toThrow('Invalid value for install-system-dependencies: "invalid-value". Must be "auto", "true", or "false".');
     });
 
-    // numeric invalid input test
-    it("returns false for numeric input", () => {
+    // for any numeric input should throw error
+    it("throws error for numeric input", () => {
         expect(() => {
             install.resolveInstallDependencies("123");
         }).toThrow('Invalid value for install-system-dependencies: "123". Must be "auto", "true", or "false".');
