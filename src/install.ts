@@ -45,7 +45,7 @@ export function resolveInstallDependencies(input: string): boolean {
  * @param release Release of MATLAB to be set up (e.g. "latest" or "R2020a").
  * @param products A list of products to install (e.g. ["MATLAB", "Simulink"]).
  * @param useCache whether to use the cache to restore & save the MATLAB installation
- * @param installSystemDependenciesInput Input value for install-system-dependencies ("auto" | "true" | "false")
+ * @param installSystemDeps Input value for install-system-dependencies ("auto" | "true" | "false")
  */
 
 
@@ -55,7 +55,7 @@ export async function install(
     release: string,
     products: string[],
     useCache: boolean,
-    installSystemDependenciesInput: string,
+    installSystemDeps: string,
 ) {
     const releaseInfo = await matlab.getReleaseInfo(release);
     if (releaseInfo.name < "r2020b") {
@@ -67,7 +67,7 @@ export async function install(
     }
 
     // resolve system-dependencies based on input and runner type
-    const installSystemDependencies = resolveInstallDependencies(installSystemDependenciesInput);
+    const installSystemDependencies = resolveInstallDependencies(installSystemDeps);
 
     if (installSystemDependencies) {
         await core.group("Preparing system for MATLAB", async () => {

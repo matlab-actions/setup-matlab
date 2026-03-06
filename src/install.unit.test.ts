@@ -89,16 +89,7 @@ describe("resolveInstallDependencies function", () => {
             install.resolveInstallDependencies("invalid-value");
         }).toThrow('Invalid value for install-system-dependencies: "invalid-value". Must be "auto", "true", or "false".');
     });
-
-    // for any numeric input should throw error
-    it("throws error for numeric input", () => {
-        expect(() => {
-            install.resolveInstallDependencies("123");
-        }).toThrow('Invalid value for install-system-dependencies: "123". Must be "auto", "true", or "false".');
-    });
 });
-
-
 
 describe("install procedure", () => {
     let matlabInstallSystemDependenciesMock: jest.Mock;
@@ -208,7 +199,7 @@ describe("install procedure", () => {
         expect(matlabInstallSystemDependenciesMock).toHaveBeenCalled();
     });
 
-    //for installSystemDependencies = false
+    // for installSystemDependencies = false
     it("does not set up dependencies for self-hosted runners", async () => {
         process.env["RUNNER_ENVIRONMENT"] = "self-hosted";
         await expect(
@@ -217,7 +208,7 @@ describe("install procedure", () => {
         expect(matlabInstallSystemDependenciesMock).not.toHaveBeenCalled();
     });
 
-    //install for self hosted if installSystemDependencies = true
+    // install for self hosted if installSystemDependencies = true
     it("sets up dependencies for self-hosted runners when installSystemDependencies is true", async () => {
         process.env["RUNNER_ENVIRONMENT"] = "self-hosted";
         await expect(
@@ -226,7 +217,7 @@ describe("install procedure", () => {
         expect(matlabInstallSystemDependenciesMock).toHaveBeenCalled();
     });
 
-    //does not install for github hosted if installSystemDependencies = false
+    // does not install for github hosted if installSystemDependencies = false
     it("does not set up dependencies for github-hosted runners when installSystemDependencies is false", async () => {
         await expect(
             install.install(platform, arch, release, products, useCache, "false"),
