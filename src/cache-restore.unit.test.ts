@@ -30,16 +30,19 @@ describe("cache-restore", () => {
         restoreCacheMock = cache.restoreCache as jest.Mock;
         saveStateMock = core.saveState as jest.Mock;
     });
-    
+
     it("returns true if cache is found", async () => {
         restoreCacheMock.mockReturnValue("matched-cache-key");
-        await expect(restoreMATLAB(release, platform, arch, products, location)).resolves.toBe(true);
+        await expect(restoreMATLAB(release, platform, arch, products, location)).resolves.toBe(
+            true,
+        );
         expect(saveStateMock).toHaveBeenCalledTimes(4);
     });
 
-
     it("returns false if cache is not found", async () => {
-        await expect(restoreMATLAB(release, platform, arch, products, location)).resolves.toBe(false);
+        await expect(restoreMATLAB(release, platform, arch, products, location)).resolves.toBe(
+            false,
+        );
         expect(saveStateMock).toHaveBeenCalledTimes(3);
     });
 });

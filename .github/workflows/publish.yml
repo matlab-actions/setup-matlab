@@ -32,7 +32,7 @@ jobs:
           git add package.json package-lock.json
           git commit -m "[skip ci] Bump $VERSION"
           git push origin HEAD:main
-          
+
       # Now carry on, business as usual
       - name: Perform npm tasks
         run: npm run ci
@@ -61,15 +61,15 @@ jobs:
 
           # Get the commit of the tag you just released
           commitHash=$(git rev-list -n 1 $longVersion)
-          
+
           # Delete the old major and minor version tags locally
           git tag -d $majorVersion || true
           git tag -d $minorVersion || true
-          
+
           # Make new major and minor version tags locally that point to the commit you got from the "git rev-list" above
           git tag -f $majorVersion $commitHash
           git tag -f $minorVersion $commitHash
-          
+
           # Force push the new minor version tag to overwrite the old tag remotely
           echo "Pushing new tags"
           git push -f origin $longVersion

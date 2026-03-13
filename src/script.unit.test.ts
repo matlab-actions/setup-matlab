@@ -73,7 +73,7 @@ describe("install command generator", () => {
 
     ["darwin", "linux"].forEach((platform) => {
         it(`calls the command with sudo on ${platform}`, () => {
-            whichMock.mockResolvedValue("path/to/sudo"); 
+            whichMock.mockResolvedValue("path/to/sudo");
             const cmd = script.generateExecCommand(platform, scriptPath);
             expect(cmd).resolves.toEqual(`sudo -E bash ${scriptPath}`);
         });
@@ -91,11 +91,11 @@ describe("default install root", () => {
         it(`sets correct install directory for ${platform}`, async () => {
             const installDir = script.defaultInstallRoot(platform, "matlab-batch");
             expect(installDir).toContain(subdirectory);
-            expect(installDir).toContain("matlab-batch")
-        })
+            expect(installDir).toContain("matlab-batch");
+        });
     };
-    
-    testCase("win32", 'Program Files');
+
+    testCase("win32", "Program Files");
     testCase("darwin", "opt");
     testCase("linux", "opt");
-})
+});
