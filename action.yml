@@ -16,7 +16,7 @@ inputs:
     default: ""
   install-system-dependencies:
     description: >-
-      Option to enable system dependencies installation required for MATLAB, specified as false or true
+      Option to install system dependencies for MATLAB, specified as auto, true, or false
     required: false
     default: auto  
   cache:
