@@ -161,7 +161,7 @@ If you are using a Linux runner, the following software must be installed on the
 
 If you are using a macOS runner with an Apple silicon processor, Java&reg; Runtime Environment (JRE&trade;) must be installed on the runner. For information about this requirement and to get a compatible JRE version, see [MATLAB on Apple Silicon Macs](https://www.mathworks.com/support/requirements/apple-silicon.html).
 
-> **Tip:** If you are using a container on your self-hosted runner, you can install the required dependencies in the container by specifying the [MATLAB Dependencies container image on Docker&reg; Hub](https://hub.docker.com/r/mathworks/matlab-deps) in your workflow.
+> **Tip:** If you are using a container on your self-hosted runner, you can satisfy the required dependencies by using the [MATLAB Dependencies container image on Docker&reg; Hub](https://hub.docker.com/r/mathworks/matlab-deps) in your workflow.
 
 #### Licensing
 
