@@ -3,7 +3,7 @@
 import * as exec from "@actions/exec";
 import * as io from "@actions/io";
 import * as toolCache from "@actions/tool-cache";
-import * as script from "./script";
+import * as script from "./script.js";
 
 jest.mock("@actions/exec");
 jest.mock("@actions/io");

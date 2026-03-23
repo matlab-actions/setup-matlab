@@ -5,8 +5,8 @@ import * as tc from "@actions/tool-cache";
 import {rmRF} from "@actions/io";
 import * as path from "path";
 import * as fs from 'fs';
-import * as matlab from "./matlab";
-import properties from "./properties.json";
+import * as matlab from "./matlab.js";
+import properties from "./properties.json" with { type: "json" };
 
 export async function setup(platform: string, architecture: string): Promise<string> {
     let mpmUrl: string;

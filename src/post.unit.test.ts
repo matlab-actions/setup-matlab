@@ -1,11 +1,11 @@
 // Copyright 2025 The MathWorks, Inc.
 
 import * as core from '@actions/core';
-import { cacheMATLAB } from "./cache-save";
-import { run } from "./post";
+import { cacheMATLAB } from "./cache-save.js";
+import { run } from "./post.js";
 
 jest.mock("@actions/core");
-jest.mock("./cache-save");
+jest.mock("./cache-save.js");
 
 afterEach(() => {
     jest.resetAllMocks();

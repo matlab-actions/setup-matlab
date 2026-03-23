@@ -2,7 +2,7 @@
 
 import * as core from '@actions/core';
 import * as cache from '@actions/cache';
-import {State} from './cache-state';
+import {State} from './cache-state.js';
 
 export async function cacheMATLAB() {
     const matchedKey = core.getState(State.CacheMatchedKey);

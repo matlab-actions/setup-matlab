@@ -1,7 +1,8 @@
 {
     "compilerOptions": {
         "target": "ES2022",
-        "module": "CommonJS",
+        "module": "NodeNext",
+        "moduleResolution": "NodeNext",
         "sourceMap": true,
         "rootDir": "src",
         "outDir": "lib",
@@ -11,5 +12,5 @@
         "esModuleInterop": true
     },
 
-    "exclude": ["node_modules", "lib", "**/*.test.ts"]
+    "exclude": ["node_modules", "lib", "**/*.test.ts", "jest.config.ts"]
 }

@@ -1,11 +1,11 @@
 // Copyright 2020-2025 The MathWorks, Inc.
 
 import * as core from "@actions/core";
-import * as matlab from "./matlab";
-import * as mpm from "./mpm";
+import * as matlab from "./matlab.js";
+import * as mpm from "./mpm.js";
 import * as path from "path";
-import * as cache from "./cache-restore";
-import { State } from './install-state';
+import * as cache from "./cache-restore.js";
+import { State } from './install-state.js';
 
 /**
  * Set up an instance of MATLAB on the runner.

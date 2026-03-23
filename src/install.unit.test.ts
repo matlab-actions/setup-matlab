@@ -1,16 +1,16 @@
 // Copyright 2020-2025 The MathWorks, Inc.
 
 import * as core from "@actions/core";
-import * as cache from "./cache-restore";
-import * as install from "./install";
-import * as matlab from "./matlab";
-import * as mpm from "./mpm";
-import { State } from './install-state';
+import * as cache from "./cache-restore.js";
+import * as install from "./install.js";
+import * as matlab from "./matlab.js";
+import * as mpm from "./mpm.js";
+import { State } from './install-state.js';
 
 jest.mock("@actions/core");
-jest.mock("./matlab");
-jest.mock("./mpm");
-jest.mock("./cache-restore");
+jest.mock("./matlab.js");
+jest.mock("./mpm.js");
+jest.mock("./cache-restore.js");
 
 afterEach(() => {
     jest.resetAllMocks();

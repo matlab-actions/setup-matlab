@@ -1,7 +1,7 @@
 // Copyright 2020-2024 The MathWorks, Inc.
 
 import * as core from "@actions/core";
-import * as install from "./install";
+import * as install from "./install.js";
 
 /**
  * Gather action inputs and then run action.

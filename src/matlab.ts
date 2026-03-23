@@ -8,8 +8,8 @@ import * as tc from "@actions/tool-cache";
 import * as fs from "fs";
 import { homedir } from "os";
 import * as path from "path";
-import properties from "./properties.json";
-import * as script from "./script";
+import properties from "./properties.json" with { type: "json" };
+import * as script from "./script.js";
 
 export interface Release {
     name: string;

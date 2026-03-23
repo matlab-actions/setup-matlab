@@ -4,14 +4,14 @@ import * as exec from "@actions/exec";
 import * as tc from "@actions/tool-cache";
 import * as io from "@actions/io";
 import * as path from "path";
-import * as mpm from "./mpm";
-import * as script from "./script";
+import * as mpm from "./mpm.js";
+import * as script from "./script.js";
 
 jest.mock("@actions/core");
 jest.mock("@actions/exec");
 jest.mock("@actions/tool-cache");
 jest.mock("@actions/io");
-jest.mock("./script");
+jest.mock("./script.js");
 
 afterEach(() => {
     jest.resetAllMocks();

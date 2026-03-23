@@ -7,10 +7,10 @@ import * as httpjs from "http";
 import * as net from "net";
 import * as path from "path";
 import * as tc from "@actions/tool-cache";
-import * as matlab from "./matlab";
-import * as script from "./script";
+import * as matlab from "./matlab.js";
+import * as script from "./script.js";
 import fs from "fs";
-import properties from "./properties.json";
+import properties from "./properties.json" with { type: "json" };
 
 jest.mock("http");
 jest.mock("net");
@@ -18,7 +18,7 @@ jest.mock("@actions/core");
 jest.mock("@actions/exec");
 jest.mock("@actions/http-client");
 jest.mock("@actions/tool-cache");
-jest.mock("./script");
+jest.mock("./script.js");
 
 afterEach(() => {
     jest.resetAllMocks();

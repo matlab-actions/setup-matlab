@@ -2,7 +2,7 @@
 
 import * as cache from "@actions/cache";
 import * as core from "@actions/core";
-import { restoreMATLAB } from "./cache-restore";
+import { restoreMATLAB } from "./cache-restore.js";
 
 jest.mock("@actions/cache");
 jest.mock("@actions/core");

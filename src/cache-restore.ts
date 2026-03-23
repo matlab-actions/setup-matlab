@@ -3,8 +3,8 @@
 import * as cache from '@actions/cache';
 import * as core from '@actions/core';
 import * as crypto from "crypto";
-import { State } from './cache-state';
-import { Release } from './matlab';
+import { State } from './cache-state.js';
+import { Release } from './matlab.js';
 
 export async function restoreMATLAB(release: Release, platform: string, architecture: string, products: string[], matlabPath: string, supportPackagesPath?: string): Promise<boolean> {
     const installHash = crypto.createHash('sha256').update(products.sort().join('|')).digest('hex');
