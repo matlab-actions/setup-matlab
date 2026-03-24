@@ -1,4 +1,4 @@
-# Copyright 2020-2025 The MathWorks, Inc.
+# Copyright 2020-2026 The MathWorks, Inc.
 
 name: Setup MATLAB
 description: >-
@@ -14,6 +14,11 @@ inputs:
       Products to set up in addition to MATLAB, specified as a list of product names separated by spaces
     required: false
     default: ""
+  install-system-dependencies:
+    description: >-
+      Option to install system dependencies for MATLAB, specified as auto, true, or false
+    required: false
+    default: auto  
   cache:
     description: >-
       Option to enable caching with GitHub Actions, specified as false or true

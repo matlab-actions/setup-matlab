@@ -47,9 +47,9 @@ export async function generateExecCommand(platform: string, scriptPath: string):
 export function defaultInstallRoot(platform: string, programName: string): string {
     let installRoot: string;
     if (platform === "win32") {
-        installRoot = path.join("C:","Program Files", programName);
+        installRoot = path.join("C:", "Program Files", programName);
     } else {
-        installRoot = path.join("/","opt", programName);
+        installRoot = path.join("/", "opt", programName);
     }
     return installRoot;
 }
