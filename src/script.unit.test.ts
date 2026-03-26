@@ -1,21 +1,32 @@
 // Copyright 2020-2024 The MathWorks, Inc.
 
-import * as exec from "@actions/exec";
-import * as io from "@actions/io";
-import * as toolCache from "@actions/tool-cache";
-import * as script from "./script";
+import { jest, describe, it, expect, afterEach, beforeAll } from "@jest/globals";
 
-jest.mock("@actions/exec");
-jest.mock("@actions/io");
-jest.mock("@actions/tool-cache");
+jest.unstable_mockModule("@actions/exec", () => ({
+    exec: jest.fn(),
+}));
+
+jest.unstable_mockModule("@actions/io", () => ({
+    which: jest.fn(),
+    rmRF: jest.fn(),
+}));
+
+jest.unstable_mockModule("@actions/tool-cache", () => ({
+    downloadTool: jest.fn(),
+}));
+
+const exec = await import("@actions/exec");
+const io = await import("@actions/io");
+const toolCache = await import("@actions/tool-cache");
+const script = await import("./script.js");
 
 afterEach(() => {
     jest.resetAllMocks();
 });
 
 describe("script downloader/runner", () => {
-    const downloadToolMock = toolCache.downloadTool as jest.Mock;
-    const execMock = exec.exec as jest.Mock;
+    const downloadToolMock = toolCache.downloadTool as jest.Mock<typeof toolCache.downloadTool>;
+    const execMock = exec.exec as jest.Mock<typeof exec.exec>;
 
     const sampleUrl = "https://www.mathworks.com/";
     const samplePlatform = "linux";
@@ -58,7 +69,7 @@ describe("script downloader/runner", () => {
 });
 
 describe("install command generator", () => {
-    const whichMock = io.which as jest.Mock;
+    const whichMock = io.which as jest.Mock<typeof io.which>;
 
     const scriptPath = "hello.sh";
 
