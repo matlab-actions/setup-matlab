@@ -1,16 +1,35 @@
 // Copyright 2020-2026 The MathWorks, Inc.
 
-import * as core from "@actions/core";
-import * as cache from "./cache-restore";
-import * as install from "./install";
-import * as matlab from "./matlab";
-import * as mpm from "./mpm";
-import { State } from "./install-state";
+import { jest, describe, it, expect, beforeEach, afterEach } from "@jest/globals";
+import { State } from "./install-state.js";
 
-jest.mock("@actions/core");
-jest.mock("./matlab");
-jest.mock("./mpm");
-jest.mock("./cache-restore");
+jest.unstable_mockModule("@actions/core", () => ({
+    info: jest.fn(),
+    group: jest.fn(),
+    saveState: jest.fn(),
+    addPath: jest.fn(),
+    setOutput: jest.fn(),
+}));
+jest.unstable_mockModule("./matlab.js", () => ({
+    installSystemDependencies: jest.fn(),
+    getReleaseInfo: jest.fn(),
+    getToolcacheDir: jest.fn(),
+    setupBatch: jest.fn(),
+    getSupportPackagesPath: jest.fn(),
+}));
+jest.unstable_mockModule("./mpm.js", () => ({
+    setup: jest.fn(),
+    install: jest.fn(),
+}));
+jest.unstable_mockModule("./cache-restore.js", () => ({
+    restoreMATLAB: jest.fn(),
+}));
+
+const core = await import("@actions/core");
+const matlab = await import("./matlab.js");
+const mpm = await import("./mpm.js");
+const cache = await import("./cache-restore.js");
+const install = await import("./install.js");
 
 afterEach(() => {
     jest.resetAllMocks();
@@ -19,10 +38,10 @@ afterEach(() => {
 });
 
 describe("resolveInstallDependencies function", () => {
-    let coreInfoMock: jest.Mock;
+    let coreInfoMock: jest.Mock<typeof core.info>;
 
     beforeEach(() => {
-        coreInfoMock = core.info as jest.Mock;
+        coreInfoMock = core.info as jest.Mock<typeof core.info>;
     });
 
     // for explicit 'true' should return true
@@ -92,16 +111,16 @@ describe("resolveInstallDependencies function", () => {
 });
 
 describe("install procedure", () => {
-    let matlabInstallSystemDependenciesMock: jest.Mock;
-    let matlabGetReleaseInfoMock: jest.Mock;
-    let matlabGetToolcacheDirMock: jest.Mock;
-    let matlabSetupBatchMock: jest.Mock;
-    let mpmSetupMock: jest.Mock;
-    let mpmInstallMock: jest.Mock;
-    let saveStateMock: jest.Mock;
-    let addPathMock: jest.Mock;
-    let setOutputMock: jest.Mock;
-    let restoreMATLABMock: jest.Mock;
+    let matlabInstallSystemDependenciesMock: jest.Mock<typeof matlab.installSystemDependencies>;
+    let matlabGetReleaseInfoMock: jest.Mock<typeof matlab.getReleaseInfo>;
+    let matlabGetToolcacheDirMock: jest.Mock<typeof matlab.getToolcacheDir>;
+    let matlabSetupBatchMock: jest.Mock<typeof matlab.setupBatch>;
+    let mpmSetupMock: jest.Mock<typeof mpm.setup>;
+    let mpmInstallMock: jest.Mock<typeof mpm.install>;
+    let saveStateMock: jest.Mock<typeof core.saveState>;
+    let addPathMock: jest.Mock<typeof core.addPath>;
+    let setOutputMock: jest.Mock<typeof core.setOutput>;
+    let restoreMATLABMock: jest.Mock<typeof cache.restoreMATLAB>;
 
     const runnerEnv = "github-hosted";
     const agentIsSelfHosted = "0";
@@ -112,7 +131,8 @@ describe("install procedure", () => {
     const releaseInfo = {
         name: "r2022b",
         version: "9.13.0",
-        updateNumber: "latest",
+        update: "latest",
+        isPrerelease: false,
     };
     const products = ["MATLAB", "Parallel_Computing_Toolbox"];
     const useCache = false;
@@ -122,20 +142,20 @@ describe("install procedure", () => {
         install.install(platform, arch, release, products, useCache, installSystemDependencies);
 
     beforeEach(() => {
-        matlabInstallSystemDependenciesMock = matlab.installSystemDependencies as jest.Mock;
-        matlabGetReleaseInfoMock = matlab.getReleaseInfo as jest.Mock;
-        matlabGetToolcacheDirMock = matlab.getToolcacheDir as jest.Mock;
-        matlabSetupBatchMock = matlab.setupBatch as jest.Mock;
-        mpmSetupMock = mpm.setup as jest.Mock;
-        mpmInstallMock = mpm.install as jest.Mock;
-        saveStateMock = core.saveState as jest.Mock;
-        addPathMock = core.addPath as jest.Mock;
-        setOutputMock = core.setOutput as jest.Mock;
-        restoreMATLABMock = cache.restoreMATLAB as jest.Mock;
+        matlabInstallSystemDependenciesMock = matlab.installSystemDependencies as jest.Mock<typeof matlab.installSystemDependencies>;
+        matlabGetReleaseInfoMock = matlab.getReleaseInfo as jest.Mock<typeof matlab.getReleaseInfo>;
+        matlabGetToolcacheDirMock = matlab.getToolcacheDir as jest.Mock<typeof matlab.getToolcacheDir>;
+        matlabSetupBatchMock = matlab.setupBatch as jest.Mock<typeof matlab.setupBatch>;
+        mpmSetupMock = mpm.setup as jest.Mock<typeof mpm.setup>;
+        mpmInstallMock = mpm.install as jest.Mock<typeof mpm.install>;
+        saveStateMock = core.saveState as jest.Mock<typeof core.saveState>;
+        addPathMock = core.addPath as jest.Mock<typeof core.addPath>;
+        setOutputMock = core.setOutput as jest.Mock<typeof core.setOutput>;
+        restoreMATLABMock = cache.restoreMATLAB as jest.Mock<typeof cache.restoreMATLAB>;
 
         // Mock core.group to simply return the output of the func it gets from
         // the caller
-        (core.group as jest.Mock).mockImplementation(async (_, func) => {
+        (core.group as jest.Mock<typeof core.group>).mockImplementation(async (_, func) => {
             return func();
         });
         matlabGetReleaseInfoMock.mockResolvedValue(releaseInfo);
@@ -175,7 +195,8 @@ describe("install procedure", () => {
         matlabGetReleaseInfoMock.mockResolvedValue({
             name: "r2020a",
             version: "9.8.0",
-            updateNumber: "latest",
+            update: "latest",
+            isPrerelease: false,
         });
         await expect(
             install.install(
@@ -272,7 +293,8 @@ describe("install procedure", () => {
         matlabGetReleaseInfoMock.mockResolvedValue({
             name: "r2023a",
             version: "9.14.0",
-            updateNumber: "latest",
+            update: "latest",
+            isPrerelease: false,
         });
         await expect(
             install.install("darwin", "arm64", "r2023a", products, true, "true"),
