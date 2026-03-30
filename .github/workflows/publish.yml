@@ -12,14 +12,14 @@ jobs:
     outputs:
       tag: ${{ steps.update-package-version.outputs.version }}
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
       - name: Configure git
         run: |
           git config user.name 'Release Action'
           git config user.email '<>'
-      - uses: actions/setup-node@v5
+      - uses: actions/setup-node@v6
         with:
-          node-version: 20
+          node-version: 24
 
       # Call `npm version`. It increments the version and commits the changes.
       # We'll save the output (new version string) for use in the following
