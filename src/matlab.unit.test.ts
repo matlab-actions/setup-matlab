@@ -1,24 +1,59 @@
-// Copyright 2022-2024 The MathWorks, Inc.
+// Copyright 2022-2026 The MathWorks, Inc.
 
-import * as core from "@actions/core";
-import * as exec from "@actions/exec";
-import * as http from "@actions/http-client";
+import { jest, describe, it, expect, beforeEach, afterEach } from "@jest/globals";
 import * as httpjs from "http";
 import * as net from "net";
 import * as path from "path";
-import * as tc from "@actions/tool-cache";
-import * as matlab from "./matlab";
-import * as script from "./script";
-import fs from "fs";
-import properties from "./properties.json";
+import * as realFs from "fs";
+import properties from "./properties.json" with { type: "json" };
 
-jest.mock("http");
-jest.mock("net");
-jest.mock("@actions/core");
-jest.mock("@actions/exec");
-jest.mock("@actions/http-client");
-jest.mock("@actions/tool-cache");
-jest.mock("./script");
+const mockWriteFileSync = jest.fn();
+const mockExistsSync = jest.fn();
+const mockMkdirSync = jest.fn();
+const mockSymlinkSync = jest.fn();
+jest.unstable_mockModule("fs", () => ({
+    ...realFs,
+    writeFileSync: mockWriteFileSync,
+    existsSync: mockExistsSync,
+    mkdirSync: mockMkdirSync,
+    symlinkSync: mockSymlinkSync,
+}));
+
+jest.unstable_mockModule("@actions/core", () => ({
+    info: jest.fn(),
+    addPath: jest.fn(),
+}));
+
+jest.unstable_mockModule("@actions/exec", () => ({
+    exec: jest.fn(),
+}));
+
+jest.unstable_mockModule("@actions/http-client", () => {
+    const HttpClient = jest.fn().mockImplementation(() => ({}));
+    HttpClient.prototype.get = jest.fn();
+    return { HttpClient };
+});
+
+jest.unstable_mockModule("@actions/io", () => ({
+    rmRF: jest.fn(),
+}));
+
+jest.unstable_mockModule("@actions/tool-cache", () => ({
+    find: jest.fn(),
+    cacheFile: jest.fn(),
+    downloadTool: jest.fn(),
+}));
+
+jest.unstable_mockModule("./script.js", () => ({
+    downloadAndRunScript: jest.fn(),
+}));
+
+const core = await import("@actions/core");
+const exec = await import("@actions/exec");
+const http = await import("@actions/http-client");
+const tc = await import("@actions/tool-cache");
+const script = await import("./script.js");
+const matlab = await import("./matlab.js");
 
 afterEach(() => {
     jest.resetAllMocks();
@@ -34,19 +69,19 @@ describe("matlab tests", () => {
     const platform = "linux";
 
     describe("toolcacheLocation", () => {
-        let findMock: jest.Mock;
-        let cacheFileMock: jest.Mock;
-        let infoMock: jest.Mock;
+        let findMock: jest.Mock<typeof tc.find>;
+        let cacheFileMock: jest.Mock<typeof tc.cacheFile>;
+        let infoMock: jest.Mock<typeof core.info>;
 
         beforeEach(() => {
-            findMock = tc.find as jest.Mock;
-            cacheFileMock = tc.cacheFile as jest.Mock;
-            infoMock = core.info as jest.Mock;
+            findMock = tc.find as jest.Mock<typeof tc.find>;
+            cacheFileMock = tc.cacheFile as jest.Mock<typeof tc.cacheFile>;
+            infoMock = core.info as jest.Mock<typeof core.info>;
         });
 
         it("returns toolpath if in toolcache", async () => {
             findMock.mockReturnValue("/opt/hostedtoolcache/matlab/r2022b");
-            await expect(matlab.getToolcacheDir(platform, release)).resolves.toMatchObject([
+            await expect(matlab.getToolcacheDir(platform, release)).resolves.toEqual([
                 "/opt/hostedtoolcache/matlab/r2022b",
                 true,
             ]);
@@ -55,8 +90,8 @@ describe("matlab tests", () => {
 
         it("creates cache and returns default path for linux", async () => {
             findMock.mockReturnValue("");
-            cacheFileMock.mockReturnValue("/opt/hostedtoolcache/matlab/r2022b");
-            await expect(matlab.getToolcacheDir(platform, release)).resolves.toMatchObject([
+            cacheFileMock.mockResolvedValue("/opt/hostedtoolcache/matlab/r2022b");
+            await expect(matlab.getToolcacheDir(platform, release)).resolves.toEqual([
                 "/opt/hostedtoolcache/matlab/r2022b",
                 false,
             ]);
@@ -64,8 +99,8 @@ describe("matlab tests", () => {
 
         it("creates cache and returns default path for mac", async () => {
             findMock.mockReturnValue("");
-            cacheFileMock.mockReturnValue("/opt/hostedtoolcache/matlab/r2022b");
-            await expect(matlab.getToolcacheDir("darwin", release)).resolves.toMatchObject([
+            cacheFileMock.mockResolvedValue("/opt/hostedtoolcache/matlab/r2022b");
+            await expect(matlab.getToolcacheDir("darwin", release)).resolves.toEqual([
                 "/opt/hostedtoolcache/matlab/r2022b/MATLAB.app",
                 false,
             ]);
@@ -88,7 +123,7 @@ describe("matlab tests", () => {
                 runnerToolcache = process.env["RUNNER_TOOL_CACHE"];
 
                 process.env["RUNNER_TOOL_CACHE"] = "C:\\hostedtoolcache\\windows\\matlab\\r2022b";
-                cacheFileMock.mockImplementation(() => process.env["RUNNER_TOOL_CACHE"]);
+                cacheFileMock.mockImplementation(() => Promise.resolve(process.env["RUNNER_TOOL_CACHE"] ?? ""));
                 findMock.mockReturnValue("");
             });
 
@@ -99,24 +134,22 @@ describe("matlab tests", () => {
                 process.env["AGENT_ISSELFHOSTED"] = "0";
                 process.env["RUNNER_ENVIRONMENT"] = "github-hosted";
                 // mock & no-op fs operations
-                let existsSyncSpy = jest.spyOn(fs, "existsSync").mockReturnValue(true);
-                let mkdirSyncSpy = jest.spyOn(fs, "mkdirSync").mockImplementation(() => "");
-                let symlinkSyncSpy = jest.spyOn(fs, "symlinkSync").mockImplementation(() => {});
+                mockExistsSync.mockReturnValue(true);
 
-                await expect(matlab.getToolcacheDir("win32", release)).resolves.toMatchObject([
+                await expect(matlab.getToolcacheDir("win32", release)).resolves.toEqual([
                     expectedToolcacheDir,
                     false,
                 ]);
-                expect(existsSyncSpy).toHaveBeenCalledTimes(2);
-                expect(mkdirSyncSpy).toHaveBeenCalledTimes(1);
-                expect(symlinkSyncSpy).toHaveBeenCalledTimes(2);
+                expect(mockExistsSync).toHaveBeenCalledTimes(2);
+                expect(mockMkdirSync).toHaveBeenCalledTimes(1);
+                expect(mockSymlinkSync).toHaveBeenCalledTimes(2);
             });
 
             it("uses default toolcache directory if not github hosted", async () => {
                 let expectedToolcacheDir = "C:\\hostedtoolcache\\windows\\matlab\\r2022b";
                 process.env["AGENT_ISSELFHOSTED"] = "1";
                 process.env["RUNNER_ENVIRONMENT"] = "self-hosted";
-                await expect(matlab.getToolcacheDir("win32", release)).resolves.toMatchObject([
+                await expect(matlab.getToolcacheDir("win32", release)).resolves.toEqual([
                     expectedToolcacheDir,
                     false,
                 ]);
@@ -125,26 +158,26 @@ describe("matlab tests", () => {
             it("uses default toolcache directory toolcache directory is not defined", async () => {
                 let expectedToolcacheDir = "C:\\hostedtoolcache\\windows\\matlab\\r2022b";
                 process.env["RUNNER_TOOL_CACHE"] = "";
-                cacheFileMock.mockReturnValue(expectedToolcacheDir);
-                await expect(matlab.getToolcacheDir("win32", release)).resolves.toMatchObject([
+                cacheFileMock.mockResolvedValue(expectedToolcacheDir);
+                await expect(matlab.getToolcacheDir("win32", release)).resolves.toEqual([
                     expectedToolcacheDir,
                     false,
                 ]);
             });
 
             it("uses default toolcache directory if d: drive doesn't exist", async () => {
-                jest.spyOn(fs, "existsSync").mockReturnValue(false);
+                mockExistsSync.mockReturnValue(false);
                 let expectedToolcacheDir = "C:\\hostedtoolcache\\windows\\matlab\\r2022b";
-                await expect(matlab.getToolcacheDir("win32", release)).resolves.toMatchObject([
+                await expect(matlab.getToolcacheDir("win32", release)).resolves.toEqual([
                     expectedToolcacheDir,
                     false,
                 ]);
             });
 
             it("uses default toolcache directory if c: drive doesn't exist", async () => {
-                jest.spyOn(fs, "existsSync").mockReturnValueOnce(true).mockReturnValue(false);
+                mockExistsSync.mockReturnValueOnce(true).mockReturnValue(false);
                 let expectedToolcacheDir = "C:\\hostedtoolcache\\windows\\matlab\\r2022b";
-                await expect(matlab.getToolcacheDir("win32", release)).resolves.toMatchObject([
+                await expect(matlab.getToolcacheDir("win32", release)).resolves.toEqual([
                     expectedToolcacheDir,
                     false,
                 ]);
@@ -153,16 +186,16 @@ describe("matlab tests", () => {
     });
 
     describe("setupBatch", () => {
-        let tcDownloadToolMock: jest.Mock;
-        let cacheFileMock: jest.Mock;
-        let execMock: jest.Mock;
+        let tcDownloadToolMock: jest.Mock<typeof tc.downloadTool>;
+        let cacheFileMock: jest.Mock<typeof tc.cacheFile>;
+        let execMock: jest.Mock<typeof exec.exec>;
         const arch = "x64";
         const batchMockPath = path.join("path", "to", "matlab-batch");
 
         beforeEach(() => {
-            tcDownloadToolMock = tc.downloadTool as jest.Mock;
-            cacheFileMock = tc.cacheFile as jest.Mock;
-            execMock = exec.exec as jest.Mock;
+            tcDownloadToolMock = tc.downloadTool as jest.Mock<typeof tc.downloadTool>;
+            cacheFileMock = tc.cacheFile as jest.Mock<typeof tc.cacheFile>;
+            execMock = exec.exec as jest.Mock<typeof exec.exec>;
             process.env.RUNNER_TEMP = path.join("runner", "workdir", "tmp");
 
             tcDownloadToolMock.mockResolvedValue(batchMockPath);
@@ -235,7 +268,7 @@ describe("matlab tests", () => {
         });
 
         it("latest-including-prereleases resolves", () => {
-            expect(matlab.getReleaseInfo("latest")).resolves.toMatchObject(release);
+            expect(matlab.getReleaseInfo("latest")).resolves.toEqual(release);
         });
 
         it("prerelease-latest resolves", () => {
@@ -254,13 +287,13 @@ describe("matlab tests", () => {
                     },
                 };
             });
-            expect(matlab.getReleaseInfo("latest-including-prerelease")).resolves.toMatchObject(
+            expect(matlab.getReleaseInfo("latest-including-prerelease")).resolves.toEqual(
                 prerelease,
             );
         });
 
         it("case insensitive", () => {
-            expect(matlab.getReleaseInfo("R2022b")).resolves.toMatchObject(release);
+            expect(matlab.getReleaseInfo("R2022b")).resolves.toEqual(release);
         });
 
         it("Sets minor version according to a or b release", () => {
@@ -270,7 +303,7 @@ describe("matlab tests", () => {
                 version: "2022.1.999",
                 isPrerelease: false,
             };
-            expect(matlab.getReleaseInfo("R2022a")).resolves.toMatchObject(R2022aRelease);
+            expect(matlab.getReleaseInfo("R2022a")).resolves.toEqual(R2022aRelease);
 
             const R2022bRelease = {
                 name: "r2022b",
@@ -278,7 +311,7 @@ describe("matlab tests", () => {
                 version: "2022.2.999",
                 isPrerelease: false,
             };
-            expect(matlab.getReleaseInfo("R2022b")).resolves.toMatchObject(R2022bRelease);
+            expect(matlab.getReleaseInfo("R2022b")).resolves.toEqual(R2022bRelease);
         });
 
         it("allows specifying update number", () => {
@@ -286,8 +319,9 @@ describe("matlab tests", () => {
                 name: "r2022b",
                 update: "u2",
                 version: "2022.2.2",
+                isPrerelease: false,
             };
-            expect(matlab.getReleaseInfo("R2022bU2")).resolves.toMatchObject(releaseWithUpdate);
+            expect(matlab.getReleaseInfo("R2022bU2")).resolves.toEqual(releaseWithUpdate);
         });
 
         it("displays message for invalid update level input format and uses latest", () => {
@@ -312,16 +346,16 @@ describe("matlab tests", () => {
     });
 
     describe("installSystemDependencies", () => {
-        let downloadAndRunScriptMock: jest.Mock;
-        let tcDownloadToolMock: jest.Mock;
-        let execMock: jest.Mock;
+        let downloadAndRunScriptMock: jest.Mock<typeof script.downloadAndRunScript>;
+        let tcDownloadToolMock: jest.Mock<typeof tc.downloadTool>;
+        let execMock: jest.Mock<typeof exec.exec>;
         const arch = "x64";
         const release = "r2023b";
 
         beforeEach(() => {
-            downloadAndRunScriptMock = script.downloadAndRunScript as jest.Mock;
-            tcDownloadToolMock = tc.downloadTool as jest.Mock;
-            execMock = exec.exec as jest.Mock;
+            downloadAndRunScriptMock = script.downloadAndRunScript as jest.Mock<typeof script.downloadAndRunScript>;
+            tcDownloadToolMock = tc.downloadTool as jest.Mock<typeof tc.downloadTool>;
+            execMock = exec.exec as jest.Mock<typeof exec.exec>;
         });
 
         describe("test on all supported platforms", () => {

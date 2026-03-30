@@ -1,4 +1,4 @@
-// Copyright 2022-2024 The MathWorks, Inc.
+// Copyright 2022-2026 The MathWorks, Inc.
 
 import * as core from "@actions/core";
 import * as exec from "@actions/exec";
@@ -8,8 +8,8 @@ import * as tc from "@actions/tool-cache";
 import * as fs from "fs";
 import { homedir } from "os";
 import * as path from "path";
-import properties from "./properties.json";
-import * as script from "./script";
+import properties from "./properties.json" with { type: "json" };
+import * as script from "./script.js";
 
 export interface Release {
     name: string;

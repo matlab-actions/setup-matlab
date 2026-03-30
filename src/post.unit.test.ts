@@ -1,25 +1,34 @@
-// Copyright 2025 The MathWorks, Inc.
+// Copyright 2025-2026 The MathWorks, Inc.
 
-import * as core from "@actions/core";
-import { cacheMATLAB } from "./cache-save";
-import { run } from "./post";
+import { jest, describe, it, expect, beforeEach, afterEach } from "@jest/globals";
 
-jest.mock("@actions/core");
-jest.mock("./cache-save");
+jest.unstable_mockModule("@actions/core", () => ({
+    getBooleanInput: jest.fn(),
+    getState: jest.fn(),
+    error: jest.fn(),
+}));
+
+jest.unstable_mockModule("./cache-save.js", () => ({
+    cacheMATLAB: jest.fn(),
+}));
+
+const core = await import("@actions/core");
+const { cacheMATLAB } = await import("./cache-save.js");
+const { run } = await import("./post.js");
 
 afterEach(() => {
     jest.resetAllMocks();
 });
 
 describe("post", () => {
-    let getBooleanInputMock: jest.Mock;
-    let getStateMock: jest.Mock;
-    let cacheMATLABMock: jest.Mock;
+    let getBooleanInputMock: jest.Mock<typeof core.getBooleanInput>;
+    let getStateMock: jest.Mock<typeof core.getState>;
+    let cacheMATLABMock: jest.Mock<typeof cacheMATLAB>;
 
     beforeEach(() => {
-        getBooleanInputMock = core.getBooleanInput as jest.Mock;
-        getStateMock = core.getState as jest.Mock;
-        cacheMATLABMock = cacheMATLAB as jest.Mock;
+        getBooleanInputMock = core.getBooleanInput as jest.Mock<typeof core.getBooleanInput>;
+        getStateMock = core.getState as jest.Mock<typeof core.getState>;
+        cacheMATLABMock = cacheMATLAB as jest.Mock<typeof cacheMATLAB>;
     });
 
     it("caches MATLAB when cache true and install successful", async () => {

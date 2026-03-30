@@ -1,19 +1,27 @@
-// Copyright 2023-2024 The MathWorks, Inc.
+// Copyright 2023-2026 The MathWorks, Inc.
 
-import * as cache from "@actions/cache";
-import * as core from "@actions/core";
-import { restoreMATLAB } from "./cache-restore";
+import { jest, describe, it, expect, beforeEach, afterEach } from "@jest/globals";
 
-jest.mock("@actions/cache");
-jest.mock("@actions/core");
+jest.unstable_mockModule("@actions/cache", () => ({
+    restoreCache: jest.fn(),
+}));
+
+jest.unstable_mockModule("@actions/core", () => ({
+    saveState: jest.fn(),
+    info: jest.fn(),
+}));
+
+const cache = await import("@actions/cache");
+const core = await import("@actions/core");
+const { restoreMATLAB } = await import("./cache-restore.js");
 
 afterEach(() => {
     jest.resetAllMocks();
 });
 
 describe("cache-restore", () => {
-    let restoreCacheMock: jest.Mock;
-    let saveStateMock: jest.Mock;
+    let restoreCacheMock: jest.Mock<typeof cache.restoreCache>;
+    let saveStateMock: jest.Mock<typeof core.saveState>;
 
     const platform = "linux";
     const arch = "x64";
@@ -27,12 +35,12 @@ describe("cache-restore", () => {
     const location = "/path/to/matlab";
 
     beforeEach(() => {
-        restoreCacheMock = cache.restoreCache as jest.Mock;
-        saveStateMock = core.saveState as jest.Mock;
+        restoreCacheMock = cache.restoreCache as jest.Mock<typeof cache.restoreCache>;
+        saveStateMock = core.saveState as jest.Mock<typeof core.saveState>;
     });
 
     it("returns true if cache is found", async () => {
-        restoreCacheMock.mockReturnValue("matched-cache-key");
+        restoreCacheMock.mockResolvedValue("matched-cache-key");
         await expect(restoreMATLAB(release, platform, arch, products, location)).resolves.toBe(
             true,
         );

@@ -1,23 +1,32 @@
-// Copyright 2023-2024 The MathWorks, Inc.
+// Copyright 2023-2026 The MathWorks, Inc.
 
-import * as core from "@actions/core";
-import * as cache from "@actions/cache";
-import { cacheMATLAB } from "./cache-save";
+import { jest, describe, it, expect, beforeEach, afterEach } from "@jest/globals";
 
-jest.mock("@actions/cache");
-jest.mock("@actions/core");
+jest.unstable_mockModule("@actions/cache", () => ({
+    saveCache: jest.fn(),
+}));
+
+jest.unstable_mockModule("@actions/core", () => ({
+    getState: jest.fn(),
+    info: jest.fn(),
+    warning: jest.fn(),
+}));
+
+const cache = await import("@actions/cache");
+const core = await import("@actions/core");
+const { cacheMATLAB } = await import("./cache-save.js");
 
 afterEach(() => {
     jest.resetAllMocks();
 });
 
 describe("cache-save", () => {
-    let saveCacheMock: jest.Mock;
-    let getStateMock: jest.Mock;
+    let saveCacheMock: jest.Mock<typeof cache.saveCache>;
+    let getStateMock: jest.Mock<typeof core.getState>;
 
     beforeEach(() => {
-        saveCacheMock = cache.saveCache as jest.Mock;
-        getStateMock = core.getState as jest.Mock;
+        saveCacheMock = cache.saveCache as jest.Mock<typeof cache.saveCache>;
+        getStateMock = core.getState as jest.Mock<typeof core.getState>;
     });
 
     it("saves cache if key does not equal matched key", async () => {

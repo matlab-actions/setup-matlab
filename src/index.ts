@@ -1,7 +1,7 @@
 // Copyright 2020-2026 The MathWorks, Inc.
 
 import * as core from "@actions/core";
-import * as install from "./install";
+import * as install from "./install.js";
 
 
 /**
