@@ -1,4 +1,4 @@
-// Copyright 2020-2024 The MathWorks, Inc.
+// Copyright 2020-2026 The MathWorks, Inc.
 
 import { jest, describe, it, expect, afterEach, beforeAll } from "@jest/globals";
 
