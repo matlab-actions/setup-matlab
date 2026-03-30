@@ -10,6 +10,7 @@ jest.unstable_mockModule("@actions/core", () => ({
     addPath: jest.fn(),
     setOutput: jest.fn(),
 }));
+
 jest.unstable_mockModule("./matlab.js", () => ({
     installSystemDependencies: jest.fn(),
     getReleaseInfo: jest.fn(),
@@ -17,10 +18,12 @@ jest.unstable_mockModule("./matlab.js", () => ({
     setupBatch: jest.fn(),
     getSupportPackagesPath: jest.fn(),
 }));
+
 jest.unstable_mockModule("./mpm.js", () => ({
     setup: jest.fn(),
     install: jest.fn(),
 }));
+
 jest.unstable_mockModule("./cache-restore.js", () => ({
     restoreMATLAB: jest.fn(),
 }));

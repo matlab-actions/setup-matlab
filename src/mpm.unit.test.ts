@@ -4,16 +4,20 @@ import { jest, describe, it, expect, beforeEach, afterEach } from "@jest/globals
 import type { ExecOptions } from "@actions/exec";
 
 jest.unstable_mockModule("@actions/core", () => ({}));
+
 jest.unstable_mockModule("@actions/exec", () => ({
     exec: jest.fn(),
 }));
+
 jest.unstable_mockModule("@actions/tool-cache", () => ({
     downloadTool: jest.fn(),
     cacheFile: jest.fn(),
 }));
+
 jest.unstable_mockModule("@actions/io", () => ({
     rmRF: jest.fn(),
 }));
+
 jest.unstable_mockModule("./script.js", () => ({
     defaultInstallRoot: jest.fn(),
 }));

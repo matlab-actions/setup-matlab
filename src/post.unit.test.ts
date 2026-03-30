@@ -7,6 +7,7 @@ jest.unstable_mockModule("@actions/core", () => ({
     getState: jest.fn(),
     error: jest.fn(),
 }));
+
 jest.unstable_mockModule("./cache-save.js", () => ({
     cacheMATLAB: jest.fn(),
 }));

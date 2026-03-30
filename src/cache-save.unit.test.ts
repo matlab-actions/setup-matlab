@@ -5,6 +5,7 @@ import { jest, describe, it, expect, beforeEach, afterEach } from "@jest/globals
 jest.unstable_mockModule("@actions/cache", () => ({
     saveCache: jest.fn(),
 }));
+
 jest.unstable_mockModule("@actions/core", () => ({
     getState: jest.fn(),
     info: jest.fn(),
