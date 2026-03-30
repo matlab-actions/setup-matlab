@@ -1,6 +1,7 @@
 // Copyright 2022-2024 The MathWorks, Inc.
 
 import { jest, describe, it, expect, beforeEach, afterEach } from "@jest/globals";
+import type { ExecOptions } from "@actions/exec";
 
 jest.unstable_mockModule("@actions/core", () => ({}));
 jest.unstable_mockModule("@actions/exec", () => ({
@@ -211,7 +212,7 @@ describe("mpm install", () => {
         const products = ["MATLAB", "Compiler"];
 
         // Simulate mpm writing the "already installed" message to stdout and returning non-zero
-        execMock.mockImplementation((cmd, args, options) => {
+        execMock.mockImplementation((cmd: string, args?: string[], options?: ExecOptions) => {
             if (options && options.listeners && typeof options.listeners.stdout === "function") {
                 options.listeners.stdout(
                     Buffer.from("All specified products are already installed."),

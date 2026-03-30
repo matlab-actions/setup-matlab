@@ -13,13 +13,6 @@ const mockMkdirSync = jest.fn();
 const mockSymlinkSync = jest.fn();
 jest.unstable_mockModule("fs", () => ({
     ...realFs,
-    default: {
-        ...realFs,
-        writeFileSync: mockWriteFileSync,
-        existsSync: mockExistsSync,
-        mkdirSync: mockMkdirSync,
-        symlinkSync: mockSymlinkSync,
-    },
     writeFileSync: mockWriteFileSync,
     existsSync: mockExistsSync,
     mkdirSync: mockMkdirSync,
