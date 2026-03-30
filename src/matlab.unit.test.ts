@@ -37,6 +37,7 @@ jest.unstable_mockModule("@actions/http-client", () => {
 jest.unstable_mockModule("@actions/io", () => ({
     rmRF: jest.fn(),
 }));
+
 jest.unstable_mockModule("@actions/tool-cache", () => ({
     find: jest.fn(),
     cacheFile: jest.fn(),
