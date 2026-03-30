@@ -14,7 +14,7 @@ jobs:
           node-version: 24
       - name: Perform npm tasks
         run: npm run ci
-      - uses: actions/upload-artifact@v5
+      - uses: actions/upload-artifact@v7
         with:
           name: built-action
           path: |
@@ -67,7 +67,7 @@ jobs:
             check-matlab: matlabVer = ver('matlab'); assert(strcmp(matlabVer.Release,'(R2023a)'));
             check-toolbox: symbolicVer = ver('symbolic'); assert(strcmp(symbolicVer.Release,'(R2023a)'));
     steps:
-      - uses: actions/download-artifact@v5
+      - uses: actions/download-artifact@v8
         with:
           name: built-action
       - name: Install selected products
