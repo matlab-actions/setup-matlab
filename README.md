@@ -23,9 +23,9 @@ jobs:
             - name: Check out repository
               uses: actions/checkout@v4
             - name: Set up MATLAB
-              uses: matlab-actions/setup-matlab@v2
+              uses: matlab-actions/setup-matlab@v3
             - name: Run build
-              uses: matlab-actions/run-build@v2
+              uses: matlab-actions/run-build@v3
 ```
 
 ### Run Tests in Parallel
@@ -43,14 +43,14 @@ jobs:
       - name: Check out repository
         uses: actions/checkout@v4
       - name: Set up products
-        uses: matlab-actions/setup-matlab@v2
+        uses: matlab-actions/setup-matlab@v3
         with:
           products: >
             Simulink
             Simulink_Test
             Parallel_Computing_Toolbox
       - name: Run tests
-        uses: matlab-actions/run-tests@v2
+        uses: matlab-actions/run-tests@v3
         with:
           use-parallel: true
 ```
@@ -70,9 +70,9 @@ jobs:
             - name: Check out repository
               uses: actions/checkout@v4
             - name: Set up MATLAB
-              uses: matlab-actions/setup-matlab@v2
+              uses: matlab-actions/setup-matlab@v3
             - name: Run script
-              uses: matlab-actions/run-command@v2
+              uses: matlab-actions/run-command@v3
               with:
                   command: myscript
 ```
@@ -104,9 +104,9 @@ jobs:
       - name: Check out repository
         uses: actions/checkout@v4
       - name: Set up MATLAB
-        uses: matlab-actions/setup-matlab@v2
+        uses: matlab-actions/setup-matlab@v3
       - name: Run tests
-        uses: matlab-actions/run-tests@v2
+        uses: matlab-actions/run-tests@v3
 ```
 
 ### Build Across Multiple Platforms
@@ -127,16 +127,16 @@ jobs:
       - name: Check out repository
         uses: actions/checkout@v4
       - name: Set up MATLAB
-        uses: matlab-actions/setup-matlab@v2
+        uses: matlab-actions/setup-matlab@v3
       - name: Run build
-        uses: matlab-actions/run-build@v2
+        uses: matlab-actions/run-build@v3
         with:
           tasks: test
 ```
 
 ## Set Up MATLAB
 
-When you define your workflow in the `.github/workflows` directory of your repository, specify the **Setup MATLAB** action as `matlab-actions/setup-matlab@v2`. The action accepts optional inputs.
+When you define your workflow in the `.github/workflows` directory of your repository, specify the **Setup MATLAB** action as `matlab-actions/setup-matlab@v3`. The action accepts optional inputs.
 
 | Input                         | Description                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           |
 | ----------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
