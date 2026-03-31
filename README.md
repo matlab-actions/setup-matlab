@@ -21,7 +21,7 @@ jobs:
         runs-on: ubuntu-latest
         steps:
             - name: Check out repository
-              uses: actions/checkout@v4
+              uses: actions/checkout@v6
             - name: Set up MATLAB
               uses: matlab-actions/setup-matlab@v3
             - name: Run build
@@ -41,7 +41,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Check out repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
       - name: Set up products
         uses: matlab-actions/setup-matlab@v3
         with:
@@ -68,7 +68,7 @@ jobs:
         runs-on: ubuntu-latest
         steps:
             - name: Check out repository
-              uses: actions/checkout@v4
+              uses: actions/checkout@v6
             - name: Set up MATLAB
               uses: matlab-actions/setup-matlab@v3
             - name: Run script
@@ -102,7 +102,7 @@ jobs:
     runs-on: self-hosted
     steps:
       - name: Check out repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
       - name: Set up MATLAB
         uses: matlab-actions/setup-matlab@v3
       - name: Run tests
@@ -125,7 +125,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     steps:
       - name: Check out repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
       - name: Set up MATLAB
         uses: matlab-actions/setup-matlab@v3
       - name: Run build
