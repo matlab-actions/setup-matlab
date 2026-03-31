@@ -13,7 +13,7 @@
         "build": "tsc",
         "package": "ncc build src/index.ts -o dist/setup --minify && ncc build src/post.ts -o dist/cache-save --minify",
         "test": "NODE_OPTIONS='--experimental-vm-modules' jest",
-        "all": "npm run lint && npm test && npm run build && npm run package",
+        "all": "npm run format-check && npm run lint && npm test && npm run build && npm run package",
         "ci": "npm run clean && npm ci && npm run all"
     },
     "files": [
