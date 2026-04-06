@@ -7,31 +7,34 @@ import * as path from "path";
 import * as cache from "./cache-restore.js";
 import { State } from "./install-state.js";
 
-
 export function resolveInstallDependencies(input: string): boolean {
-    const normalized = (input ?? '').trim().toLowerCase();
+    const normalized = (input ?? "").trim().toLowerCase();
 
-    if (normalized === 'true') {
+    if (normalized === "true") {
         return true;
     }
 
-    if (normalized === 'false'){
+    if (normalized === "false") {
         return false;
     }
 
-    if (normalized === 'auto') {
+    if (normalized === "auto") {
         // detect runner type and provide value accordingly
         const runnerEnvironment = process.env["RUNNER_ENVIRONMENT"];
         const agentIsSelfHosted = process.env["AGENT_ISSELFHOSTED"];
 
         const isGitHubHosted = runnerEnvironment === "github-hosted" && agentIsSelfHosted !== "1";
 
-        core.info(`Auto-detected runner type: ${isGitHubHosted ? 'GitHub-hosted' : 'self-hosted'}`);
-        core.info(`System dependencies will ${isGitHubHosted ? 'be' : 'not be'} installed (auto mode)`);
+        core.info(`Auto-detected runner type: ${isGitHubHosted ? "GitHub-hosted" : "self-hosted"}`);
+        core.info(
+            `System dependencies will ${isGitHubHosted ? "be" : "not be"} installed (auto mode)`,
+        );
 
         return isGitHubHosted;
     }
-    throw new Error(`Invalid value for install-system-dependencies: "${input}". Must be "auto", "true", or "false".`);
+    throw new Error(
+        `Invalid value for install-system-dependencies: "${input}". Must be "auto", "true", or "false".`,
+    );
 }
 
 /**
@@ -47,7 +50,6 @@ export function resolveInstallDependencies(input: string): boolean {
  * @param useCache whether to use the cache to restore & save the MATLAB installation
  * @param installSystemDeps Input value for install-system-dependencies ("auto" | "true" | "false")
  */
-
 
 export async function install(
     platform: string,

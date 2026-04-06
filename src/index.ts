@@ -3,7 +3,6 @@
 import * as core from "@actions/core";
 import * as install from "./install.js";
 
-
 /**
  * Gather action inputs and then run action.
  */
@@ -14,8 +13,15 @@ export async function run() {
     const products = core.getMultilineInput("products");
     const cache = core.getBooleanInput("cache");
     const installSystemDependencies = core.getInput("install-system-dependencies");
-    
-    return install.install(platform, architecture, release, products, cache, installSystemDependencies);
+
+    return install.install(
+        platform,
+        architecture,
+        release,
+        products,
+        cache,
+        installSystemDependencies,
+    );
 }
 
 run().catch((e) => {

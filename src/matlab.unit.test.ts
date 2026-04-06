@@ -123,7 +123,9 @@ describe("matlab tests", () => {
                 runnerToolcache = process.env["RUNNER_TOOL_CACHE"];
 
                 process.env["RUNNER_TOOL_CACHE"] = "C:\\hostedtoolcache\\windows\\matlab\\r2022b";
-                cacheFileMock.mockImplementation(() => Promise.resolve(process.env["RUNNER_TOOL_CACHE"] ?? ""));
+                cacheFileMock.mockImplementation(() =>
+                    Promise.resolve(process.env["RUNNER_TOOL_CACHE"] ?? ""),
+                );
                 findMock.mockReturnValue("");
             });
 
@@ -353,7 +355,9 @@ describe("matlab tests", () => {
         const release = "r2023b";
 
         beforeEach(() => {
-            downloadAndRunScriptMock = script.downloadAndRunScript as jest.Mock<typeof script.downloadAndRunScript>;
+            downloadAndRunScriptMock = script.downloadAndRunScript as jest.Mock<
+                typeof script.downloadAndRunScript
+            >;
             tcDownloadToolMock = tc.downloadTool as jest.Mock<typeof tc.downloadTool>;
             execMock = exec.exec as jest.Mock<typeof exec.exec>;
         });

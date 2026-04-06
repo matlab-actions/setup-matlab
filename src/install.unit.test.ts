@@ -92,8 +92,10 @@ describe("resolveInstallDependencies function", () => {
 
         expect(() => {
             install.resolveInstallDependencies("");
-        }).toThrow('Invalid value for install-system-dependencies: "". Must be "auto", "true", or "false".');
-    });  
+        }).toThrow(
+            'Invalid value for install-system-dependencies: "". Must be "auto", "true", or "false".',
+        );
+    });
 
     // for empty string should throw error for self hosted
     it("throws error for empty string input for self-hosted runner", () => {
@@ -102,14 +104,18 @@ describe("resolveInstallDependencies function", () => {
 
         expect(() => {
             install.resolveInstallDependencies("");
-        }).toThrow('Invalid value for install-system-dependencies: "". Must be "auto", "true", or "false".');
-    });  
+        }).toThrow(
+            'Invalid value for install-system-dependencies: "". Must be "auto", "true", or "false".',
+        );
+    });
 
     // for any invalid input should throw error
     it("throws error for invalid string input", () => {
         expect(() => {
             install.resolveInstallDependencies("invalid-value");
-        }).toThrow('Invalid value for install-system-dependencies: "invalid-value". Must be "auto", "true", or "false".');
+        }).toThrow(
+            'Invalid value for install-system-dependencies: "invalid-value". Must be "auto", "true", or "false".',
+        );
     });
 });
 
@@ -145,9 +151,13 @@ describe("install procedure", () => {
         install.install(platform, arch, release, products, useCache, installSystemDependencies);
 
     beforeEach(() => {
-        matlabInstallSystemDependenciesMock = matlab.installSystemDependencies as jest.Mock<typeof matlab.installSystemDependencies>;
+        matlabInstallSystemDependenciesMock = matlab.installSystemDependencies as jest.Mock<
+            typeof matlab.installSystemDependencies
+        >;
         matlabGetReleaseInfoMock = matlab.getReleaseInfo as jest.Mock<typeof matlab.getReleaseInfo>;
-        matlabGetToolcacheDirMock = matlab.getToolcacheDir as jest.Mock<typeof matlab.getToolcacheDir>;
+        matlabGetToolcacheDirMock = matlab.getToolcacheDir as jest.Mock<
+            typeof matlab.getToolcacheDir
+        >;
         matlabSetupBatchMock = matlab.setupBatch as jest.Mock<typeof matlab.setupBatch>;
         mpmSetupMock = mpm.setup as jest.Mock<typeof mpm.setup>;
         mpmInstallMock = mpm.install as jest.Mock<typeof mpm.install>;
@@ -202,14 +212,7 @@ describe("install procedure", () => {
             isPrerelease: false,
         });
         await expect(
-            install.install(
-                platform,
-                arch,
-                "r2020a",
-                products,
-                useCache,
-                "true",
-            ),
+            install.install(platform, arch, "r2020a", products, useCache, "true"),
         ).rejects.toBeDefined();
     });
 
