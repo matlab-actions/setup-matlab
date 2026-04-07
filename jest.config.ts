@@ -14,7 +14,7 @@ export default {
             },
         ],
     },
-    extensionsToTreatAsEsm: ['.ts'],
+    extensionsToTreatAsEsm: [".ts"],
     transformIgnorePatterns: ["node_modules/(?!(@actions)/)"],
     moduleNameMapper: {
         "^(\\.{1,2}/.*)\\.js$": "$1",

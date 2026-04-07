@@ -45,7 +45,9 @@ describe("setup mpm", () => {
         tcDownloadToolMock = tc.downloadTool as jest.Mock<typeof tc.downloadTool>;
         tcCacheFileMock = tc.cacheFile as jest.Mock<typeof tc.cacheFile>;
         execMock = exec.exec as jest.Mock<typeof exec.exec>;
-        defaultInstallRootMock = script.defaultInstallRoot as jest.Mock<typeof script.defaultInstallRoot>;
+        defaultInstallRootMock = script.defaultInstallRoot as jest.Mock<
+            typeof script.defaultInstallRoot
+        >;
         tcDownloadToolMock.mockResolvedValue(mpmMockPath);
         tcCacheFileMock.mockResolvedValue(mpmMockPath);
         process.env.RUNNER_TEMP = path.join("runner", "workdir", "tmp");

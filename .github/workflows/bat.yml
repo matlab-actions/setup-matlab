@@ -80,11 +80,11 @@ jobs:
         run: 'if [[ "${{ steps.setup_matlab.outputs.matlabroot }}" != *"MATLAB"* ]]; then exit 1; fi'
         shell: bash
       - name: Check MATLAB version
-        uses: matlab-actions/run-command@v2
+        uses: matlab-actions/run-command@v3
         with:
           command: "${{ matrix.check-matlab }}"
       - name: Check toolbox version
-        uses: matlab-actions/run-command@v2
+        uses: matlab-actions/run-command@v3
         with:
           command: "${{ matrix.check-toolbox }}"
       - name: Check NoOp on 2nd install
@@ -100,7 +100,7 @@ jobs:
           products: Image_Processing_Toolbox
       - name: Check additional product was installed
         if: matrix.os != 'windows-latest'
-        uses: matlab-actions/run-command@v2
+        uses: matlab-actions/run-command@v3
         with:
           command: assert(any(strcmp({ver().Name},'Image Processing Toolbox')))
       - name: Call setup MATLAB again with different release # should not error as in issue 130
@@ -108,6 +108,6 @@ jobs:
         with:
           release: R2023b
       - name: Check MATLAB version
-        uses: matlab-actions/run-command@v2
+        uses: matlab-actions/run-command@v3
         with:
           command: matlabVer = ver('matlab'); assert(strcmp(matlabVer.Release,'(R2023b)'));
