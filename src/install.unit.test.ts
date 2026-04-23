@@ -336,9 +336,9 @@ describe("install procedure", () => {
             matlabGetReleaseInfoMock.mockResolvedValue(prereleaseInfo);
         });
 
-        it("retries with general release when prerelease install fails", async () => {
+        it("retries with general release when prerelease install fails with unavailable release", async () => {
             mpmInstallMock
-                .mockRejectedValueOnce(Error("Script exited with non-zero code 1"))
+                .mockRejectedValueOnce(Error("Specified release is unavailable"))
                 .mockResolvedValueOnce(undefined);
             matlabGetToolcacheDirMock
                 .mockResolvedValueOnce([
@@ -360,7 +360,7 @@ describe("install procedure", () => {
         });
 
         it("rejects when both prerelease and general release install fail", async () => {
-            mpmInstallMock.mockRejectedValue(Error("Script exited with non-zero code 1"));
+            mpmInstallMock.mockRejectedValue(Error("Specified release is unavailable"));
             matlabGetToolcacheDirMock
                 .mockResolvedValueOnce([
                     "/opt/hostedtoolcache/MATLAB/2026.1.999-prerelease/x64",
@@ -375,7 +375,18 @@ describe("install procedure", () => {
 
         it("does not retry for non-prerelease install failures", async () => {
             matlabGetReleaseInfoMock.mockResolvedValue(releaseInfo);
+            mpmInstallMock.mockRejectedValue(Error("Specified release is unavailable"));
+            await expect(doInstall()).rejects.toBeDefined();
+            expect(mpmInstallMock).toHaveBeenCalledTimes(1);
+        });
+
+        it("does not retry prerelease install for other errors", async () => {
             mpmInstallMock.mockRejectedValue(Error("Script exited with non-zero code 1"));
+            matlabGetToolcacheDirMock.mockResolvedValueOnce([
+                "/opt/hostedtoolcache/MATLAB/2026.1.999-prerelease/x64",
+                false,
+            ]);
+
             await expect(doInstall()).rejects.toBeDefined();
             expect(mpmInstallMock).toHaveBeenCalledTimes(1);
         });

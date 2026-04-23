@@ -109,7 +109,11 @@ export async function install(
             try {
                 await mpm.install(mpmPath, releaseInfo, products, destination);
             } catch (e) {
-                if (releaseInfo.isPrerelease && e instanceof Error && e.message === "Specified release is unavailable") {
+                if (
+                    releaseInfo.isPrerelease &&
+                    e instanceof Error &&
+                    e.message === "Specified release is unavailable"
+                ) {
                     core.info("Installation failed. Retrying...");
                     const grRelease: matlab.Release = {
                         ...releaseInfo,
