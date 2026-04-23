@@ -100,13 +100,12 @@ export async function install(
 
         if (!cacheHit) {
             const mpmPath: string = await mpm.setup(platform, matlabArch);
-
             // Workaround: When a new General Release ships, there is a lag
             // before latest-including-prerelease is updated. During this
-            // window the prerelease install fails because the release does
-            // not exist yet. Fall back to the General Release so the job
-            // can still succeed. Remove this once the release pipeline
-            // eliminates the lag.
+            // window the prerelease install fails because the prerelease is
+            // pulled. Fall back to the General Release so the job can still
+            // succeed. Remove this once the release procss eliminates the
+            // lag.
             try {
                 await mpm.install(mpmPath, releaseInfo, products, destination);
             } catch (e) {
