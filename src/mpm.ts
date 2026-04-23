@@ -114,6 +114,10 @@ export async function install(
         throw e;
     });
 
+    if (exitCode !== 0 && output.toLowerCase().includes("specified release is unavailable")) {
+        await rmRF(destination);
+        return Promise.reject(Error("Specified release is unavailable"));
+    }
     if (exitCode !== 0 && !output.toLowerCase().includes("already installed")) {
         await rmRF(destination);
         return Promise.reject(Error(`Script exited with non-zero code ${exitCode}`));
