@@ -100,7 +100,30 @@ export async function install(
 
         if (!cacheHit) {
             const mpmPath: string = await mpm.setup(platform, matlabArch);
-            await mpm.install(mpmPath, releaseInfo, products, destination);
+
+            // Workaround: When a new General Release ships, there is a lag
+            // before latest-including-prerelease is updated. During this
+            // window the prerelease install fails because the release does
+            // not exist yet. Fall back to the General Release so the job
+            // can still succeed. Remove this once the release pipeline
+            // eliminates the lag.
+            try {
+                await mpm.install(mpmPath, releaseInfo, products, destination);
+            } catch (e) {
+                if (releaseInfo.isPrerelease) {
+                    core.info("Install failed, retrying...");
+                    const grRelease: matlab.Release = {
+                        ...releaseInfo,
+                        isPrerelease: false,
+                        version: releaseInfo.version.replace("-prerelease", ""),
+                    };
+                    destination = (await matlab.getToolcacheDir(platform, grRelease))[0];
+                    await mpm.install(mpmPath, grRelease, products, destination);
+                } else {
+                    throw e;
+                }
+            }
+
             core.saveState(State.InstallSuccessful, "true");
         }
 
