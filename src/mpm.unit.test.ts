@@ -213,6 +213,23 @@ describe("mpm install", () => {
         expect(rmRFMock).toHaveBeenCalledWith(destination);
     });
 
+    it("rejects with specific message when output includes specified release is unavailable", async () => {
+        const destination = "/opt/matlab";
+        const products = ["MATLAB", "Compiler"];
+
+        execMock.mockImplementation((cmd: string, args?: string[], options?: ExecOptions) => {
+            if (options && options.listeners && typeof options.listeners.stderr === "function") {
+                options.listeners.stderr(Buffer.from("Error: Specified release is unavailable."));
+            }
+            return Promise.resolve(1);
+        });
+
+        await expect(mpm.install(mpmPath, releaseInfo, products, destination)).rejects.toThrow(
+            "Specified release is unavailable",
+        );
+        expect(rmRFMock).toHaveBeenCalledWith(destination);
+    });
+
     it("does not reject when mpm exits non-zero but reports already installed", async () => {
         const destination = "/opt/matlab";
         const products = ["MATLAB", "Compiler"];

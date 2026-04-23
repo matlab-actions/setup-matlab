@@ -322,4 +322,73 @@ describe("install procedure", () => {
         expect(addPathMock).toHaveBeenCalledWith(expect.stringContaining("bin"));
         expect(addPathMock).toHaveBeenCalledWith(expect.stringContaining("runtime"));
     });
+
+    describe("prerelease fallback to general release", () => {
+        const prereleaseInfo = {
+            name: "r2026a",
+            version: "2026.1.999-prerelease",
+            update: "",
+            isPrerelease: true,
+        };
+        const grDestination = "/opt/hostedtoolcache/MATLAB/2026.1.999/x64";
+
+        beforeEach(() => {
+            matlabGetReleaseInfoMock.mockResolvedValue(prereleaseInfo);
+        });
+
+        it("retries with general release when prerelease install fails with unavailable release", async () => {
+            mpmInstallMock
+                .mockRejectedValueOnce(Error("Specified release is unavailable"))
+                .mockResolvedValueOnce(undefined);
+            matlabGetToolcacheDirMock
+                .mockResolvedValueOnce([
+                    "/opt/hostedtoolcache/MATLAB/2026.1.999-prerelease/x64",
+                    false,
+                ])
+                .mockResolvedValueOnce([grDestination, false]);
+
+            await expect(doInstall()).resolves.toBeUndefined();
+            expect(mpmInstallMock).toHaveBeenCalledTimes(2);
+            // Second call should be without prerelease
+            const secondCall = mpmInstallMock.mock.calls[1];
+            expect(secondCall[1]).toMatchObject({
+                isPrerelease: false,
+                version: "2026.1.999",
+            });
+            expect(saveStateMock).toHaveBeenCalledWith(State.InstallSuccessful, "true");
+            expect(addPathMock).toHaveBeenCalledWith(expect.stringContaining(grDestination));
+        });
+
+        it("rejects when both prerelease and general release install fail", async () => {
+            mpmInstallMock.mockRejectedValue(Error("Specified release is unavailable"));
+            matlabGetToolcacheDirMock
+                .mockResolvedValueOnce([
+                    "/opt/hostedtoolcache/MATLAB/2026.1.999-prerelease/x64",
+                    false,
+                ])
+                .mockResolvedValueOnce([grDestination, false]);
+
+            await expect(doInstall()).rejects.toBeDefined();
+            expect(mpmInstallMock).toHaveBeenCalledTimes(2);
+            expect(saveStateMock).toHaveBeenCalledTimes(0);
+        });
+
+        it("does not retry for non-prerelease install failures", async () => {
+            matlabGetReleaseInfoMock.mockResolvedValue(releaseInfo);
+            mpmInstallMock.mockRejectedValue(Error("Specified release is unavailable"));
+            await expect(doInstall()).rejects.toBeDefined();
+            expect(mpmInstallMock).toHaveBeenCalledTimes(1);
+        });
+
+        it("does not retry prerelease install for other errors", async () => {
+            mpmInstallMock.mockRejectedValue(Error("Script exited with non-zero code 1"));
+            matlabGetToolcacheDirMock.mockResolvedValueOnce([
+                "/opt/hostedtoolcache/MATLAB/2026.1.999-prerelease/x64",
+                false,
+            ]);
+
+            await expect(doInstall()).rejects.toBeDefined();
+            expect(mpmInstallMock).toHaveBeenCalledTimes(1);
+        });
+    });
 });
