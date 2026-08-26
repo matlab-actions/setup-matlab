@@ -178,9 +178,8 @@ describe("mpm install", () => {
         const products = ["MATLAB", "Compiler"];
         const expectedMpmArgs = [
             "install",
-            `--release=${mpmRelease}`,
+            `--release=${mpmRelease}prerelease`,
             `--destination=${destination}`,
-            "--release-status=Prerelease",
             "--products",
             "MATLAB",
             "Compiler",

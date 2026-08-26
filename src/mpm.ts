@@ -73,7 +73,7 @@ export async function install(
     products: string[],
     destination: string,
 ) {
-    const mpmRelease = release.name + release.update;
+    const mpmRelease = release.name + release.update + (release.isPrerelease ? "prerelease" : "");
     // remove spaces and flatten product list
     let parsedProducts = products.flatMap((p) => p.split(/[ ]+/));
     // Add MATLAB by default
@@ -86,9 +86,6 @@ export async function install(
         `--release=${mpmRelease}`,
         `--destination=${destination}`,
     ];
-    if (release.isPrerelease) {
-        mpmArguments = mpmArguments.concat(["--release-status=Prerelease"]);
-    }
     mpmArguments = mpmArguments.concat("--products", ...parsedProducts);
 
     let output = "";
