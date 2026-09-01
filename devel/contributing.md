@@ -14,6 +14,8 @@ Changes should be made on a new branch. The new branch should be merged to the m
 
 After the pull request has been approved and merged to main, follow the Github process for [creating a new release](https://docs.github.com/en/repositories/releasing-projects-on-github/managing-releases-in-a-repository). The release must follow semantic versioning (ex: vX.Y.Z). This will kick off a new pipeline execution, and the action will automatically be published to the GitHub Actions Marketplace if the pipeline finishes successfully. Check the [GitHub Marketplace](https://github.com/marketplace/actions/setup-matlab) and check the major version in the repository (ex: v1 for v1.0.0) to ensure that the new semantically versioned tag is available.
 
+For prereleases, use a semver prerelease tag (e.g. `v3.3.0-rc.1`, `v3.3.0-beta.1`) and mark the GitHub Release as a **prerelease**. This skips updating the floating major and minor tags (e.g. `v3`, `v3.3`) so that users on `@v3` stay on the latest stable release. Avoid using a bare version like `v3.3.0` for a prerelease — the workflow will respect the prerelease flag and skip the floating tags, but the tag name itself creates a problem: when you're ready to publish the stable release, `v3.3.0` is already taken, so you'd have to delete and recreate the release rather than simply publishing a new one.
+
 ## Adding a Pre-Commit Hook
 
 You can run all CI checks before each commit by adding a pre-commit hook. To do so, navigate to the repository root folder and run the following commands:

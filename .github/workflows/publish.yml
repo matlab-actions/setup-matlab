@@ -38,7 +38,12 @@ jobs:
           VERSION=$(npm version "${{ github.event.release.tag_name }}" --no-git-tag-version)
           git add package.json package-lock.json
           git commit -m "[skip ci] Bump $VERSION"
-          git push origin HEAD:main
+          # Skip pushing the version bump to main for prereleases so that
+          # main stays on the last stable version and future npm version
+          # calls don't fail due to semver ordering (e.g. 3.3.1 < 3.4.0-rc.1).
+          if [[ "${{ github.event.release.prerelease }}" != "true" ]]; then
+            git push origin HEAD:main
+          fi
 
       # Now carry on, business as usual
       - name: Perform npm tasks
@@ -54,8 +59,12 @@ jobs:
           longVersion="${{github.event.release.tag_name}}"
           echo "Preparing release for version $longVersion"
           [[ $longVersion == v[0-9]*.[0-9]*.[0-9]* ]]  || (echo "must follow semantic versioning" && exit 1)
-          majorVersion=$(echo ${longVersion%.*.*})
-          minorVersion=$(echo ${longVersion%.*})
+
+          # Strip any semver prerelease suffix (e.g. v3.3.0-rc.1 -> v3.3.0)
+          # before deriving the floating major/minor tags.
+          baseVersion="${longVersion%%-*}"
+          majorVersion="${baseVersion%.*.*}"
+          minorVersion="${baseVersion%.*}"
 
           # Add the built artifacts. Using --force because dist should be in
           # .gitignore
@@ -66,19 +75,25 @@ jobs:
           git commit --allow-empty -m "$MESSAGE"
           git tag -f -a -m "Release $longVersion" $longVersion
 
-          # Get the commit of the tag you just released
-          commitHash=$(git rev-list -n 1 $longVersion)
-
-          # Delete the old major and minor version tags locally
-          git tag -d $majorVersion || true
-          git tag -d $minorVersion || true
-
-          # Make new major and minor version tags locally that point to the commit you got from the "git rev-list" above
-          git tag -f $majorVersion $commitHash
-          git tag -f $minorVersion $commitHash
-
-          # Force push the new minor version tag to overwrite the old tag remotely
-          echo "Pushing new tags"
+          # Always push the exact release tag
+          echo "Pushing exact release tag $longVersion"
           git push -f origin $longVersion
-          git push -f origin $majorVersion
-          git push -f origin $minorVersion
+
+          # Floating major/minor tags (e.g. v3, v3.3) should always point to the
+          # latest stable release. Skip updating them for prereleases so that
+          # users on @v3 are not moved to a prerelease version.
+          if [[ "${{ github.event.release.prerelease }}" == "true" ]]; then
+            echo "Prerelease detected — skipping update of floating tags $majorVersion and $minorVersion"
+          else
+            commitHash=$(git rev-list -n 1 $longVersion)
+
+            git tag -d $majorVersion || true
+            git tag -d $minorVersion || true
+
+            git tag -f $majorVersion $commitHash
+            git tag -f $minorVersion $commitHash
+
+            echo "Pushing floating tags"
+            git push -f origin $majorVersion
+            git push -f origin $minorVersion
+          fi
