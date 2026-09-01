@@ -5,6 +5,7 @@ import { State } from "./install-state.js";
 
 jest.unstable_mockModule("@actions/core", () => ({
     info: jest.fn(),
+    debug: jest.fn(),
     group: jest.fn(),
     saveState: jest.fn(),
     addPath: jest.fn(),
@@ -41,10 +42,10 @@ afterEach(() => {
 });
 
 describe("resolveInstallDependencies function", () => {
-    let coreInfoMock: jest.Mock<typeof core.info>;
+    let coreDebugMock: jest.Mock<typeof core.debug>;
 
     beforeEach(() => {
-        coreInfoMock = core.info as jest.Mock<typeof core.info>;
+        coreDebugMock = core.debug as jest.Mock<typeof core.debug>;
     });
 
     // for explicit 'true' should return true
@@ -66,8 +67,8 @@ describe("resolveInstallDependencies function", () => {
 
         const result = install.resolveInstallDependencies("auto");
         expect(result).toBe(true);
-        expect(coreInfoMock).toHaveBeenCalledWith("Auto-detected runner type: GitHub-hosted");
-        expect(coreInfoMock).toHaveBeenCalledWith(
+        expect(coreDebugMock).toHaveBeenCalledWith("Auto-detected runner type: GitHub-hosted");
+        expect(coreDebugMock).toHaveBeenCalledWith(
             "System dependencies will be installed (auto mode)",
         );
     });
@@ -79,8 +80,8 @@ describe("resolveInstallDependencies function", () => {
 
         const result = install.resolveInstallDependencies("auto");
         expect(result).toBe(false);
-        expect(coreInfoMock).toHaveBeenCalledWith("Auto-detected runner type: self-hosted");
-        expect(coreInfoMock).toHaveBeenCalledWith(
+        expect(coreDebugMock).toHaveBeenCalledWith("Auto-detected runner type: self-hosted");
+        expect(coreDebugMock).toHaveBeenCalledWith(
             "System dependencies will not be installed (auto mode)",
         );
     });
