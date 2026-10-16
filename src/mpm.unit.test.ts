@@ -122,6 +122,8 @@ describe("mpm install", () => {
     let execMock: jest.Mock<typeof exec.exec>;
     let rmRFMock: jest.Mock<typeof io.rmRF>;
     const mpmPath = "mpm";
+    const platform = "linux";
+    const arch = "x64";
     const releaseInfo = { name: "r2022b", version: "9.13.0", update: "", isPrerelease: false };
     const mpmRelease = "r2022b";
     beforeEach(() => {
@@ -144,7 +146,7 @@ describe("mpm install", () => {
         execMock.mockResolvedValue(0);
 
         await expect(
-            mpm.install(mpmPath, releaseInfo, products, destination),
+            mpm.install(mpmPath, releaseInfo, products, destination, platform, arch),
         ).resolves.toBeUndefined();
         expect(execMock.mock.calls[0][1]).toEqual(expectedMpmArgs);
     });
@@ -164,7 +166,7 @@ describe("mpm install", () => {
         execMock.mockResolvedValue(0);
 
         await expect(
-            mpm.install(mpmPath, releaseInfo, products, destination),
+            mpm.install(mpmPath, releaseInfo, products, destination, platform, arch),
         ).resolves.toBeUndefined();
         expect(execMock.mock.calls[0][1]).toEqual(expectedMpmArgs);
     });
@@ -190,7 +192,26 @@ describe("mpm install", () => {
         execMock.mockResolvedValue(0);
 
         await expect(
-            mpm.install(mpmPath, prereleaseInfo, products, destination),
+            mpm.install(mpmPath, prereleaseInfo, products, destination, platform, arch),
+        ).resolves.toBeUndefined();
+        expect(execMock.mock.calls[0][1]).toEqual(expectedMpmArgs);
+    });
+
+    it("omits --caller with maci64 mpm", async () => {
+        const destination = "/opt/matlab";
+        const products = ["MATLAB", "Compiler"];
+        const expectedMpmArgs = [
+            "install",
+            `--release=${mpmRelease}`,
+            `--destination=${destination}`,
+            "--products",
+            "MATLAB",
+            "Compiler",
+        ];
+        execMock.mockResolvedValue(0);
+
+        await expect(
+            mpm.install(mpmPath, releaseInfo, products, destination, "darwin", "x64"),
         ).resolves.toBeUndefined();
         expect(execMock.mock.calls[0][1]).toEqual(expectedMpmArgs);
     });
@@ -200,7 +221,7 @@ describe("mpm install", () => {
         const products = ["MATLAB", "Compiler"];
         execMock.mockRejectedValue(1);
         await expect(
-            mpm.install(mpmPath, releaseInfo, products, destination),
+            mpm.install(mpmPath, releaseInfo, products, destination, platform, arch),
         ).rejects.toBeDefined();
         expect(rmRFMock).toHaveBeenCalledWith(destination);
     });
@@ -210,7 +231,7 @@ describe("mpm install", () => {
         const products = ["MATLAB", "Compiler"];
         execMock.mockResolvedValue(1);
         await expect(
-            mpm.install(mpmPath, releaseInfo, products, destination),
+            mpm.install(mpmPath, releaseInfo, products, destination, platform, arch),
         ).rejects.toBeDefined();
         expect(rmRFMock).toHaveBeenCalledWith(destination);
     });
@@ -226,9 +247,9 @@ describe("mpm install", () => {
             return Promise.resolve(1);
         });
 
-        await expect(mpm.install(mpmPath, releaseInfo, products, destination)).rejects.toThrow(
-            "Specified release is unavailable",
-        );
+        await expect(
+            mpm.install(mpmPath, releaseInfo, products, destination, platform, arch),
+        ).rejects.toThrow("Specified release is unavailable");
         expect(rmRFMock).toHaveBeenCalledWith(destination);
     });
 
@@ -247,7 +268,7 @@ describe("mpm install", () => {
         });
 
         await expect(
-            mpm.install(mpmPath, releaseInfo, products, destination),
+            mpm.install(mpmPath, releaseInfo, products, destination, platform, arch),
         ).resolves.toBeUndefined();
         expect(rmRFMock).not.toHaveBeenCalled();
     });
