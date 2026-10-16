@@ -85,6 +85,7 @@ export async function install(
         "install",
         `--release=${mpmRelease}`,
         `--destination=${destination}`,
+        "--caller=CI_INTEG:GITHUB_ACTIONS",
     ];
     mpmArguments = mpmArguments.concat("--products", ...parsedProducts);
 
