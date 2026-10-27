@@ -1,11 +1,3 @@
-# Temporary experiment: does MATLAB on Apple silicon work without setup-matlab
-# installing a Java runtime? Delete this workflow before opening a pull request.
-#
-# java modes:
-#   preinstalled     Java that ships with GitHub-hosted runners (11, 17, 21, 25)
-#   none             all Java runtimes removed, like a bare self-hosted runner
-#   support-package  no system Java; MATLAB_Support_for_OpenJDK installed with mpm
-
 name: Apple Silicon Java Experiment
 on:
   push:
@@ -35,6 +27,7 @@ jobs:
     name: ${{ matrix.release }} / ${{ matrix.java }}
     needs: build
     runs-on: macos-latest
+    timeout-minutes: 20
     strategy:
       fail-fast: false
       matrix:
@@ -118,4 +111,4 @@ jobs:
         if: ${{ !cancelled() && steps.setup.outcome == 'success' }}
         uses: matlab-actions/run-command@bcd446a219949c24051c1d04a4b4e0274c42f23b # v3.2.0
         with:
-          command: list = java.util.ArrayList; list.add(1); assert(list.size() == 1); f = [tempname ".xml"]; writelines("<a><b>1</b></a>", f); assert(string(xmlread(f).getDocumentElement.getTagName) == "a");
+          command: list = java.util.ArrayList; list.add(1); assert(list.size() == 1); f = [tempname '.xml']; writelines("<a><b>1</b></a>", f); doc = xmlread(f); assert(string(doc.getDocumentElement.getTagName) == "a"); disp(version("-java"));
