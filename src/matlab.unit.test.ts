@@ -391,16 +391,11 @@ describe("matlab tests", () => {
 
             it(`works on mac with apple silicon`, async () => {
                 const platform = "darwin";
-                tcDownloadToolMock.mockResolvedValue("java.jdk");
-                execMock.mockResolvedValue(0);
                 await expect(
                     matlab.installSystemDependencies(platform, "arm64", release),
                 ).resolves.toBeUndefined();
-                expect(tcDownloadToolMock).toHaveBeenCalledWith(
-                    properties.appleSiliconJdkUrl,
-                    expect.anything(),
-                );
-                expect(execMock).toHaveBeenCalledWith(`sudo installer -pkg "java.jdk" -target /`);
+                expect(tcDownloadToolMock).not.toHaveBeenCalled();
+                expect(execMock).not.toHaveBeenCalled();
             });
 
             it(`works on mac with apple silicon <R2023b`, async () => {
@@ -413,23 +408,6 @@ describe("matlab tests", () => {
                     `sudo softwareupdate --install-rosetta --agree-to-license`,
                 );
             });
-        });
-
-        it("rejects when the apple silicon JDK download fails", async () => {
-            const platform = "darwin";
-            tcDownloadToolMock.mockRejectedValue(Error("oof"));
-            await expect(
-                matlab.installSystemDependencies(platform, "arm64", release),
-            ).rejects.toBeDefined();
-        });
-
-        it("rejects when the apple silicon JDK fails to install", async () => {
-            const platform = "darwin";
-            tcDownloadToolMock.mockResolvedValue("java.jdk");
-            execMock.mockResolvedValue(1);
-            await expect(
-                matlab.installSystemDependencies(platform, "arm64", release),
-            ).rejects.toBeDefined();
         });
     });
 });

@@ -261,12 +261,8 @@ export async function installSystemDependencies(
 ) {
     if (platform === "linux") {
         return script.downloadAndRunScript(platform, properties.matlabDepsUrl, [release]);
-    } else if (platform === "darwin" && architecture === "arm64") {
-        if (release < "r2023b") {
-            return installAppleSiliconRosetta();
-        } else {
-            return installAppleSiliconJdk();
-        }
+    } else if (platform === "darwin" && architecture === "arm64" && release < "r2023b") {
+        return installAppleSiliconRosetta();
     }
 }
 
@@ -274,15 +270,5 @@ async function installAppleSiliconRosetta() {
     const exitCode = await exec.exec(`sudo softwareupdate --install-rosetta --agree-to-license`);
     if (exitCode !== 0) {
         return Promise.reject(Error("Unable to install Rosetta 2."));
-    }
-}
-
-async function installAppleSiliconJdk() {
-    const jdkPath = path.join(process.env["RUNNER_TEMP"] ?? "", "jdk.pkg");
-    await io.rmRF(jdkPath);
-    const jdk = await tc.downloadTool(properties.appleSiliconJdkUrl, jdkPath);
-    const exitCode = await exec.exec(`sudo installer -pkg "${jdk}" -target /`);
-    if (exitCode !== 0) {
-        return Promise.reject(Error("Unable to install Java runtime."));
     }
 }
