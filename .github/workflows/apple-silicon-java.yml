@@ -38,6 +38,10 @@ jobs:
             java: support-package
           - release: R2026b
             java: support-package
+          - release: R2026a
+            java: support-package-clear
+          - release: R2026b
+            java: support-package-clear
     steps:
       - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
         with:
@@ -65,7 +69,16 @@ jobs:
         uses: ./
         with:
           release: ${{ matrix.release }}
-          products: ${{ matrix.java == 'support-package' && 'MATLAB MATLAB_Support_for_OpenJDK' || 'MATLAB' }}
+          products: ${{ startsWith(matrix.java, 'support-package') && 'MATLAB MATLAB_Support_for_OpenJDK' || 'MATLAB' }}
+
+      - name: Clear the MATLAB Java configuration
+        if: ${{ !cancelled() && steps.setup.outcome == 'success' && matrix.java == 'support-package-clear' }}
+        run: |
+          jenv=$(find "${{ steps.setup.outputs.matlabroot }}/bin" -name matlab_jenv -type f | head -1)
+          echo "Using $jenv"
+          "$jenv" || true
+          "$jenv" -clear
+          "$jenv" || true
 
       - name: Create sample code and tests
         if: ${{ !cancelled() && steps.setup.outcome == 'success' }}
@@ -111,4 +124,4 @@ jobs:
         if: ${{ !cancelled() && steps.setup.outcome == 'success' }}
         uses: matlab-actions/run-command@bcd446a219949c24051c1d04a4b4e0274c42f23b # v3.2.0
         with:
-          command: list = java.util.ArrayList; list.add(1); assert(list.size() == 1); f = [tempname '.xml']; writelines("<a><b>1</b></a>", f); doc = xmlread(f); assert(string(doc.getDocumentElement.getTagName) == "a"); disp(version("-java"));
+          command: list = java.util.ArrayList; list.add(1); assert(list.size() == 1); f = [tempname '.xml']; writelines("<a><b>1</b></a>", f); doc = xmlread(f); assert(string(doc.getDocumentElement.getTagName) == "a"); disp(version("-java")); disp(string(java.lang.System.getProperty("java.home")));
