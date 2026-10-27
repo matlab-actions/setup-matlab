@@ -1,0 +1,121 @@
+# Temporary experiment: does MATLAB on Apple silicon work without setup-matlab
+# installing a Java runtime? Delete this workflow before opening a pull request.
+#
+# java modes:
+#   preinstalled     Java that ships with GitHub-hosted runners (11, 17, 21, 25)
+#   none             all Java runtimes removed, like a bare self-hosted runner
+#   support-package  no system Java; MATLAB_Support_for_OpenJDK installed with mpm
+
+name: Apple Silicon Java Experiment
+on:
+  push:
+  workflow_dispatch:
+permissions:
+  contents: read
+
+jobs:
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: 24
+      - name: Perform npm tasks
+        run: npm run ci
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: built-action
+          path: |
+            **/*
+            !node_modules/
+
+  java:
+    name: ${{ matrix.release }} / ${{ matrix.java }}
+    needs: build
+    runs-on: macos-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        release: [R2023b, R2024a, R2024b, R2025a, R2025b, R2026a, R2026b]
+        java: [preinstalled, none]
+        include:
+          - release: R2026a
+            java: support-package
+          - release: R2026b
+            java: support-package
+    steps:
+      - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        with:
+          name: built-action
+
+      - name: Remove all Java runtimes
+        if: matrix.java != 'preinstalled'
+        run: |
+          sudo rm -rf /Library/Java/JavaVirtualMachines/* ~/Library/Java/JavaVirtualMachines
+          echo "JAVA_HOME=" >> "$GITHUB_ENV"
+          if /usr/libexec/java_home; then
+            echo "::error::A Java runtime is still visible to java_home"
+            exit 1
+          fi
+
+      - name: Show Java runtimes visible to java_home
+        run: |
+          /usr/libexec/java_home -V || true
+          for v in 1.8 1.11 11 17; do
+            /usr/libexec/java_home --failfast --version "$v" && echo "-v $v: exit 0" || echo "-v $v: exit $?"
+          done
+
+      - name: Set up MATLAB
+        id: setup
+        uses: ./
+        with:
+          release: ${{ matrix.release }}
+          products: ${{ matrix.java == 'support-package' && 'MATLAB MATLAB_Support_for_OpenJDK' || 'MATLAB' }}
+
+      - name: Create sample code and tests
+        if: ${{ !cancelled() && steps.setup.outcome == 'success' }}
+        run: |
+          mkdir -p sample/code sample/tests
+          cat > sample/code/addOne.m <<'EOF'
+          function y = addOne(x)
+          y = x + 1;
+          end
+          EOF
+          cat > sample/tests/addOneTest.m <<'EOF'
+          classdef addOneTest < matlab.unittest.TestCase
+              methods (Test)
+                  function addsOne(testCase)
+                      testCase.verifyEqual(addOne(1), 2);
+                  end
+              end
+          end
+          EOF
+
+      - name: "Core: start MATLAB and report Java"
+        if: ${{ !cancelled() && steps.setup.outcome == 'success' }}
+        uses: matlab-actions/run-command@bcd446a219949c24051c1d04a4b4e0274c42f23b # v3.2.0
+        with:
+          command: disp(version); fprintf("JVM available = %d\n", usejava("jvm")); if usejava("jvm"), disp(version("-java")); end
+
+      - name: "Core: run tests with JUnit and Cobertura reports"
+        if: ${{ !cancelled() && steps.setup.outcome == 'success' }}
+        uses: matlab-actions/run-tests@v3
+        with:
+          source-folder: sample/code
+          select-by-folder: sample/tests
+          test-results-junit: test-results/results.xml
+          code-coverage-cobertura: code-coverage/coverage.xml
+
+      - name: "Core: plot and save a figure"
+        if: ${{ !cancelled() && steps.setup.outcome == 'success' }}
+        uses: matlab-actions/run-command@bcd446a219949c24051c1d04a4b4e0274c42f23b # v3.2.0
+        with:
+          command: f = figure; plot(1:10); exportgraphics(f, "plot.png"); assert(isfile("plot.png"));
+
+      - name: "Java features: Java classes and xmlread"
+        if: ${{ !cancelled() && steps.setup.outcome == 'success' }}
+        uses: matlab-actions/run-command@bcd446a219949c24051c1d04a4b4e0274c42f23b # v3.2.0
+        with:
+          command: list = java.util.ArrayList; list.add(1); assert(list.size() == 1); f = [tempname ".xml"]; writelines("<a><b>1</b></a>", f); assert(string(xmlread(f).getDocumentElement.getTagName) == "a");
