@@ -109,7 +109,14 @@ export async function install(
             // succeed. Remove this once the release procss eliminates the
             // lag.
             try {
-                await mpm.install(mpmPath, releaseInfo, products, destination);
+                await mpm.install(
+                    mpmPath,
+                    releaseInfo,
+                    products,
+                    destination,
+                    platform,
+                    matlabArch,
+                );
             } catch (e) {
                 if (
                     releaseInfo.isPrerelease &&
@@ -123,7 +130,14 @@ export async function install(
                         version: releaseInfo.version.replace("-prerelease", ""),
                     };
                     destination = (await matlab.getToolcacheDir(platform, grRelease))[0];
-                    await mpm.install(mpmPath, grRelease, products, destination);
+                    await mpm.install(
+                        mpmPath,
+                        grRelease,
+                        products,
+                        destination,
+                        platform,
+                        matlabArch,
+                    );
                 } else {
                     throw e;
                 }

@@ -72,6 +72,8 @@ export async function install(
     release: matlab.Release,
     products: string[],
     destination: string,
+    platform: string,
+    architecture: string,
 ) {
     const mpmRelease = release.name + release.update + (release.isPrerelease ? "prerelease" : "");
     // remove spaces and flatten product list
@@ -86,6 +88,10 @@ export async function install(
         `--release=${mpmRelease}`,
         `--destination=${destination}`,
     ];
+    // The maci64 mpm predates support for --caller
+    if (!(platform === "darwin" && architecture === "x64")) {
+        mpmArguments.push("--caller=CI_INTEG:GITHUB_ACTIONS");
+    }
     mpmArguments = mpmArguments.concat("--products", ...parsedProducts);
 
     let output = "";
