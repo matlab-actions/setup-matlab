@@ -403,6 +403,15 @@ describe("matlab tests", () => {
                 expect(execMock).toHaveBeenCalledWith(`sudo installer -pkg "java.jdk" -target /`);
             });
 
+            it(`works on mac with apple silicon >=R2026b`, async () => {
+                const platform = "darwin";
+                await expect(
+                    matlab.installSystemDependencies(platform, "arm64", "r2026b"),
+                ).resolves.toBeUndefined();
+                expect(tcDownloadToolMock).not.toHaveBeenCalled();
+                expect(execMock).not.toHaveBeenCalled();
+            });
+
             it(`works on mac with apple silicon <R2023b`, async () => {
                 const platform = "darwin";
                 execMock.mockResolvedValue(0);
