@@ -3,5 +3,5 @@
     "matlabReleaseInfoUrl": "https://ssd.mathworks.com/supportfiles/ci/matlab-release/v0/",
     "matlabBatchRootUrl": "https://ssd.mathworks.com/supportfiles/ci/matlab-batch/v1/",
     "mpmRootUrl": "https://www.mathworks.com/mpm/",
-    "appleSiliconJdkUrl": "https://corretto.aws/downloads/resources/8.402.08.1/amazon-corretto-8.402.08.1-macosx-aarch64.pkg"
+    "appleSiliconJdkUrl": "https://corretto.aws/downloads/resources/11.0.33.0.10/amazon-corretto-11.0.33.0.10-macosx-aarch64.pkg"
 }
