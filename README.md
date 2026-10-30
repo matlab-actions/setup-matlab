@@ -160,7 +160,7 @@ If you are using a Linux runner, the following software must be installed on the
 
 ##### macOS
 
-If you are using a macOS runner with an Apple silicon processor, Java&reg; Runtime Environment (JRE&trade;) must be installed on the runner. For information about this requirement and to get a compatible JRE version, see [MATLAB on Apple Silicon Macs](https://www.mathworks.com/support/requirements/apple-silicon.html).
+If you are using a macOS runner with an Apple silicon processor and MATLAB R2023b through R2026a, Java&reg; Runtime Environment (JRE&trade;) must be installed on the runner. For information about this requirement and to get a compatible JRE version, see [MATLAB on Apple Silicon Macs](https://www.mathworks.com/support/requirements/apple-silicon.html). Starting in R2026b, a JRE is required only for products and features that use Java. To use them, install a compatible JRE on the runner or include `MATLAB_Support_for_OpenJDK` in the `products` input. For more information, see [Versions of OpenJDK Compatible with MATLAB by Release](https://www.mathworks.com/support/requirements/openjdk.html).
 
 #### Licensing
 
