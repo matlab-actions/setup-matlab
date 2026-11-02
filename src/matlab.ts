@@ -264,7 +264,7 @@ export async function installSystemDependencies(
     } else if (platform === "darwin" && architecture === "arm64") {
         if (release < "r2023b") {
             return installAppleSiliconRosetta();
-        } else {
+        } else if (release < "r2026b") {
             return installAppleSiliconJdk();
         }
     }
