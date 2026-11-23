@@ -56,12 +56,12 @@ jobs:
             products: Symbolic_Math_Toolbox
             check-matlab: pause(10); matlabVer = ver('matlab'); assert(~isempty(matlabVer));
             check-toolbox: pause(10); symbolicVer = ver('symbolic'); assert(~isempty(symbolicVer));
-          - os: macos-14
+          - os: macos-15
             release: latest
             products: Symbolic_Math_Toolbox
             check-matlab: pause(10); matlabVer = ver('matlab'); assert(~isempty(matlabVer));
             check-toolbox: pause(10); symbolicVer = ver('symbolic'); assert(~isempty(symbolicVer));
-          - os: macos-14
+          - os: macos-15
             release: R2023a
             products: Symbolic_Math_Toolbox
             check-matlab: matlabVer = ver('matlab'); assert(strcmp(matlabVer.Release,'(R2023a)'));
