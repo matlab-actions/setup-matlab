@@ -106,6 +106,16 @@ describe("matlab tests", () => {
             ]);
         });
 
+        it("creates cache and returns app path for mac in R2026b", async () => {
+            findMock.mockReturnValue("");
+            cacheFileMock.mockResolvedValue("/opt/hostedtoolcache/matlab/r2026b");
+            const r2026b = { ...release, name: "r2026b", version: "2026.2.999" };
+            await expect(matlab.getToolcacheDir("darwin", r2026b)).resolves.toEqual([
+                "/opt/hostedtoolcache/matlab/r2026b/MATLAB.app",
+                false,
+            ]);
+        });
+
         it("creates cache and returns parent install folder for mac in R2027a and later", async () => {
             findMock.mockReturnValue("");
             cacheFileMock.mockResolvedValue("/opt/hostedtoolcache/matlab/r2027a");

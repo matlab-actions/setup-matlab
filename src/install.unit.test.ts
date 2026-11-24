@@ -212,6 +212,58 @@ describe("install procedure", () => {
         expect(setOutputMock).toHaveBeenCalledWith("matlabroot", matlabRoot);
     });
 
+    describe("decoupled macOS layout", () => {
+        const macReleaseInfo = {
+            name: "r2027a",
+            version: "2027.1.999",
+            update: "",
+            isPrerelease: false,
+        };
+        const destination = "/opt/hostedtoolcache/MATLAB/2027.1.999/arm64";
+        const matlabRoot = `${destination}/MATLAB_R2027a/matlab.root`;
+        const doMacInstall = (cache: boolean) =>
+            install.install("darwin", "arm64", "r2027a", products, cache, "false");
+
+        beforeEach(() => {
+            matlabGetReleaseInfoMock.mockResolvedValue(macReleaseInfo);
+            matlabGetToolcacheDirMock.mockResolvedValue([destination, false]);
+            matlabGetMatlabRootMock.mockReturnValue(matlabRoot);
+            mpmSetupMock.mockResolvedValue("/path/to/mpm");
+        });
+
+        it("installs to destination and adds matlab.root to path", async () => {
+            await expect(doMacInstall(false)).resolves.toBeUndefined();
+            expect(mpmInstallMock).toHaveBeenCalledWith(
+                "/path/to/mpm",
+                macReleaseInfo,
+                products,
+                destination,
+                "darwin",
+                "arm64",
+            );
+            expect(matlabGetMatlabRootMock).toHaveBeenCalledWith("darwin", "r2027a", destination);
+            expect(addPathMock).toHaveBeenCalledTimes(1);
+            expect(addPathMock).toHaveBeenCalledWith(`${matlabRoot}/bin`);
+            expect(setOutputMock).toHaveBeenCalledWith("matlabroot", matlabRoot);
+        });
+
+        it("restores cache to destination and adds matlab.root to path", async () => {
+            restoreMATLABMock.mockResolvedValue(true);
+            await expect(doMacInstall(true)).resolves.toBeUndefined();
+            expect(restoreMATLABMock).toHaveBeenCalledWith(
+                macReleaseInfo,
+                "darwin",
+                "arm64",
+                products,
+                destination,
+                undefined,
+            );
+            expect(mpmInstallMock).not.toHaveBeenCalled();
+            expect(addPathMock).toHaveBeenCalledWith(`${matlabRoot}/bin`);
+            expect(setOutputMock).toHaveBeenCalledWith("matlabroot", matlabRoot);
+        });
+    });
+
     it("re-calls MPM install even if MATLAB already exists in toolcache", async () => {
         matlabGetToolcacheDirMock.mockResolvedValue([
             "/opt/hostedtoolcache/MATLAB/9.13.0/x64",
