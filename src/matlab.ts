@@ -30,10 +30,32 @@ export async function getToolcacheDir(
     } else {
         toolpath = await makeToolcacheDir(platform, release);
     }
-    if (platform == "darwin") {
+    if (platform == "darwin" && !usesDecoupledMacLayout(release.name)) {
         toolpath = toolpath + "/MATLAB.app";
     }
     return [toolpath, alreadyExists];
+}
+
+/**
+ * Starting in R2027a, MATLAB on macOS is installed as a signed MATLAB_<release>.app with a
+ * sibling matlab.root folder that holds the MATLAB content (bin, toolbox, etc).
+ */
+function usesDecoupledMacLayout(releaseName: string): boolean {
+    return releaseName >= "r2027a";
+}
+
+/**
+ * Get the matlabroot of an installation, given the destination passed to mpm.
+ *
+ * On macOS in R2027a and later, mpm installs into <destination>/MATLAB_<release>/, which contains
+ * MATLAB_<release>.app and matlab.root. matlabroot is the matlab.root folder.
+ */
+export function getMatlabRoot(platform: string, releaseName: string, destination: string): string {
+    if (platform === "darwin" && usesDecoupledMacLayout(releaseName)) {
+        const capitalizedRelease = releaseName[0].toUpperCase() + releaseName.slice(1);
+        return path.join(destination, `MATLAB_${capitalizedRelease}`, "matlab.root");
+    }
+    return destination;
 }
 
 async function makeToolcacheDir(platform: string, release: Release): Promise<string> {

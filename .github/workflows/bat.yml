@@ -61,6 +61,12 @@ jobs:
             products: Symbolic_Math_Toolbox
             check-matlab: pause(10); matlabVer = ver('matlab'); assert(~isempty(matlabVer));
             check-toolbox: pause(10); symbolicVer = ver('symbolic'); assert(~isempty(symbolicVer));
+          # Covers the decoupled macOS layout (MATLAB_<release>.app + matlab.root) in R2027a and later
+          - os: macos-latest
+            release: latest-including-prerelease
+            products: Symbolic_Math_Toolbox
+            check-matlab: pause(10); matlabVer = ver('matlab'); assert(~isempty(matlabVer)); assert(endsWith(matlabroot, 'matlab.root') || verLessThan('matlab', '27.1'));
+            check-toolbox: pause(10); symbolicVer = ver('symbolic'); assert(~isempty(symbolicVer));
           - os: macos-15
             release: R2023a
             products: Symbolic_Math_Toolbox

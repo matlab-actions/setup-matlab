@@ -106,6 +106,16 @@ describe("matlab tests", () => {
             ]);
         });
 
+        it("creates cache and returns parent install folder for mac in R2027a and later", async () => {
+            findMock.mockReturnValue("");
+            cacheFileMock.mockResolvedValue("/opt/hostedtoolcache/matlab/r2027a");
+            const r2027a = { ...release, name: "r2027a", version: "2027.1.999" };
+            await expect(matlab.getToolcacheDir("darwin", r2027a)).resolves.toEqual([
+                "/opt/hostedtoolcache/matlab/r2027a",
+                false,
+            ]);
+        });
+
         describe("windows performance workaround", () => {
             let runnerEnv: string | undefined;
             let agentIsSelfHosted: string | undefined;
@@ -184,6 +194,29 @@ describe("matlab tests", () => {
                     false,
                 ]);
             });
+        });
+    });
+
+    describe("getMatlabRoot", () => {
+        const destination = "/opt/hostedtoolcache/MATLAB/2027.1.999/arm64";
+
+        it("returns destination on linux and windows", () => {
+            expect(matlab.getMatlabRoot("linux", "r2027a", destination)).toBe(destination);
+            expect(matlab.getMatlabRoot("win32", "r2027a", destination)).toBe(destination);
+        });
+
+        it("returns destination on mac before R2027a", () => {
+            const appPath = "/opt/hostedtoolcache/MATLAB/2026.2.999/arm64/MATLAB.app";
+            expect(matlab.getMatlabRoot("darwin", "r2026b", appPath)).toBe(appPath);
+        });
+
+        it("returns matlab.root folder on mac in R2027a and later", () => {
+            expect(matlab.getMatlabRoot("darwin", "r2027a", destination)).toBe(
+                `${destination}/MATLAB_R2027a/matlab.root`,
+            );
+            expect(matlab.getMatlabRoot("darwin", "r2027b", destination)).toBe(
+                `${destination}/MATLAB_R2027b/matlab.root`,
+            );
         });
     });
 

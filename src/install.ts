@@ -146,8 +146,9 @@ export async function install(
             core.saveState(State.InstallSuccessful, "true");
         }
 
-        core.addPath(path.join(destination, "bin"));
-        core.setOutput("matlabroot", destination);
+        const matlabRoot = matlab.getMatlabRoot(platform, releaseInfo.name, destination);
+        core.addPath(path.join(matlabRoot, "bin"));
+        core.setOutput("matlabroot", matlabRoot);
 
         await matlab.setupBatch(platform, matlabArch);
 

@@ -16,6 +16,7 @@ jest.unstable_mockModule("./matlab.js", () => ({
     installSystemDependencies: jest.fn(),
     getReleaseInfo: jest.fn(),
     getToolcacheDir: jest.fn(),
+    getMatlabRoot: jest.fn(),
     setupBatch: jest.fn(),
     getSupportPackagesPath: jest.fn(),
 }));
@@ -125,6 +126,7 @@ describe("install procedure", () => {
     let matlabGetReleaseInfoMock: jest.Mock<typeof matlab.getReleaseInfo>;
     let matlabGetToolcacheDirMock: jest.Mock<typeof matlab.getToolcacheDir>;
     let matlabSetupBatchMock: jest.Mock<typeof matlab.setupBatch>;
+    let matlabGetMatlabRootMock: jest.Mock<typeof matlab.getMatlabRoot>;
     let mpmSetupMock: jest.Mock<typeof mpm.setup>;
     let mpmInstallMock: jest.Mock<typeof mpm.install>;
     let saveStateMock: jest.Mock<typeof core.saveState>;
@@ -160,6 +162,10 @@ describe("install procedure", () => {
             typeof matlab.getToolcacheDir
         >;
         matlabSetupBatchMock = matlab.setupBatch as jest.Mock<typeof matlab.setupBatch>;
+        matlabGetMatlabRootMock = matlab.getMatlabRoot as jest.Mock<typeof matlab.getMatlabRoot>;
+        matlabGetMatlabRootMock.mockImplementation(
+            (_platform, _release, destination) => destination,
+        );
         mpmSetupMock = mpm.setup as jest.Mock<typeof mpm.setup>;
         mpmInstallMock = mpm.install as jest.Mock<typeof mpm.install>;
         saveStateMock = core.saveState as jest.Mock<typeof core.saveState>;
@@ -191,6 +197,19 @@ describe("install procedure", () => {
         expect(saveStateMock).toHaveBeenCalledWith(State.InstallSuccessful, "true");
         expect(addPathMock).toHaveBeenCalledTimes(1);
         expect(setOutputMock).toHaveBeenCalledTimes(1);
+    });
+
+    it("adds matlabroot bin folder to path and sets matlabroot output", async () => {
+        const matlabRoot = "/opt/hostedtoolcache/MATLAB/9.13.0/x64/MATLAB_R2022b/matlab.root";
+        matlabGetMatlabRootMock.mockReturnValue(matlabRoot);
+        await expect(doInstall()).resolves.toBeUndefined();
+        expect(matlabGetMatlabRootMock).toHaveBeenCalledWith(
+            platform,
+            releaseInfo.name,
+            "/opt/hostedtoolcache/MATLAB/9.13.0/x64",
+        );
+        expect(addPathMock).toHaveBeenCalledWith(`${matlabRoot}/bin`);
+        expect(setOutputMock).toHaveBeenCalledWith("matlabroot", matlabRoot);
     });
 
     it("re-calls MPM install even if MATLAB already exists in toolcache", async () => {
