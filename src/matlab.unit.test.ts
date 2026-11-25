@@ -106,6 +106,26 @@ describe("matlab tests", () => {
             ]);
         });
 
+        it("creates cache and returns app path for mac in R2026b", async () => {
+            findMock.mockReturnValue("");
+            cacheFileMock.mockResolvedValue("/opt/hostedtoolcache/matlab/r2026b");
+            const r2026b = { ...release, name: "r2026b", version: "2026.2.999" };
+            await expect(matlab.getToolcacheDir("darwin", r2026b)).resolves.toEqual([
+                "/opt/hostedtoolcache/matlab/r2026b/MATLAB.app",
+                false,
+            ]);
+        });
+
+        it("creates cache and returns parent install folder for mac in R2027a and later", async () => {
+            findMock.mockReturnValue("");
+            cacheFileMock.mockResolvedValue("/opt/hostedtoolcache/matlab/r2027a");
+            const r2027a = { ...release, name: "r2027a", version: "2027.1.999" };
+            await expect(matlab.getToolcacheDir("darwin", r2027a)).resolves.toEqual([
+                "/opt/hostedtoolcache/matlab/r2027a",
+                false,
+            ]);
+        });
+
         describe("windows performance workaround", () => {
             let runnerEnv: string | undefined;
             let agentIsSelfHosted: string | undefined;
@@ -184,6 +204,29 @@ describe("matlab tests", () => {
                     false,
                 ]);
             });
+        });
+    });
+
+    describe("getMatlabRoot", () => {
+        const destination = "/opt/hostedtoolcache/MATLAB/2027.1.999/arm64";
+
+        it("returns destination on linux and windows", () => {
+            expect(matlab.getMatlabRoot("linux", "r2027a", destination)).toBe(destination);
+            expect(matlab.getMatlabRoot("win32", "r2027a", destination)).toBe(destination);
+        });
+
+        it("returns destination on mac before R2027a", () => {
+            const appPath = "/opt/hostedtoolcache/MATLAB/2026.2.999/arm64/MATLAB.app";
+            expect(matlab.getMatlabRoot("darwin", "r2026b", appPath)).toBe(appPath);
+        });
+
+        it("returns matlab.root folder on mac in R2027a and later", () => {
+            expect(matlab.getMatlabRoot("darwin", "r2027a", destination)).toBe(
+                `${destination}/MATLAB_R2027a/matlab.root`,
+            );
+            expect(matlab.getMatlabRoot("darwin", "r2027b", destination)).toBe(
+                `${destination}/MATLAB_R2027b/matlab.root`,
+            );
         });
     });
 
@@ -324,6 +367,45 @@ describe("matlab tests", () => {
                 isPrerelease: false,
             };
             expect(matlab.getReleaseInfo("R2022bU2")).resolves.toEqual(releaseWithUpdate);
+        });
+
+        it("allows specifying a prerelease", async () => {
+            const prerelease = {
+                name: "r2027a",
+                update: "",
+                version: "2027.1.999-prerelease",
+                isPrerelease: true,
+            };
+            await expect(matlab.getReleaseInfo("R2027aPrerelease")).resolves.toEqual(prerelease);
+            await expect(matlab.getReleaseInfo(" r2027aprerelease ")).resolves.toEqual(prerelease);
+        });
+
+        it("allows specifying a prerelease update", async () => {
+            await expect(matlab.getReleaseInfo("R2027aPrereleaseU4")).resolves.toEqual({
+                name: "r2027a",
+                update: "u4",
+                version: "2027.1.4-prerelease",
+                isPrerelease: true,
+            });
+        });
+
+        it("allows multi-digit update numbers", async () => {
+            await expect(matlab.getReleaseInfo("R2022bU10")).resolves.toMatchObject({
+                update: "u10",
+                version: "2022.2.10",
+            });
+        });
+
+        it("rejects a prerelease with the update before prerelease", async () => {
+            await expect(matlab.getReleaseInfo("R2027aU1Prerelease")).rejects.toThrow(
+                "Specify a prerelease as R20XXyPrerelease or R20XXyPrereleaseUn",
+            );
+        });
+
+        it("rejects invalid text after prerelease", async () => {
+            await expect(matlab.getReleaseInfo("R2027aPrereleaseX")).rejects.toThrow(
+                "x is not a valid update release name.",
+            );
         });
 
         it("displays message for invalid update level input format and uses latest", () => {

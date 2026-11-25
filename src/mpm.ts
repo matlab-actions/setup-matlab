@@ -75,7 +75,8 @@ export async function install(
     platform: string,
     architecture: string,
 ) {
-    const mpmRelease = release.name + release.update + (release.isPrerelease ? "prerelease" : "");
+    // mpm expects R20XXy, R20XXyUn, R20XXyPrerelease, or R20XXyPrereleaseUn
+    const mpmRelease = release.name + (release.isPrerelease ? "prerelease" : "") + release.update;
     // remove spaces and flatten product list
     let parsedProducts = products.flatMap((p) => p.split(/[ ]+/));
     // Add MATLAB by default

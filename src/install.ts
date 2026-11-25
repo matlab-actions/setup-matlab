@@ -146,16 +146,17 @@ export async function install(
             core.saveState(State.InstallSuccessful, "true");
         }
 
-        core.addPath(path.join(destination, "bin"));
-        core.setOutput("matlabroot", destination);
+        const matlabRoot = matlab.getMatlabRoot(platform, releaseInfo.name, destination);
+        core.addPath(path.join(matlabRoot, "bin"));
+        core.setOutput("matlabroot", matlabRoot);
 
         await matlab.setupBatch(platform, matlabArch);
 
         if (platform === "win32") {
             if (matlabArch === "x86") {
-                core.addPath(path.join(destination, "runtime", "win32"));
+                core.addPath(path.join(matlabRoot, "runtime", "win32"));
             } else {
-                core.addPath(path.join(destination, "runtime", "win64"));
+                core.addPath(path.join(matlabRoot, "runtime", "win64"));
             }
         }
     });
