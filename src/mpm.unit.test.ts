@@ -197,6 +197,21 @@ describe("mpm install", () => {
         expect(execMock.mock.calls[0][1]).toEqual(expectedMpmArgs);
     });
 
+    it("puts update after prerelease for prerelease updates", async () => {
+        const prereleaseInfo = {
+            name: "r2027a",
+            version: "2027.1.4-prerelease",
+            update: "u4",
+            isPrerelease: true,
+        };
+        execMock.mockResolvedValue(0);
+
+        await expect(
+            mpm.install(mpmPath, prereleaseInfo, ["MATLAB"], "/opt/matlab", platform, arch),
+        ).resolves.toBeUndefined();
+        expect(execMock.mock.calls[0][1]).toContain("--release=r2027aprereleaseu4");
+    });
+
     it("omits --caller with maci64 mpm", async () => {
         const destination = "/opt/matlab";
         const products = ["MATLAB", "Compiler"];

@@ -200,7 +200,7 @@ export async function getReleaseInfo(release: string): Promise<Release> {
             );
         }
     } else {
-        const nameMatch = trimmedRelease.match(/r[0-9]{4}[a-b]/);
+        const nameMatch = trimmedRelease.match(/r[0-9]{4}[a-b](prerelease)?/);
         if (!nameMatch) {
             return Promise.reject(
                 Error(
@@ -211,6 +211,22 @@ export async function getReleaseInfo(release: string): Promise<Release> {
         name = nameMatch[0];
     }
 
+    const isLatest =
+        trimmedRelease === "latest" || trimmedRelease === "latest-including-prerelease";
+    // The release name with any prerelease suffix, e.g. r2027aprerelease
+    const fullName = name;
+    if (name.endsWith("prerelease")) {
+        name = name.slice(0, -"prerelease".length);
+        isPrerelease = true;
+    } else if (!isLatest && trimmedRelease.includes("prerelease")) {
+        // e.g. R2027aU1Prerelease, which mpm does not support
+        return Promise.reject(
+            Error(
+                `${release} is invalid. Specify a prerelease as R20XXyPrerelease or R20XXyPrereleaseUn.`,
+            ),
+        );
+    }
+
     // create semantic version of format year.semiannual.update from release
     const year = name.slice(1, 5);
     const semiannual = name[5] === "a" ? "1" : "2";
@@ -219,24 +235,18 @@ export async function getReleaseInfo(release: string): Promise<Release> {
     let update: string;
     if (updateMatch) {
         update = updateMatch[0];
-        version += `.${update[1]}`;
+        version += `.${update.slice(1)}`;
     } else {
         // Notify user if Update version format is invalid
-        if (
-            trimmedRelease !== name &&
-            trimmedRelease !== "latest" &&
-            trimmedRelease !== "latest-including-prerelease"
-        ) {
-            const invalidUpdate = trimmedRelease.replace(name, "");
+        if (trimmedRelease !== fullName && !isLatest) {
+            const invalidUpdate = trimmedRelease.replace(fullName, "");
             return Promise.reject(Error(`${invalidUpdate} is not a valid update release name.`));
         }
         update = "";
         version += ".999";
-        if (name.includes("prerelease")) {
-            name = name.replace("prerelease", "");
-            version += "-prerelease";
-            isPrerelease = true;
-        }
+    }
+    if (isPrerelease) {
+        version += "-prerelease";
     }
 
     return {

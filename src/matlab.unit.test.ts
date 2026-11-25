@@ -369,6 +369,45 @@ describe("matlab tests", () => {
             expect(matlab.getReleaseInfo("R2022bU2")).resolves.toEqual(releaseWithUpdate);
         });
 
+        it("allows specifying a prerelease", async () => {
+            const prerelease = {
+                name: "r2027a",
+                update: "",
+                version: "2027.1.999-prerelease",
+                isPrerelease: true,
+            };
+            await expect(matlab.getReleaseInfo("R2027aPrerelease")).resolves.toEqual(prerelease);
+            await expect(matlab.getReleaseInfo(" r2027aprerelease ")).resolves.toEqual(prerelease);
+        });
+
+        it("allows specifying a prerelease update", async () => {
+            await expect(matlab.getReleaseInfo("R2027aPrereleaseU4")).resolves.toEqual({
+                name: "r2027a",
+                update: "u4",
+                version: "2027.1.4-prerelease",
+                isPrerelease: true,
+            });
+        });
+
+        it("allows multi-digit update numbers", async () => {
+            await expect(matlab.getReleaseInfo("R2022bU10")).resolves.toMatchObject({
+                update: "u10",
+                version: "2022.2.10",
+            });
+        });
+
+        it("rejects a prerelease with the update before prerelease", async () => {
+            await expect(matlab.getReleaseInfo("R2027aU1Prerelease")).rejects.toThrow(
+                "Specify a prerelease as R20XXyPrerelease or R20XXyPrereleaseUn",
+            );
+        });
+
+        it("rejects invalid text after prerelease", async () => {
+            await expect(matlab.getReleaseInfo("R2027aPrereleaseX")).rejects.toThrow(
+                "x is not a valid update release name.",
+            );
+        });
+
         it("displays message for invalid update level input format and uses latest", () => {
             expect(matlab.getReleaseInfo("r2022bUpdate1")).rejects.toBeDefined();
         });
